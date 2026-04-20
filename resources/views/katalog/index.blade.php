@@ -382,18 +382,6 @@
         font-weight: 500;
     }
 
-    .book-isbn {
-        font-size: 11px;
-        color: #999;
-        margin-top: 10px;
-        padding-top: 8px;
-        border-top: 1px solid #f0f0f0;
-    }
-
-    .book-isbn i {
-        margin-right: 5px;
-    }
-
     /* Empty State */
     .empty-state {
         text-align: center;
@@ -513,7 +501,6 @@
                         @if($book->penerbit)
                         | <i class="fas fa-building"></i> {{ $book->penerbit }}
                         @endif
-                        | <i class="fas fa-barcode"></i> ISBN: {{ $book->isbn ?? 'Tidak tersedia' }}
                     </div>
                 </div>
                 <div class="rekomendasi-stats">
@@ -580,11 +567,6 @@
                         <div class="book-kategori">
                             <i class="fas fa-tag me-1"></i> {{ $book->kategori->nama ?? 'Tanpa Kategori' }}
                         </div>
-                        @if($book->isbn)
-                        <div class="book-isbn">
-                            <i class="fas fa-barcode"></i> ISBN: {{ $book->isbn }}
-                        </div>
-                        @endif
                     </div>
                 </div>
                 @endforeach
@@ -710,7 +692,6 @@
                         <div class="book-kategori">
                             <i class="fas fa-tag me-1"></i> ${escapeHtml(book.kategori?.nama || 'Tanpa Kategori')}
                         </div>
-                        ${book.isbn ? `<div class="book-isbn"><i class="fas fa-barcode"></i> ISBN: ${escapeHtml(book.isbn)}</div>` : ''}
                     </div>
                 </div>
             `;
