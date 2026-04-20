@@ -4,807 +4,349 @@
 
 @section('content')
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+    /* 1. MENGHILANGKAN SIDEBAR & RESET LAYOUT */
+    /* Ganti selector di bawah sesuai dengan class/id sidebar di layouts.app kamu */
+    .sidebar, #sidebar-wrapper, .nav-sidebar { display: none !important; }
+    .main-content, #page-content-wrapper, .content-wrapper { 
+        margin-left: 0 !important; 
+        width: 100% !important; 
+        padding: 0 !important;
+        background: #0f0c29 !important;
     }
 
     body {
+        background: #0f0c29;
         font-family: 'Inter', sans-serif;
-        background: linear-gradient(135deg, #0f0c29 0%, #1a1a3e 50%, #24243e 100%);
-        min-height: 100vh;
         color: #fff;
     }
 
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-        width: 8px;
+    .container-custom {
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 0 40px;
     }
 
-    ::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 10px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: linear-gradient(135deg, #7c9bff, #b38dff, #ff9bc4);
-        border-radius: 10px;
-    }
-
-    /* Header Section */
+    /* ========== HEADER SECTION ========== */
     .catalog-header {
-        position: relative;
-        padding: 60px 0 80px;
         text-align: center;
-        overflow: hidden;
-        background: linear-gradient(135deg, rgba(124, 155, 255, 0.15), rgba(179, 141, 255, 0.15), rgba(255, 155, 196, 0.15));
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .catalog-header::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(124, 155, 255, 0.1) 0%, transparent 70%);
-        animation: rotate 20s linear infinite;
-    }
-
-    @keyframes rotate {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+        padding: 50px 0 30px;
     }
 
     .catalog-header h1 {
-        font-size: 48px;
+        font-size: 40px;
         font-weight: 800;
-        background: linear-gradient(135deg, #7c9bff, #b38dff, #ff9bc4);
+        background: linear-gradient(135deg, #d161ff, #ff9bc4);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        background-clip: text;
-        margin-bottom: 15px;
-        position: relative;
-        z-index: 1;
+        margin-bottom: 5px;
     }
 
-    .catalog-header p {
-        font-size: 16px;
-        color: rgba(255, 255, 255, 0.7);
-        position: relative;
-        z-index: 1;
-    }
-
-    /* Container */
-    .container-custom {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 0 30px;
-    }
-
-    /* ========== REKOMENDASI SECTION ========== */
-    .rekomendasi-section {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
-        border-radius: 24px;
+    /* ========== TOP 10 SECTION (HORIZONTAL) ========== */
+    .top-section {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 20px;
         padding: 30px;
-        margin: -40px 0 40px;
         border: 1px solid rgba(255, 255, 255, 0.1);
-        position: relative;
-        z-index: 2;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        margin-bottom: 40px;
     }
 
-    .rekomendasi-header {
+    .top-header {
         display: flex;
-    align-items: center;
         justify-content: space-between;
-        margin-bottom: 30px;
-        flex-wrap: wrap;
-        gap: 15px;
-    }
-
-    .rekomendasi-title {
-        display: flex;
         align-items: center;
-        gap: 12px;
-    }
-
-    .rekomendasi-title i {
-        font-size: 32px;
-        background: linear-gradient(135deg, #ffd700, #ff9bc4);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    .rekomendasi-title h2 {
-        font-size: 24px;
-        font-weight: 700;
-        background: linear-gradient(135deg, #fff, rgba(255,255,255,0.8));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    .rekomendasi-badge {
-        background: linear-gradient(135deg, rgba(124, 155, 255, 0.2), rgba(179, 141, 255, 0.2));
-        padding: 8px 20px;
-        border-radius: 50px;
-        font-size: 13px;
-        color: #a8c0ff;
-        border: 1px solid rgba(124, 155, 255, 0.3);
-    }
-
-    /* List Rekomendasi */
-    .rekomendasi-list {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .rekomendasi-item {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        padding: 18px 20px;
-        background: rgba(255, 255, 255, 0.03);
-        border-radius: 16px;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .rekomendasi-item:hover {
-        background: rgba(124, 155, 255, 0.1);
-        transform: translateX(8px);
-        border-color: rgba(124, 155, 255, 0.3);
-    }
-
-    .rank-number {
-        width: 50px;
-        height: 50px;
-        background: linear-gradient(135deg, #7c9bff, #b38dff);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 800;
-        font-size: 22px;
-        flex-shrink: 0;
-        box-shadow: 0 5px 15px rgba(124, 155, 255, 0.3);
-    }
-
-    .rank-1 {
-        background: linear-gradient(135deg, #ffd700, #ff9bc4);
-        box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
-    }
-
-    .rank-2 {
-        background: linear-gradient(135deg, #c0c0c0, #a8c0ff);
-    }
-
-    .rank-3 {
-        background: linear-gradient(135deg, #cd7f32, #ff9bc4);
-    }
-
-    .rekomendasi-info {
-        flex: 1;
-    }
-
-    .rekomendasi-judul {
-        font-weight: 700;
-        font-size: 18px;
-        color: #fff;
-        margin-bottom: 8px;
-    }
-
-    .rekomendasi-meta {
-        font-size: 13px;
-        color: rgba(255, 255, 255, 0.6);
-    }
-
-    .rekomendasi-meta i {
-        margin-right: 6px;
-        color: #7c9bff;
-    }
-
-    .rekomendasi-stats {
-        font-size: 14px;
-        font-weight: 600;
-        background: linear-gradient(135deg, #7c9bff, #ff9bc4);
-        padding: 8px 16px;
-        border-radius: 30px;
-        flex-shrink: 0;
-    }
-
-    /* ========== SEARCH & FILTER ========== */
-    .search-filter-section {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
-        padding: 25px;
-        margin-bottom: 30px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .search-box {
-        display: flex;
-        gap: 15px;
-        margin-bottom: 25px;
-    }
-
-    .search-box input {
-        flex: 1;
-        padding: 16px 24px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 60px;
-        font-size: 14px;
-        color: #fff;
-        transition: all 0.3s;
-    }
-
-    .search-box input::placeholder {
-        color: rgba(255, 255, 255, 0.4);
-    }
-
-    .search-box input:focus {
-        outline: none;
-        border-color: #7c9bff;
-        background: rgba(124, 155, 255, 0.1);
-        box-shadow: 0 0 20px rgba(124, 155, 255, 0.2);
-    }
-
-    .search-box button {
-        background: linear-gradient(135deg, #7c9bff, #b38dff);
-        border: none;
-        border-radius: 60px;
-        padding: 0 35px;
-        color: white;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-
-    .search-box button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(124, 155, 255, 0.4);
-    }
-
-    .filter-info {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 20px;
-    }
-
-    .total-buku {
-        font-size: 14px;
-        color: rgba(255, 255, 255, 0.7);
-        padding: 8px 16px;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 30px;
-    }
-
-    .total-buku i {
-        margin-right: 8px;
-        color: #7c9bff;
-    }
-
-    .kategori-filter {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
-
-    .kategori-label {
-        font-size: 14px;
-        font-weight: 500;
-        color: rgba(255, 255, 255, 0.8);
-    }
-
-    .filter-chip {
-        padding: 8px 22px;
-        border-radius: 30px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        cursor: pointer;
-        transition: all 0.3s;
-        font-size: 13px;
-        font-weight: 500;
-        color: rgba(255, 255, 255, 0.7);
-    }
-
-    .filter-chip:hover {
-        background: rgba(124, 155, 255, 0.2);
-        border-color: #7c9bff;
-        transform: translateY(-2px);
-    }
-
-    .filter-chip.active {
-        background: linear-gradient(135deg, #7c9bff, #b38dff);
-        color: white;
-        border-color: transparent;
-    }
-
-    /* ========== KATALOG BUKU ========== */
-    .katalog-section {
-        background: rgba(255, 255, 255, 0.03);
-        backdrop-filter: blur(5px);
-        border-radius: 24px;
-        padding: 30px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .katalog-header {
-        margin-bottom: 30px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .katalog-header h3 {
-        font-size: 22px;
-        font-weight: 700;
-        color: #fff;
-    }
-
-    .katalog-header h3 i {
-        background: linear-gradient(135deg, #7c9bff, #ff9bc4);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-right: 10px;
-    }
-
-    .books-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 25px;
-    }
-
-    .book-card {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 20px;
-        overflow: hidden;
-        transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-        cursor: pointer;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        backdrop-filter: blur(10px);
-    }
-
-    .book-card:hover {
-        transform: translateY(-8px);
-        background: rgba(255, 255, 255, 0.1);
-        border-color: rgba(124, 155, 255, 0.4);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    }
-
-    .book-cover {
-        height: 200px;
-        background: linear-gradient(135deg, rgba(124, 155, 255, 0.2), rgba(179, 141, 255, 0.2));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-    }
-
-    .book-cover img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .book-cover i {
-        font-size: 60px;
-        background: linear-gradient(135deg, #7c9bff, #ff9bc4);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    .stock-badge {
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        padding: 5px 14px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 600;
-        backdrop-filter: blur(10px);
-    }
-
-    .stock-badge.available {
-        background: rgba(16, 185, 129, 0.9);
-        color: white;
-    }
-
-    .stock-badge.low {
-        background: rgba(245, 158, 11, 0.9);
-        color: white;
-    }
-
-    .stock-badge.out {
-        background: rgba(239, 68, 68, 0.9);
-        color: white;
-    }
-
-    .book-info {
-        padding: 18px;
-    }
-
-    .book-judul {
-        font-size: 16px;
-        font-weight: 700;
-        color: #fff;
-        margin-bottom: 8px;
-        line-height: 1.4;
-    }
-
-    .book-penulis {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.6);
-        margin-bottom: 12px;
-    }
-
-    .book-penulis i {
-        margin-right: 6px;
-        color: #7c9bff;
-    }
-
-    .book-kategori {
-        display: inline-block;
-        font-size: 11px;
-        background: linear-gradient(135deg, rgba(124, 155, 255, 0.2), rgba(179, 141, 255, 0.2));
-        padding: 5px 14px;
-        border-radius: 20px;
-        color: #a8c0ff;
-        font-weight: 500;
-    }
-
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 80px 20px;
-        background: rgba(255, 255, 255, 0.03);
-        border-radius: 20px;
-    }
-
-    .empty-state i {
-        font-size: 80px;
-        background: linear-gradient(135deg, #7c9bff, #ff9bc4);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
         margin-bottom: 20px;
     }
 
-    .empty-state h4 {
-        font-size: 20px;
+    .top-title h2 {
+        color: #ff9d76;
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .btn-real-data {
+        background: rgba(255, 165, 0, 0.1);
+        color: #ffcc00;
+        border: 1px solid rgba(255, 204, 0, 0.5);
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+
+    .horizontal-scroll {
+        display: flex;
+        gap: 20px;
+        overflow-x: auto;
+        padding-bottom: 15px;
+        scroll-behavior: smooth;
+    }
+
+    .horizontal-scroll::-webkit-scrollbar { height: 6px; }
+    .horizontal-scroll::-webkit-scrollbar-thumb { background: #d161ff; border-radius: 10px; }
+
+    .top-card {
+        min-width: 180px;
+        position: relative;
+    }
+
+    .rank-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: #ffcc00;
+        color: #000;
+        font-weight: 900;
+        padding: 2px 10px;
+        border-radius: 6px;
+        z-index: 5;
+    }
+
+    .top-card img {
+        width: 180px;
+        height: 260px;
+        object-fit: cover;
+        border-radius: 12px;
+        transition: transform 0.3s;
+    }
+
+    .top-card:hover img { transform: scale(1.05); }
+
+    /* ========== SEARCH BOX ========== */
+    .search-container {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50px;
+        padding: 8px 30px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 40px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .search-container input, .search-container select {
+        background: transparent;
+        border: none;
         color: #fff;
+        padding: 10px;
+        outline: none;
+    }
+
+    .search-container input { flex: 2; border-right: 1px solid rgba(255,255,255,0.1); }
+    .search-container select { flex: 1; color: rgba(255,255,255,0.7); }
+
+    .btn-cari {
+        background: #d161ff;
+        color: white;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 40px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    /* ========== GRID KATALOG ========== */
+    .books-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 25px;
+        padding-bottom: 50px;
+    }
+
+    .book-card {
+        background: transparent;
+        transition: 0.3s;
+    }
+
+    .book-card:hover { transform: translateY(-10px); }
+
+    .poster-wrapper {
+        position: relative;
         margin-bottom: 10px;
     }
 
-    .empty-state p {
-        font-size: 14px;
-        color: rgba(255, 255, 255, 0.5);
+    .poster-wrapper img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        border-radius: 10px;
     }
 
-    /* Loading */
-    .loading {
-        text-align: center;
-        padding: 80px;
+    .stock-tag {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background: rgba(255, 165, 0, 0.9);
+        color: white;
+        padding: 2px 10px;
+        border-radius: 5px;
+        font-size: 11px;
     }
 
-    .loading i {
-        font-size: 50px;
-        background: linear-gradient(135deg, #7c9bff, #ff9bc4);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        animation: spin 1s linear infinite;
+    .book-title {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 2px;
+        color: #fff;
     }
 
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+    .book-author {
+        font-size: 13px;
+        color: rgba(255,255,255,0.5);
     }
 
-    /* Pagination */
-    .pagination-wrapper {
-        margin-top: 40px;
-        display: flex;
-        justify-content: center;
-    }
-
-    .pagination {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    .pagination .page-link {
-        padding: 10px 18px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        color: rgba(255, 255, 255, 0.7);
+    /* Back Button */
+    .btn-back-home {
+        position: fixed;
+        bottom: 30px;
+        left: 30px;
+        background: #a855f7;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 50px;
         text-decoration: none;
-        transition: all 0.3s;
-    }
-
-    .pagination .page-link:hover {
-        background: linear-gradient(135deg, #7c9bff, #b38dff);
-        color: white;
-        transform: translateY(-2px);
-    }
-
-    .pagination .active .page-link {
-        background: linear-gradient(135deg, #7c9bff, #b38dff);
-        color: white;
-        border-color: transparent;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .container-custom { padding: 0 20px; }
-        .catalog-header h1 { font-size: 32px; }
-        .rekomendasi-header { flex-direction: column; align-items: flex-start; }
-        .rekomendasi-item { flex-wrap: wrap; }
-        .rank-number { width: 40px; height: 40px; font-size: 18px; }
-        .rekomendasi-judul { font-size: 15px; }
-        .books-grid { grid-template-columns: 1fr; }
-        .search-box { flex-direction: column; }
-        .filter-info { flex-direction: column; align-items: flex-start; }
-        .kategori-filter { width: 100%; overflow-x: auto; }
-    }
-
-    @media (max-width: 480px) {
-        .rekomendasi-stats { font-size: 11px; padding: 5px 12px; }
-        .rekomendasi-meta { font-size: 11px; }
+        z-index: 1000;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.4);
     }
 </style>
 
+<a href="{{ url('/') }}" class="btn-back-home">
+    <i class="fas fa-arrow-left me-2"></i> Kembali ke Beranda
+</a>
+
 <div class="catalog-header">
-    <h1><i class="fas fa-book-open me-2"></i>Katalog Buku</h1>
-    <p>Koleksi Buku Perpustakaan SDN Berat Wetan 1</p>
+    <div class="container-custom">
+        <div class="d-flex justify-content-center align-items-center gap-2">
+             <img src="https://img.icons8.com/color/48/open-book.png" alt="book-icon"/>
+             <h1>Katalog Buku</h1>
+        </div>
+        <p>Koleksi Buku Perpustakaan SDN Berat Wetan 1</p>
+    </div>
 </div>
 
 <div class="container-custom">
-    <!-- ==================== REKOMENDASI BUKU POPULER ==================== -->
+    
     @if(isset($popularBooks) && $popularBooks->count() > 0)
-    <div class="rekomendasi-section">
-        <div class="rekomendasi-header">
-            <div class="rekomendasi-title">
-                <i class="fas fa-trophy"></i>
+    <div class="top-section">
+        <div class="top-header">
+            <div class="top-title">
+                <i class="fas fa-trophy text-warning"></i>
                 <h2>Top {{ $popularBooks->count() }} Paling Populer</h2>
+                <p class="text-muted m-0 small">Buku yang paling sering dipinjam murid</p>
             </div>
-            <span class="rekomendasi-badge">
-                <i class="fas fa-chart-line me-1"></i>Buku yang paling sering dipinjam
-            </span>
+            <div class="btn-real-data">
+                <i class="fas fa-chart-line"></i> Berdasarkan data peminjaman real
+            </div>
         </div>
-        <div class="rekomendasi-list">
+
+        <div class="horizontal-scroll">
             @foreach($popularBooks as $index => $book)
-            <div class="rekomendasi-item">
-                <div class="rank-number rank-{{ $index+1 }} @if($index+1 == 1) rank-1 @elseif($index+1 == 2) rank-2 @elseif($index+1 == 3) rank-3 @endif">
-                    {{ $index+1 }}
-                </div>
-                <div class="rekomendasi-info">
-                    <div class="rekomendasi-judul">{{ $book->judul }}</div>
-                    <div class="rekomendasi-meta">
-                        <i class="fas fa-user"></i> {{ $book->penulis ?: 'Penulis tidak diketahui' }}
-                        @if($book->penerbit)
-                        | <i class="fas fa-building"></i> {{ $book->penerbit }}
-                        @endif
+            <div class="top-card">
+                <div class="rank-badge">#{{ $index + 1 }}</div>
+                @if($book->gambar)
+                    <img src="{{ asset('storage/' . $book->gambar) }}" alt="{{ $book->judul }}">
+                @else
+                    <div style="width:180px;height:260px;background:#333;border-radius:12px;display:flex;align-items:center;justify-content:center">
+                        <i class="fas fa-book fa-3x"></i>
                     </div>
-                </div>
-                <div class="rekomendasi-stats">
-                    <i class="fas fa-chart-line me-1"></i> {{ $book->total_dipinjam ?? 0 }}x dipinjam
-                </div>
+                @endif
             </div>
             @endforeach
         </div>
     </div>
     @endif
 
-    <!-- ==================== SEARCH & FILTER ==================== -->
-    <div class="search-filter-section">
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="🔍 Cari judul, penulis, atau penerbit...">
-            <button id="searchBtn"><i class="fas fa-search me-2"></i>Cari</button>
-        </div>
-        <div class="filter-info">
-            <div class="total-buku">
-                <i class="fas fa-book"></i> Total <span id="bookCount">{{ $books->total() }}</span> buku
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Cari judul atau penulis...">
+        <select id="categoryFilter">
+            <option value="">Semua Kategori</option>
+            @foreach($kategoris as $kategori)
+                <option value="{{ $kategori->id }}">{{ $kategori->nama }}</option>
+            @endforeach
+        </select>
+        <button class="btn-cari" id="btnCari">
+            <i class="fas fa-search me-1"></i> Cari
+        </button>
+    </div>
+
+    <div id="booksSection">
+        <div class="books-grid">
+            @foreach($books as $book)
+            <div class="book-card">
+                <div class="poster-wrapper">
+                    @if($book->gambar)
+                        <img src="{{ asset('storage/' . $book->gambar) }}" alt="{{ $book->judul }}">
+                    @else
+                        <div style="height:250px;background:#333;border-radius:10px;display:flex;align-items:center;justify-content:center">
+                            <i class="fas fa-image fa-2x"></i>
+                        </div>
+                    @endif
+                    <div class="stock-tag">Sisa {{ $book->stok }}</div>
+                </div>
+                <div class="book-title">{{ Str::limit($book->judul, 35) }}</div>
+                <div class="book-author">{{ $book->penulis ?? 'Penulis tidak diketahui' }}</div>
+                <div class="mt-2">
+                    <span style="font-size: 11px; background: rgba(255,255,255,0.1); padding: 3px 10px; border-radius: 20px;">
+                        {{ $book->kategori->nama ?? 'Umum' }}
+                    </span>
+                </div>
             </div>
-            <div class="kategori-filter">
-                <span class="kategori-label"><i class="fas fa-tags me-1"></i>Kategori:</span>
-                <button class="filter-chip active" data-category="">Semua Kategori</button>
-                @foreach($kategoris as $kategori)
-                    <button class="filter-chip" data-category="{{ $kategori->id }}">{{ $kategori->nama }}</button>
-                @endforeach
-            </div>
+            @endforeach
         </div>
     </div>
 
-    <!-- ==================== KATALOG BUKU ==================== -->
-    <div class="katalog-section">
-        <div class="katalog-header">
-            <h3><i class="fas fa-layer-group"></i> Koleksi Buku</h3>
-        </div>
-        
-        <div id="booksSection">
-            <div class="books-grid">
-                @foreach($books as $book)
-                <div class="book-card">
-                    <div class="book-cover">
-                        @if($book->gambar)
-                            <img src="{{ asset('storage/' . $book->gambar) }}" alt="{{ $book->judul }}">
-                        @else
-                            <i class="fas fa-book"></i>
-                        @endif
-                        <span class="stock-badge 
-                            @if($book->stok > 5) available 
-                            @elseif($book->stok > 0) low 
-                            @else out @endif">
-                            @if($book->stok > 0)
-                                Sisa {{ $book->stok }}
-                            @else
-                                Habis
-                            @endif
-                        </span>
-                    </div>
-                    <div class="book-info">
-                        <div class="book-judul">{{ Str::limit($book->judul, 45) }}</div>
-                        <div class="book-penulis">
-                            <i class="fas fa-user"></i> {{ Str::limit($book->penulis, 25) ?: 'Penulis tidak diketahui' }}
-                        </div>
-                        <div class="book-kategori">
-                            <i class="fas fa-tag me-1"></i> {{ $book->kategori->nama ?? 'Tanpa Kategori' }}
-                        </div>
-                    </div>
-                </div>
-                @endforeach
-            </div>
-
-            @if($books->count() == 0)
-            <div class="empty-state">
-                <i class="fas fa-book-open"></i>
-                <h4>Belum Ada Buku</h4>
-                <p>Belum ada buku yang tersedia di katalog</p>
-            </div>
-            @endif
-        </div>
-
-        <!-- Pagination -->
-        @if($books->count() > 0)
-        <div class="pagination-wrapper">
-            {{ $books->links() }}
-        </div>
-        @endif
+    <div class="d-flex justify-content-center pb-5">
+        {{ $books->links() }}
     </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    let currentCategory = '';
-    let currentSearch = '';
-
     $(document).ready(function() {
-        $('#searchBtn').on('click', function() {
-            currentSearch = $('#searchInput').val();
-            loadBooks();
+        $('#btnCari').on('click', function() {
+            let search = $('#searchInput').val();
+            let kategori = $('#categoryFilter').val();
+            loadBooks(search, kategori);
         });
 
-        $('#searchInput').on('keypress', function(e) {
-            if (e.which === 13) {
-                currentSearch = $(this).val();
-                loadBooks();
-            }
-        });
-
-        $('.filter-chip').on('click', function() {
-            $('.filter-chip').removeClass('active');
-            $(this).addClass('active');
-            currentCategory = $(this).data('category');
-            loadBooks();
-        });
-    });
-
-    function loadBooks() {
-        $('#booksSection').html('<div class="loading"><i class="fas fa-spinner fa-spin"></i><p>Memuat buku...</p></div>');
-        
-        $.ajax({
-            url: '{{ route("katalog.filter") }}',
-            method: 'GET',
-            data: {
-                kategori: currentCategory,
-                search: currentSearch
-            },
-            success: function(response) {
-                if (response.success) {
-                    displayBooks(response.books);
-                    $('#bookCount').text(response.books.length);
-                } else {
-                    $('#booksSection').html(`
-                        <div class="empty-state">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <h4>Error</h4>
-                            <p>${response.message || 'Gagal memuat buku'}</p>
-                        </div>
-                    `);
-                }
-            },
-            error: function() {
-                $('#booksSection').html(`
-                    <div class="empty-state">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h4>Error</h4>
-                        <p>Gagal memuat data. Silahkan refresh halaman.</p>
-                    </div>
-                `);
-            }
-        });
-    }
-
-    function displayBooks(books) {
-        if (!books || books.length === 0) {
-            let msg = currentSearch ? `Tidak ditemukan "${currentSearch}"` : 'Tidak ada buku yang tersedia';
-            $('#booksSection').html(`
-                <div class="empty-state">
-                    <i class="fas fa-search"></i>
-                    <h4>Tidak Ada Buku</h4>
-                    <p>${msg}</p>
-                    ${(currentSearch || currentCategory) ? '<button class="btn-reset" onclick="resetFilters()" style="margin-top:20px;padding:10px 25px;background:linear-gradient(135deg,#7c9bff,#b38dff);border:none;border-radius:30px;color:white;cursor:pointer;">Reset Filter</button>' : ''}
-                </div>
-            `);
-            return;
-        }
-        
-        let html = `<div class="books-grid">`;
-        
-        books.forEach(book => {
-            let stockClass = book.stok > 5 ? 'available' : (book.stok > 0 ? 'low' : 'out');
-            let stockText = book.stok > 0 ? `Sisa ${book.stok}` : 'Habis';
+        function loadBooks(search, kategori) {
+            $('#booksSection').html('<div class="text-center py-5"><i class="fas fa-spinner fa-spin fa-2x"></i></div>');
             
-            html += `
-                <div class="book-card">
-                    <div class="book-cover">
-                        ${book.gambar ? `<img src="/storage/${book.gambar}" alt="${escapeHtml(book.judul)}">` : 
-                                        `<i class="fas fa-book"></i>`}
-                        <span class="stock-badge ${stockClass}">
-                            ${stockText}
-                        </span>
-                    </div>
-                    <div class="book-info">
-                        <div class="book-judul">${escapeHtml(book.judul)}</div>
-                        <div class="book-penulis">
-                            <i class="fas fa-user"></i> ${escapeHtml(book.penulis) || 'Penulis tidak diketahui'}
-                        </div>
-                        <div class="book-kategori">
-                            <i class="fas fa-tag me-1"></i> ${escapeHtml(book.kategori?.nama || 'Tanpa Kategori')}
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
-        html += `</div>`;
-        
-        $('#booksSection').html(html);
-    }
+            $.ajax({
+                url: '{{ route("katalog.filter") }}',
+                method: 'GET',
+                data: { search: search, kategori: kategori },
+                success: function(response) {
+                    if (response.success) {
+                        renderBooks(response.books);
+                    }
+                }
+            });
+        }
 
-    function escapeHtml(text) {
-        if (!text) return '';
-        return $('<div>').text(text).html();
-    }
+        function renderBooks(books) {
+            if(books.length == 0) {
+                $('#booksSection').html('<div class="text-center py-5">Buku tidak ditemukan.</div>');
+                return;
+            }
 
-    window.resetFilters = function() {
-        currentCategory = '';
-        currentSearch = '';
-        $('#searchInput').val('');
-        $('.filter-chip').removeClass('active');
-        $('.filter-chip[data-category=""]').addClass('active');
-        loadBooks();
-    };
+            let html = '<div class="books-grid">';
+            books.forEach(book => {
+                let img = book.gambar ? `/storage/${book.gambar}` : 'https://via.placeholder.com/180x250';
+                html += `
+                    <div class="book-card">
+                        <div class="poster-wrapper">
+                            <img src="${img}" alt="${book.judul}">
+                            <div class="stock-tag">Sisa ${book.stok}</div>
+                        </div>
+                        <div class="book-title">${book.judul}</div>
+                        <div class="book-author">${book.penulis ?? ''}</div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            $('#booksSection').html(html);
+        }
+    });
 </script>
 @endsection

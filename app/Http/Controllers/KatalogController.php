@@ -12,17 +12,20 @@ class KatalogController extends Controller
 {
     public function index(Request $request)
     {
+        // 1. Ambil data kategori untuk filter
         $kategoris = Category::all();
+
+        // 2. Ambil Top 10 Buku Populer
         $popularBooks = $this->getPopularBooks(10);
 
+        // 3. Query Utama untuk Katalog Bawah
         $query = Book::with('kategori');
 
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('judul', 'LIKE', '%'.$search.'%')
-                  ->orWhere('penulis', 'LIKE', '%'.$search.'%')
-                  ->orWhere('penerbit', 'LIKE', '%'.$search.'%');
+                  ->orWhere('penulis', 'LIKE', '%'.$search.'%');
             });
         }
 
@@ -30,6 +33,7 @@ class KatalogController extends Controller
             $query->where('kategori_id', $request->kategori);
         }
 
+        // Tampilkan yang terbaru dan paginate 12 buku per halaman
         $books = $query->latest()->paginate(12)->withQueryString();
 
         return view('katalog.index', [
@@ -48,106 +52,45 @@ class KatalogController extends Controller
                 $search = $request->search;
                 $query->where(function($q) use ($search) {
                     $q->where('judul', 'LIKE', '%'.$search.'%')
-                      ->orWhere('penulis', 'LIKE', '%'.$search.'%')
-                      ->orWhere('penerbit', 'LIKE', '%'.$search.'%');
+                      ->orWhere('penulis', 'LIKE', '%'.$search.'%');
                 });
             }
 
-            if ($request->filled('kategori') && $request->kategori != '') {
+            if ($request->filled('kategori')) {
                 $query->where('kategori_id', $request->kategori);
             }
 
-            $books = $query->latest()->get();
-
             return response()->json([
                 'success' => true,
-                'books' => $books
+                'books' => $query->latest()->get()
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ]);
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
     }
 
     private function getPopularBooks($limit = 10)
     {
-        $cacheKey = 'popular_books_limit_' . $limit;
+        $cacheKey = 'popular_books_v1_' . $limit;
         
         return Cache::remember($cacheKey, now()->addMinutes(30), function() use ($limit) {
-            if (!$this->hasPinjamanTable()) {
-                return $this->getDefaultPopularBooks($limit);
+            // Cek apakah tabel pinjaman ada
+            if (DB::connection()->getSchemaBuilder()->hasTable('pinjamans')) {
+                $popular = Book::select('books.*', DB::raw('COUNT(pinjamans.id) as total_dipinjam'))
+                    ->leftJoin('pinjamans', 'books.id', '=', 'pinjamans.buku_id')
+                    ->groupBy('books.id')
+                    ->orderBy('total_dipinjam', 'DESC')
+                    ->limit($limit)
+                    ->get();
+
+                // Jika ada data peminjaman, kembalikan
+                if ($popular->sum('total_dipinjam') > 0) {
+                    return $popular;
+                }
             }
 
-            $popularBooks = Book::with('kategori')
-                ->leftJoin('pinjamans', function($join) {
-                    $join->on('books.id', '=', 'pinjamans.buku_id')
-                         ->where('pinjamans.status', '=', 'sudah dikembalikan');
-                })
-                ->select(
-                    'books.id',
-                    'books.judul',
-                    'books.penulis',
-                    'books.penerbit',
-                    'books.tahun_terbit',
-                    'books.gambar',
-                    'books.stok',
-                    'books.kategori_id',
-                    DB::raw('COUNT(pinjamans.id) as total_dipinjam')
-                )
-                ->groupBy(
-                    'books.id',
-                    'books.judul',
-                    'books.penulis',
-                    'books.penerbit',
-                    'books.tahun_terbit',
-                    'books.gambar',
-                    'books.stok',
-                    'books.kategori_id'
-                )
-                ->orderBy('total_dipinjam', 'DESC')
-                ->limit($limit)
-                ->get();
-
-            if ($popularBooks->isEmpty() || $popularBooks->sum('total_dipinjam') == 0) {
-                return $this->getDefaultPopularBooks($limit);
-            }
-
-            return $popularBooks;
+            // Jika belum ada data pinjaman, ambil berdasarkan stok terbanyak sebagai default
+            return Book::orderBy('stok', 'DESC')->limit($limit)->get();
         });
-    }
-
-    private function getDefaultPopularBooks($limit)
-    {
-        return Book::with('kategori')
-            ->orderBy('stok', 'DESC')
-            ->limit($limit)
-            ->get()
-            ->map(function($book) {
-                $book->total_dipinjam = 0;
-                return $book;
-            });
-    }
-
-    private function hasPinjamanTable()
-    {
-        try {
-            return DB::connection()->getSchemaBuilder()->hasTable('pinjamans');
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
-    public function clearRecommendationCache()
-    {
-        Cache::forget('popular_books_limit_10');
-        Cache::forget('popular_books_limit_5');
-        
-        if (request()->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Cache rekomendasi berhasil dihapus']);
-        }
-        
-        return back()->with('success', 'Cache rekomendasi berhasil dihapus');
     }
 }
