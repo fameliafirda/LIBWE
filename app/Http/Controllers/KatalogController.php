@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Book;
 use App\Models\Category;
+use App\Models\Rak;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -18,8 +19,10 @@ class KatalogController extends Controller
         // Ambil semua kategori
         $kategoris = Category::all();
 
+        // 🔥 TAMBAHAN FIX: ambil data rak (INI YANG KURANG)
+        $raks = Rak::all();
+
         // ==================== REKOMENDASI BUKU POPULER ====================
-        // Ambil 10 buku paling sering dipinjam (diurutkan dari tertinggi ke terendah)
         $popularBooks = $this->getPopularBooks(10);
 
         // ==================== QUERY KATALOG BUKU ====================
@@ -47,28 +50,21 @@ class KatalogController extends Controller
             'books' => $books,
             'kategoris' => $kategoris,
             'popularBooks' => $popularBooks,
+
+            // 🔥 FIX INI PENTING
+            'raks' => $raks,
         ]);
     }
 
-    /**
-     * Get popular books based on borrowing history from pinjamans table.
-     * Diurutkan dari yang paling banyak dipinjam ke yang paling sedikit
-     * 
-     * @param int $limit Jumlah buku yang ditampilkan (default 10)
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
     private function getPopularBooks($limit = 10)
     {
         $cacheKey = 'popular_books_limit_' . $limit;
         
         return Cache::remember($cacheKey, now()->addMinutes(30), function() use ($limit) {
-            // Cek apakah tabel pinjamans ada
             if (!$this->hasPinjamanTable()) {
                 return collect();
             }
 
-            // Query untuk mendapatkan buku paling sering dipinjam
-            // Diurutkan dari total_dipinjam TERTINGGI ke TERENDAH
             $popularBooks = Book::with('kategori')
                 ->leftJoin('pinjamans', function($join) {
                     $join->on('books.id', '=', 'pinjamans.buku_id')
@@ -95,11 +91,10 @@ class KatalogController extends Controller
                     'books.stok',
                     'books.kategori_id'
                 )
-                ->orderBy('total_dipinjam', 'DESC') // 🔥 URUTAN DARI TERBANYAK KE TERSEDIKIT
+                ->orderBy('total_dipinjam', 'DESC')
                 ->limit($limit)
                 ->get();
 
-            // Jika tidak ada data peminjaman sama sekali, tampilkan berdasarkan stok terbanyak
             if ($popularBooks->isEmpty() || $popularBooks->sum('total_dipinjam') == 0) {
                 return Book::with('kategori')
                     ->orderBy('stok', 'DESC')
@@ -115,9 +110,6 @@ class KatalogController extends Controller
         });
     }
 
-    /**
-     * Check if pinjamans table exists.
-     */
     private function hasPinjamanTable()
     {
         try {
@@ -127,17 +119,14 @@ class KatalogController extends Controller
         }
     }
 
-    /**
-     * Clear popular books cache.
-     */
     public function clearRecommendationCache()
     {
         Book::clearPopularBooksCache();
         
         if (request()->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Cache rekomendasi berhasil dihapus']);
+            return response()->json(['success' => true]);
         }
         
-        return back()->with('success', 'Cache rekomendasi berhasil dihapus');
+        return back()->with('success', 'Cache berhasil dihapus');
     }
 }
