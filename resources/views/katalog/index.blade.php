@@ -82,6 +82,7 @@
         background-clip: text;
     }
 
+    /* Search & Filter Section */
     .search-filter-section {
         background: var(--glass-bg);
         backdrop-filter: blur(12px);
@@ -137,6 +138,7 @@
         color: white;
     }
 
+    /* Books Grid */
     .books-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -165,6 +167,12 @@
         justify-content: center;
         object-fit: cover;
         width: 100%;
+    }
+
+    .book-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 
     .book-cover i {
@@ -250,7 +258,8 @@
         margin-top: 20px;
     }
 
-    .popular-books-section {
+    /* Popular Books Section */
+    .popular-section {
         background: var(--glass-bg);
         backdrop-filter: blur(12px);
         border-radius: var(--radius);
@@ -258,17 +267,91 @@
         margin-bottom: 32px;
     }
 
-    .popular-books-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 20px;
-        margin-top: 20px;
+    .popular-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid rgba(0,0,0,0.05);
+    }
+
+    .popular-title i {
+        font-size: 28px;
+        color: #ff6d00;
+    }
+
+    .popular-title h3 {
+        font-size: 20px;
+        font-weight: 700;
+        margin: 0;
+        color: var(--text-dark);
+    }
+
+    .popular-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .popular-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 12px;
+        background: rgba(255,255,255,0.5);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .popular-item:hover {
+        background: white;
+        transform: translateX(5px);
+    }
+
+    .rank-number {
+        width: 40px;
+        height: 40px;
+        background: var(--pastel-purple);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 16px;
+    }
+
+    .rank-1 { background: #ffd700; color: #333; }
+    .rank-2 { background: #c0c0c0; color: #333; }
+    .rank-3 { background: #cd7f32; color: white; }
+
+    .popular-info {
+        flex: 1;
+    }
+
+    .popular-judul {
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text-dark);
+        margin-bottom: 4px;
+    }
+
+    .popular-meta {
+        font-size: 11px;
+        color: var(--text-gray);
+    }
+
+    .popular-stats {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--pastel-purple);
     }
 
     @media (max-width: 768px) {
         .page-header h1 { font-size: 24px; }
         .books-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
-        .popular-books-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
     }
 </style>
 
@@ -287,35 +370,33 @@
         </div>
     @endif
 
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show mb-4" style="border-radius: 16px;">
-            <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
     <!-- Popular Books Section -->
     @if(isset($popularBooks) && $popularBooks->count() > 0)
-    <div class="popular-books-section">
-        <h4><i class="fas fa-fire text-danger me-2"></i>Rekomendasi Buku Populer</h4>
-        <p class="text-muted small">Buku paling sering dipinjam oleh anggota</p>
-        <div class="popular-books-grid">
-            @foreach($popularBooks as $book)
-            <div class="book-card" onclick="window.location.href='{{ route('books.show', $book->id) }}'">
-                @if($book->gambar)
-                    <img src="{{ asset('storage/' . $book->gambar) }}" class="book-cover" alt="{{ $book->judul }}">
-                @else
-                    <div class="book-cover"><i class="fas fa-book"></i></div>
-                @endif
-                <div class="book-info">
-                    <h6 class="book-title">{{ Str::limit($book->judul, 40) }}</h6>
-                    <p class="book-author">{{ Str::limit($book->penulis, 25) ?: 'Penulis tidak diketahui' }}</p>
-                    <span class="book-category">{{ $book->kategori->nama ?? 'Tanpa Kategori' }}</span>
-                    <div class="mt-2">
-                        <small class="text-muted">
-                            <i class="fas fa-chart-line"></i> {{ $book->total_dipinjam ?? 0 }} kali dipinjam
-                        </small>
+    <div class="popular-section">
+        <div class="popular-title">
+            <i class="fas fa-trophy"></i>
+            <h3>Top {{ $popularBooks->count() }} Buku Paling Populer</h3>
+        </div>
+        <div class="popular-list">
+            @foreach($popularBooks as $index => $book)
+            <div class="popular-item">
+                <div class="rank-number rank-{{ $index+1 }} @if($index+1 == 1) rank-1 @elseif($index+1 == 2) rank-2 @elseif($index+1 == 3) rank-3 @endif">
+                    {{ $index+1 }}
+                </div>
+                <div class="popular-info">
+                    <div class="popular-judul">{{ $book->judul }}</div>
+                    <div class="popular-meta">
+                        <i class="fas fa-user me-1"></i>{{ $book->penulis ?: 'Penulis tidak diketahui' }}
+                        @if($book->penerbit)
+                        | <i class="fas fa-building me-1"></i>{{ $book->penerbit }}
+                        @endif
                     </div>
+                    <div class="popular-meta">
+                        <i class="fas fa-barcode me-1"></i>ISBN: {{ $book->isbn ?? 'Tidak tersedia' }}
+                    </div>
+                </div>
+                <div class="popular-stats">
+                    <i class="fas fa-chart-line me-1"></i>{{ $book->total_dipinjam ?? 0 }}x dipinjam
                 </div>
             </div>
             @endforeach
@@ -325,19 +406,13 @@
 
     <!-- Search & Filter Section -->
     <div class="search-filter-section">
-        <div class="row">
-            <div class="col-md-6">
-                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Cari judul, penulis, atau penerbit...">
-            </div>
-            <div class="col-md-6">
-                <div class="filter-label"><i class="fas fa-tags me-2"></i>Filter Kategori</div>
-                <div class="filter-buttons" id="filterButtons">
-                    <button class="filter-chip active" data-category="">📚 Semua Buku</button>
-                    @foreach($kategoris as $kategori)
-                        <button class="filter-chip" data-category="{{ $kategori->id }}">{{ $kategori->nama }}</button>
-                    @endforeach
-                </div>
-            </div>
+        <input type="text" id="searchInput" class="search-input" placeholder="🔍 Cari judul, penulis, atau penerbit...">
+        <div class="filter-label"><i class="fas fa-tags me-2"></i>Filter Kategori</div>
+        <div class="filter-buttons" id="filterButtons">
+            <button class="filter-chip active" data-category="">Semua Kategori</button>
+            @foreach($kategoris as $kategori)
+                <button class="filter-chip" data-category="{{ $kategori->id }}">{{ $kategori->nama }}</button>
+            @endforeach
         </div>
     </div>
 
@@ -345,7 +420,7 @@
     <div id="booksSection">
         <div class="books-grid">
             @foreach($books as $book)
-            <div class="book-card" onclick="window.location.href='{{ route('books.show', $book->id) }}'">
+            <div class="book-card">
                 @if($book->gambar)
                     <img src="{{ asset('storage/' . $book->gambar) }}" class="book-cover" alt="{{ $book->judul }}">
                 @else
@@ -355,11 +430,6 @@
                     <h6 class="book-title">{{ Str::limit($book->judul, 40) }}</h6>
                     <p class="book-author">{{ Str::limit($book->penulis, 25) ?: 'Penulis tidak diketahui' }}</p>
                     <span class="book-category">{{ $book->kategori->nama ?? 'Tanpa Kategori' }}</span>
-                    <div class="mt-2">
-                        <small class="text-muted">
-                            <i class="fas fa-box"></i> Stok: {{ $book->stok }}
-                        </small>
-                    </div>
                 </div>
             </div>
             @endforeach
@@ -376,7 +446,7 @@
 
     <!-- Pagination -->
     @if($books->count() > 0)
-    <div class="mt-4">
+    <div class="mt-4 d-flex justify-content-center">
         {{ $books->links() }}
     </div>
     @endif
@@ -389,19 +459,19 @@
     let searchTimeout;
 
     $(document).ready(function() {
+        // Search input
+        $('#searchInput').on('input', function() {
+            clearTimeout(searchTimeout);
+            currentSearch = $(this).val();
+            searchTimeout = setTimeout(() => loadBooks(), 500);
+        });
+
         // Filter category click
         $('.filter-chip').on('click', function() {
             $('.filter-chip').removeClass('active');
             $(this).addClass('active');
             currentCategory = $(this).data('category');
             loadBooks();
-        });
-
-        // Search input
-        $('#searchInput').on('input', function() {
-            clearTimeout(searchTimeout);
-            currentSearch = $(this).val();
-            searchTimeout = setTimeout(() => loadBooks(), 500);
         });
     });
 
@@ -442,7 +512,7 @@
 
     function displayBooks(books) {
         if (!books || books.length === 0) {
-            let msg = currentSearch ? `Tidak ditemukan "${currentSearch}"` : 'Tidak ada buku';
+            let msg = currentSearch ? `Tidak ditemukan "${currentSearch}"` : 'Tidak ada buku yang tersedia';
             $('#booksSection').html(`
                 <div class="empty-state">
                     <i class="fas fa-search fa-3x mb-3"></i>
@@ -458,30 +528,18 @@
         
         books.forEach(book => {
             html += `
-                <div class="book-card" onclick="window.location.href='/books/${book.id}'">
+                <div class="book-card">
                     ${book.gambar ? `<img src="/storage/${book.gambar}" class="book-cover" alt="${escapeHtml(book.judul)}">` : 
                                     `<div class="book-cover"><i class="fas fa-book"></i></div>`}
                     <div class="book-info">
                         <h6 class="book-title">${escapeHtml(book.judul)}</h6>
                         <p class="book-author">${escapeHtml(book.penulis) || 'Penulis tidak diketahui'}</p>
                         <span class="book-category">${escapeHtml(book.kategori?.nama || 'Tanpa Kategori')}</span>
-                        <div class="mt-2">
-                            <small class="text-muted">
-                                <i class="fas fa-box"></i> Stok: ${book.stok}
-                            </small>
-                        </div>
                     </div>
                 </div>
             `;
         });
         html += `</div>`;
-        
-        // Add pagination info
-        if (books.length >= 24) {
-            html += `<div class="text-center mt-4">
-                        <small class="text-muted">Menampilkan ${books.length} buku. Gunakan filter untuk pencarian lebih spesifik.</small>
-                     </div>`;
-        }
         
         $('#booksSection').html(html);
     }

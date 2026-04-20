@@ -14,26 +14,23 @@ use App\Http\Middleware\PustakawanMiddleware;
 
 /*
 |--------------------------------------------------------------------------
-| PUBLIC ROUTES
+| PUBLIC ROUTES (Tidak memerlukan login)
 |--------------------------------------------------------------------------
 */
 
-// Landing page
+// Landing page / Halaman utama website
 Route::view('/', 'landing')->name('landing');
 
-// Katalog publik
+// Katalog publik - untuk semua pengunjung
 Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog');
 Route::get('/katalog/filter', [KatalogController::class, 'filter'])->name('katalog.filter');
 
-// Detail buku publik
-Route::get('/books/{id}', [KatalogController::class, 'show'])->name('books.show');
-
-// AJAX check book
+// AJAX check ketersediaan buku
 Route::get('/check-book', [PinjamanController::class, 'checkBook'])->name('check-book');
 
 /*
 |--------------------------------------------------------------------------
-| AUTH ROUTES
+| AUTH ROUTES (Login/Logout)
 |--------------------------------------------------------------------------
 */
 
@@ -46,45 +43,45 @@ Route::controller(LoginController::class)->group(function () {
 /*
 |--------------------------------------------------------------------------
 | ADMIN ROUTES (Protected by Pustakawan Middleware)
+| Hanya bisa diakses oleh pustakawan yang sudah login
 |--------------------------------------------------------------------------
 */
 
 Route::middleware([PustakawanMiddleware::class])->group(function () {
 
-    // Dashboard
+    // Dashboard Admin
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Books Management
+    // ==================== MANAJEMEN BUKU ====================
     Route::resource('books', BookController::class);
     Route::get('/books/category/{id}', [BookController::class, 'byCategory'])->name('books.byCategory');
 
-    // Categories Management
+    // ==================== MANAJEMEN KATEGORI ====================
     Route::resource('categories', CategoryController::class);
 
-    // Anggota Management
+    // ==================== MANAJEMEN ANGGOTA ====================
     Route::resource('anggotas', AnggotaController::class);
     Route::get('/anggotas/{anggota}/peminjaman', [AnggotaController::class, 'peminjaman'])->name('anggotas.peminjaman');
     Route::delete('/anggotas/delete-all', [AnggotaController::class, 'deleteAll'])->name('anggotas.delete-all');
 
-    // Peminjaman Management
+    // ==================== MANAJEMEN PEMINJAMAN ====================
     Route::resource('pinjamans', PinjamanController::class);
     Route::post('/pinjamans/{id}/mark-returned', [PinjamanController::class, 'markAsReturned'])->name('pinjamans.mark-returned');
 
-    // Pengembalian Management
+    // ==================== MANAJEMEN PENGEMBALIAN ====================
     Route::resource('pengembalians', PengembalianController::class);
 
-    /*
-    |-----------------------------
-    | LAPORAN
-    |-----------------------------
-    */
+    // ==================== LAPORAN ====================
     Route::prefix('laporan')->name('laporan.')->controller(LaporanController::class)->group(function () {
+        // Laporan Peminjaman
         Route::get('/peminjaman', 'laporanPeminjaman')->name('peminjaman');
         Route::get('/peminjaman/export', 'exportPeminjaman')->name('peminjaman.export');
 
+        // Laporan Buku
         Route::get('/buku', 'laporanBuku')->name('buku');
         Route::get('/buku/export', 'exportBuku')->name('buku.export');
 
+        // Laporan Pengembalian
         Route::get('/pengembalian', 'laporanPengembalian')->name('pengembalian');
         Route::get('/pengembalian/export', 'exportPengembalian')->name('pengembalian.export');
     });
@@ -92,7 +89,7 @@ Route::middleware([PustakawanMiddleware::class])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| FALLBACK
+| FALLBACK ROUTE (Halaman 404 Not Found)
 |--------------------------------------------------------------------------
 */
 Route::fallback(function () {
