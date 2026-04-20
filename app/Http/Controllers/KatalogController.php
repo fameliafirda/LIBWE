@@ -68,7 +68,6 @@ class KatalogController extends Controller
             }
 
             // Query untuk mendapatkan buku paling sering dipinjam
-            // Diurutkan dari total_dipinjam TERTINGGI ke TERENDAH
             $popularBooks = Book::with('kategori')
                 ->leftJoin('pinjamans', function($join) {
                     $join->on('books.id', '=', 'pinjamans.buku_id')
@@ -95,11 +94,11 @@ class KatalogController extends Controller
                     'books.stok',
                     'books.kategori_id'
                 )
-                ->orderBy('total_dipinjam', 'DESC') // 🔥 URUTAN DARI TERBANYAK KE TERSEDIKIT
+                ->orderBy('total_dipinjam', 'DESC')
                 ->limit($limit)
                 ->get();
 
-            // Jika tidak ada data peminjaman sama sekali, tampilkan berdasarkan stok terbanyak
+            // Jika tidak ada data peminjaman, tampilkan berdasarkan stok terbanyak
             if ($popularBooks->isEmpty() || $popularBooks->sum('total_dipinjam') == 0) {
                 return Book::with('kategori')
                     ->orderBy('stok', 'DESC')
@@ -132,7 +131,9 @@ class KatalogController extends Controller
      */
     public function clearRecommendationCache()
     {
-        Book::clearPopularBooksCache();
+        // Hapus cache popular books
+        Cache::forget('popular_books_limit_10');
+        Cache::forget('popular_books_limit_5');
         
         if (request()->ajax()) {
             return response()->json(['success' => true, 'message' => 'Cache rekomendasi berhasil dihapus']);
