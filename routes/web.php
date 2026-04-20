@@ -22,11 +22,16 @@ use App\Http\Middleware\PustakawanMiddleware;
 // =============================================
 // 🔹 PUBLIC ROUTES (Tanpa Login)
 // =============================================
-Route::get('/', function () {
-    return file_get_contents(public_path('index.html'));
-});
 
+// Halaman Landing (Homepage)
+Route::get('/', function () {
+    return view('landing');
+})->name('landing');
+
+// Katalog Buku Publik
 Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog');
+
+// Check ketersediaan buku (AJAX)
 Route::get('/check-book', [PinjamanController::class, 'checkBook'])->name('check-book');
 
 // =============================================

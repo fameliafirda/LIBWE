@@ -1,16 +1,29 @@
+{{-- resources/views/landing.blade.php --}}
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>Perpustakaan SDN Berat Wetan 1</title>
+  
+  {{-- Vue JS --}}
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  
+  {{-- Google Fonts --}}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+  
+  {{-- Spline Viewer --}}
   <script type="module" src="https://unpkg.com/@splinetool/viewer/build/spline-viewer.js"></script>
+  
+  {{-- Font Awesome --}}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <style>
+    /* Semua style CSS tetap sama seperti kode Anda */
     :root {
       --primary-color: #000000;
       --secondary-color: #ffffff;
@@ -191,6 +204,7 @@
       padding: 8px 15px;
       font-size: 15px;
       position: relative;
+      cursor: pointer;
     }
 
     nav a::after {
@@ -296,7 +310,7 @@
       gap: 5px;
     }
 
-    /* Desktop-specific styles - UNCHANGED */
+    /* Desktop-specific styles */
     @media (min-width: 769px) {
       .nav-container {
         display: flex;
@@ -318,19 +332,17 @@
       }
     }
 
-    /* Mobile styles - DYNAMIC */
+    /* Mobile styles */
     @media (max-width: 768px) {
       header {
         width: 90%;
         padding: 10px 15px;
       }
       
-      /* Hide desktop login button on mobile */
       .login-btn {
         display: none !important;
       }
       
-      /* Show mobile login button */
       .mobile-login-btn {
         display: flex;
         animation: slideUp 0.5s ease-out;
@@ -369,25 +381,21 @@
         background-color: var(--accent-color);
       }
       
-      /* Adjust section content for better mobile view */
       .section-content {
         margin: 0 10px;
         padding: 25px 15px !important;
       }
       
-      /* Better touch targets */
       nav a, .mobile-login-btn, .hero button {
         cursor: pointer;
         -webkit-tap-highlight-color: transparent;
       }
       
-      /* Improve text readability on mobile */
       .info p, .visi-misi p, ol, ul {
         font-size: 14px;
         line-height: 1.6;
       }
       
-      /* Adjust list padding for mobile */
       ul {
         padding-left: 20px !important;
       }
@@ -396,12 +404,10 @@
         margin-bottom: 12px;
       }
       
-      /* Better spacing for maps on mobile */
       .maps-container iframe {
         height: 250px;
       }
       
-      /* Adjust denah image for mobile */
       .denah img {
         width: 100%;
         height: auto;
@@ -480,7 +486,7 @@
       transform: translateY(-50%);
       width: 600px;
       height: 700px;
-      background-image: url('web-perpus/img/bukubaru.png');
+      background-image: url('{{ asset("web-perpus/img/bukubaru.png") }}');
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
@@ -888,7 +894,7 @@
       opacity: 0.3;
     }
 
-    /* Desktop-specific improvements - UNCHANGED */
+    /* Desktop-specific improvements */
     @media (min-width: 1025px) {
       .hero {
         flex-direction: row;
@@ -1042,7 +1048,7 @@
       <div class="logo-nav">
         <div class="logo-container">
           <img 
-            src="web-perpus/img/Open_Book_Vector_Illustration_Flat_Logo_Stock_Vector_-_Illustration_of_flat__minimal__187678563__3_-removebg-preview - Copy.png" 
+            src="{{ asset('web-perpus/img/Open_Book_Vector_Illustration_Flat_Logo_Stock_Vector_-_Illustration_of_flat__minimal__187678563__3_-removebg-preview - Copy.png') }}" 
             alt="logo Perpustakaan">
           <strong>LIBWE</strong>
         </div>
@@ -1061,13 +1067,13 @@
               <a href="#denah" @click="closeMenu">Denah & Lokasi</a>
             </div>
           </nav>
-          <button class="login-btn" onclick="window.location.href='/login'">Masuk</button>
+          <button class="login-btn" onclick="window.location.href='{{ route('login') }}'">Masuk</button>
         </div>
       </div>
     </header>
 
     <!-- Mobile Login Button - Only visible on mobile devices -->
-    <button class="mobile-login-btn" onclick="window.location.href='/login'">
+    <button class="mobile-login-btn" onclick="window.location.href='{{ route('login') }}'">
       <i class="fas fa-sign-in-alt"></i> Masuk sebagai Pustakawan
     </button>
 
@@ -1075,7 +1081,7 @@
       <div class="hero-content">
         <h1>Selamat datang di Perpustakaan Online <br><span class="highlight">SDN Berat Wetan 1</span></h1>
         <p>Membangun generasi cerdas dan berbudaya literasi.</p>
-        <button onclick="window.location.href='/katalog'">TELUSURI BUKU</button>
+        <button onclick="window.location.href='{{ route('katalog') }}'">TELUSURI BUKU</button>
       </div>
       
       <!-- Book Animation -->
@@ -1083,7 +1089,7 @@
     </div>
 
     <section id="informasi" class="info" ref="informasi">
-      <img class="section-bg" src="web perpus/img/2.png" alt="Background">
+      <img class="section-bg" src="{{ asset('web-perpus/img/2.png') }}" alt="Background">
       <div class="section-content" :class="{ 'in-view': isInfoInView }">
         <h2>Informasi</h2>
         <p style="text-align: justify">Perpustakaan SDN Berat Wetan 1 didirikan sebagai bagian dari komitmen sekolah untuk meningkatkan minat baca dan literasi siswa sejak dini. Berdiri sejak awal tahun 2005, perpustakaan ini awalnya hanya memiliki koleksi buku bacaan dasar dan beberapa rak sederhana yang ditempatkan di salah satu sudut ruang kelas. Namun, seiring waktu dan dukungan dari pihak sekolah, guru, serta orang tua murid, perpustakaan terus mengalami perkembangan baik dari segi fasilitas maupun jumlah koleksi buku.<br><br>
@@ -1111,7 +1117,7 @@
     </section>
 
     <section id="visi" class="visi-misi" ref="visi">
-      <img class="section-bg" src="web perpus/img/3.png" alt="Background">
+      <img class="section-bg" src="{{ asset('web-perpus/img/3.png') }}" alt="Background">
       <div class="section-content" :class="{ 'in-view': isVisiInView }">
         <h2>Visi dan Misi</h2>
         <p><strong>Visi:</strong> Menjadi sekolah dasar yang unggul dalam pendidikan, karakter, dan kreativitas, serta mencetak generasi yang berakhlak mulia dan berprestasi.</p>
@@ -1127,10 +1133,10 @@
     </section>
 
     <section id="pustakawan" class="pustakawan" ref="pustakawan">
-      <img class="section-bg" src="web perpus/img/4.png" alt="Background">
+      <img class="section-bg" src="{{ asset('web-perpus/img/4.png') }}" alt="Background">
       <div class="section-content" :class="{ 'in-view': isPustakawanInView }">
         <h2>Pustakawan</h2>
-<img src="web-perpus/img/Screenshot-2025-05-01-180615.png" alt="Foto Pustakawan">
+        <img src="{{ asset('web-perpus/img/Screenshot-2025-05-01-180615.png') }}" alt="Foto Pustakawan">
         <p><strong>Nama:</strong> Lilik Nurhayati, S.Pd</p>
         <p><strong>Email:</strong> lilik.nur246@guruku.belajar.id</p>
         <p><strong>Jabatan:</strong> Pustakawan</p>
@@ -1138,7 +1144,7 @@
     </section>
 
     <section id="denah" class="denah" ref="denah">
-      <img class="section-bg" src="web perpus/img/5.png" alt="Background">
+      <img class="section-bg" src="{{ asset('web-perpus/img/5.png') }}" alt="Background">
       <div class="section-content" :class="{ 'in-view': isDenahInView }">
         <h2>Denah & Lokasi Perpustakaan</h2>
         
@@ -1163,7 +1169,7 @@
         </div>
         
         <!-- Denah Gambar -->
-        <img src="web-perpus/img/meja-pustakawan.png" alt="Denah Perpustakaan">
+        <img src="{{ asset('web-perpus/img/meja-pustakawan.png') }}" alt="Denah Perpustakaan">
       </div>
     </section>
 
@@ -1171,9 +1177,6 @@
       SDN BERAT WETAN 1 &copy; Famella Firda Levia
     </footer>
   </div>
-
-  <!-- Font Awesome untuk ikon -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <script>
     const { createApp, ref, onMounted, onUnmounted } = Vue;
@@ -1247,11 +1250,11 @@
           if (!container) return;
           
           const bookImages = [
-            'web-perpus/img/book1.png',
-            'web-perpus/img/book2.png',
-            'web-perpus/img/book3.png',
-            'web-perpus/img/book4.png',
-            'web-perpus/img/book5.png'
+            '{{ asset("web-perpus/img/book1.png") }}',
+            '{{ asset("web-perpus/img/book2.png") }}',
+            '{{ asset("web-perpus/img/book3.png") }}',
+            '{{ asset("web-perpus/img/book4.png") }}',
+            '{{ asset("web-perpus/img/book5.png") }}'
           ];
           
           // Clear existing books
