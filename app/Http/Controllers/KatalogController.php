@@ -15,7 +15,7 @@ class KatalogController extends Controller
         // 1. Ambil data kategori untuk filter
         $kategoris = Category::all();
 
-        // 2. Ambil Top 10 Buku Populer
+        // 2. Ambil Top 10 Buku Populer (Logika diperbaiki agar tidak SQL Error)
         $popularBooks = $this->getPopularBooks(10);
 
         // 3. Query Utama untuk Katalog Bawah
@@ -36,11 +36,7 @@ class KatalogController extends Controller
         // Tampilkan yang terbaru dan paginate 12 buku per halaman
         $books = $query->latest()->paginate(12)->withQueryString();
 
-        return view('katalog.index', [
-            'books' => $books,
-            'kategoris' => $kategoris,
-            'popularBooks' => $popularBooks,
-        ]);
+        return view('katalog.index', compact('books', 'kategoris', 'popularBooks'));
     }
 
     public function filter(Request $request)
@@ -74,22 +70,27 @@ class KatalogController extends Controller
         $cacheKey = 'popular_books_v1_' . $limit;
         
         return Cache::remember($cacheKey, now()->addMinutes(30), function() use ($limit) {
-            // Cek apakah tabel pinjaman ada
+            // Cek apakah tabel pinjamans ada
             if (DB::connection()->getSchemaBuilder()->hasTable('pinjamans')) {
-                $popular = Book::select('books.*', DB::raw('COUNT(pinjamans.id) as total_dipinjam'))
-                    ->leftJoin('pinjamans', 'books.id', '=', 'pinjamans.buku_id')
-                    ->groupBy('books.id')
-                    ->orderBy('total_dipinjam', 'DESC')
+                
+                // Ambil ID buku yang paling banyak dipinjam
+                $popularIds = DB::table('pinjamans')
+                    ->select('buku_id', DB::raw('COUNT(id) as total'))
+                    ->groupBy('buku_id')
+                    ->orderBy('total', 'DESC')
                     ->limit($limit)
-                    ->get();
+                    ->pluck('buku_id');
 
-                // Jika ada data peminjaman, kembalikan
-                if ($popular->sum('total_dipinjam') > 0) {
-                    return $popular;
+                if ($popularIds->isNotEmpty()) {
+                    // Ambil detail buku berdasarkan ID tersebut dan jaga urutannya
+                    $idsOrder = $popularIds->implode(',');
+                    return Book::whereIn('id', $popularIds)
+                        ->orderByRaw("FIELD(id, $idsOrder)")
+                        ->get();
                 }
             }
 
-            // Jika belum ada data pinjaman, ambil berdasarkan stok terbanyak sebagai default
+            // Fallback: Jika belum ada data pinjaman, ambil berdasarkan stok terbanyak
             return Book::orderBy('stok', 'DESC')->limit($limit)->get();
         });
     }
