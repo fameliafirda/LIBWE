@@ -632,7 +632,7 @@
 
             <div class="hero-content">
                 <h1>Selamat datang di <br><span>Perpustakaan Online</span></h1>
-                <p>SDN Berat Wetan 1 — Membangun generasi cerdas dan berbudaya literasi.</p>
+                <p>SDN Berat Wetan 1 <br>Membangun generasi cerdas dan berbudaya literasi.</p>
                 <div class="btn-wrapper">
                     <button class="btn-hero" onclick="window.location.href='{{ route('katalog') }}'">TELUSURI BUKU</button>
                 </div>
