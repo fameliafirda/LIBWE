@@ -1,14 +1,22 @@
 @extends('layouts.app')
 
-@section('title', 'Katalog Digital SDN Berat Wetan 1')
-
 @section('content')
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&family=Unbounded:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Unbounded:wght@700;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 
 <style>
     /* ============================================================
-       1. CORE THEME & LAYOUT (CYBER-Y2K DARK)
+       1. COLOR PALETTE & RESET
        ============================================================ */
+    :root {
+        --color-1: #cdb4db; /* Soft Purple */
+        --color-2: #ffc8dd; /* Soft Pink */
+        --color-3: #ffafcc; /* Hot Pink Pastel */
+        --color-4: #bde0fe; /* Sky Blue */
+        --color-5: #a2d2ff; /* Bright Blue */
+        --color-black: #0a0a0a;
+        --glass: rgba(255, 255, 255, 0.03);
+    }
+
     .main-header, .main-sidebar, .content-header, .main-footer, hr, .breadcrumb { 
         display: none !important; 
     }
@@ -16,442 +24,437 @@
     .content-wrapper { 
         margin-left: 0 !important; 
         padding: 0 !important; 
-        background: #02020a !important; 
+        background: var(--color-black) !important; 
         min-height: 100vh;
-        overflow: hidden;
-    }
-
-    :root {
-        --y2k-pink: #ff00ff;
-        --y2k-purple: #bc13fe;
-        --y2k-blue: #00f2ff;
-        --y2k-yellow: #ffea00;
-        --deep-space: #02020a;
-        --glass: rgba(255, 255, 255, 0.05);
     }
 
     body {
-        background: radial-gradient(circle at top right, #1a0b2e, #02020a);
-        color: #fff;
         font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: var(--color-black);
+        color: #fff;
+        overflow-x: hidden;
         scroll-behavior: smooth;
     }
 
-    .container-custom {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 0 40px;
-        position: relative;
-        z-index: 10;
-    }
-
-    /* BACKGROUND NEON DOTS ANIMATION */
-    .nebula-bg {
+    /* Floating Background Elements */
+    .bg-glow {
         position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background-image: radial-gradient(var(--glass) 1px, transparent 1px);
-        background-size: 50px 50px;
-        z-index: 1;
-        opacity: 0.3;
-        animation: nebulaFloat 30s linear infinite;
-    }
-
-    @keyframes nebulaFloat {
-        0% { background-position: 0 0; }
-        100% { background-position: 100px 100px; }
+        width: 40vw; height: 40vw;
+        border-radius: 50%;
+        filter: blur(120px);
+        z-index: 0;
+        opacity: 0.15;
+        pointer-events: none;
     }
 
     /* ============================================================
-       2. FIXED TOP NAVIGATION (HUSH LAYOUT VIBE)
+       2. NAVIGATION (HUSH STYLE)
        =========================================================== */
-    .y2k-nav {
+    .libwe-nav {
         position: fixed;
-        top: 0; left: 0; right: 0;
-        padding: 15px 60px;
+        top: 0; left: 0; width: 100%;
+        padding: 25px 60px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: rgba(2, 2, 10, 0.7);
-        backdrop-filter: blur(25px);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(10, 10, 10, 0.6);
+        backdrop-filter: blur(20px);
         z-index: 1000;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    .nav-left { display: flex; align-items: center; gap: 20px; }
-    .logo-hush-y2k { font-family: 'Unbounded', sans-serif; font-size: 1.5rem; color: var(--y2k-pink); text-transform: uppercase; letter-spacing: -1px; filter: drop-shadow(0 0 5px var(--y2k-pink)); }
-    .school-id { font-size: 0.7rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 2px; }
+    .brand-libwe {
+        font-family: 'Unbounded', sans-serif;
+        font-size: 1.8rem;
+        font-weight: 900;
+        background: linear-gradient(to right, var(--color-4), var(--color-1));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -2px;
+    }
 
-    .nav-center-links { display: flex; gap: 30px; }
-    .nav-center-links a { 
+    .nav-links { display: flex; gap: 40px; }
+    .nav-links a { 
         text-decoration: none; 
-        color: #fff; 
+        color: rgba(255,255,255,0.7); 
         font-weight: 600; 
-        font-size: 0.9rem;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
         transition: 0.3s;
     }
-    .nav-center-links a:hover { color: var(--y2k-blue); text-shadow: 0 0 10px var(--y2k-blue); }
-
-    .nav-right-icons { color: var(--y2k-yellow); font-size: 1.2rem; cursor: pointer; }
+    .nav-links a:hover { color: var(--color-2); text-shadow: 0 0 10px var(--color-2); }
 
     /* ============================================================
        3. HERO SECTION (BUKU UTAMA)
        =========================================================== */
-    .hero-section {
+    .hero {
         height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
-        overflow: hidden;
     }
 
-    .hero-text-bg {
+    .hero-bg-text {
         position: absolute;
-        font-family: 'Unbounded', sans-serif;
-        font-size: 18vw;
-        color: rgba(255, 255, 255, 0.02);
+        font-family: 'Syne', sans-serif;
+        font-size: 15vw;
+        font-weight: 800;
+        color: transparent;
+        -webkit-text-stroke: 1px rgba(255,255,255,0.05);
         z-index: 1;
         white-space: nowrap;
-        animation: textFloat 10s ease-in-out infinite;
+        user-select: none;
     }
 
-    @keyframes textFloat { 0%, 100% { transform: translateX(-10%); } 50% { transform: translateX(10%); } }
-
-    .hero-content {
+    .hero-img-container {
         position: relative;
         z-index: 2;
-        text-align: center;
+        width: 420px;
+        transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1);
     }
 
-    .hero-book-wrapper {
-        position: relative;
-        width: 380px;
-        margin: 0 auto;
-        transition: 0.5s;
-    }
+    .hero-img-container:hover { transform: scale(1.05) rotate(-2deg); }
 
-    .hero-book-wrapper:hover { transform: translateY(-15px) rotate(2deg); }
-
-    .hero-book-wrapper img {
+    .hero-img-container img {
         width: 100%;
-        border-radius: 12px;
-        border: 2px solid var(--glass);
-        box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        filter: drop-shadow(0 0 50px rgba(189, 224, 254, 0.3));
+        animation: floatImg 6s ease-in-out infinite;
     }
 
-    /* Elemen Futuristik Kuning Melayang */
-    .y2k-orb { position: absolute; width: 40px; height: 40px; background: var(--y2k-yellow); border-radius: 50%; box-shadow: 0 0 30px var(--y2k-yellow); animation: orbFloat 4s ease-in-out infinite; }
-    @keyframes orbFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-30px); } }
-
-    .hero-desc { margin-top: 30px; }
-    .hero-desc h2 { font-family: 'Unbounded'; font-size: 2.5rem; margin-bottom: 5px; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
-    .hero-desc p { color: rgba(255,255,255,0.6); margin-bottom: 20px; }
-
-    .btn-y2k {
-        background: linear-gradient(45deg, var(--y2k-purple), var(--y2k-pink));
-        color: white;
-        border: none;
-        padding: 12px 35px;
-        border-radius: 50px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        transition: 0.3s;
-        box-shadow: 0 0 15px var(--y2k-pink);
+    @keyframes floatImg {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-30px); }
     }
-    .btn-y2k:hover { transform: scale(1.05); box-shadow: 0 0 25px var(--y2k-pink); }
+
+    .hero-content {
+        position: absolute;
+        bottom: 10%;
+        text-align: center;
+        z-index: 3;
+    }
+
+    .hero-content h1 { font-family: 'Unbounded'; font-size: 3rem; margin-bottom: 10px; }
 
     /* ============================================================
-       4. REKOMENDASI SECTION (PINK SLIDER)
+       4. TOP 10 BUKU TERLARIS (SLIDER)
        =========================================================== */
-    #rekomendasi {
-        background: linear-gradient(135deg, #1a0b2e, var(--y2k-pink));
-        padding: 100px 0;
-        border-top: 2px solid var(--y2k-purple);
-        border-bottom: 2px solid var(--y2k-purple);
-        position: relative;
+    #top10 {
+        padding: 120px 0;
+        background: linear-gradient(to bottom, transparent, rgba(205, 180, 219, 0.05));
     }
 
-    .slider-container {
+    .section-label {
+        font-family: 'Unbounded';
+        font-size: 0.7rem;
+        letter-spacing: 5px;
+        color: var(--color-3);
+        margin-bottom: 15px;
+        display: block;
+    }
+
+    .slider-wrapper {
         display: flex;
         align-items: center;
-        justify-content: center;
         gap: 30px;
         margin-top: 50px;
+        padding: 0 60px;
     }
 
-    .slider-track {
+    .track-container {
         display: flex;
-        gap: 25px;
+        gap: 30px;
         overflow: hidden;
-        width: 1000px;
         scroll-behavior: smooth;
-        padding: 20px 0;
+        padding: 20px 10px;
     }
 
-    .slider-item {
+    .slider-card {
         min-width: 280px;
         background: var(--glass);
-        backdrop-filter: blur(15px);
-        padding: 25px;
-        border-radius: 25px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255,255,255,0.1);
+        padding: 30px;
+        border-radius: 40px;
         text-align: center;
+        position: relative;
         transition: 0.4s;
     }
 
-    .slider-item:hover { border-color: var(--y2k-blue); box-shadow: 0 10px 30px rgba(0, 242, 255, 0.2); }
+    .slider-card:hover {
+        background: rgba(255,255,255,0.08);
+        border-color: var(--color-4);
+        transform: translateY(-15px);
+    }
 
-    .slider-item img {
+    .slider-card img {
         width: 180px;
         height: 260px;
         object-fit: cover;
-        border-radius: 15px;
-        margin-bottom: 20px;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        margin-bottom: 25px;
     }
 
-    .card-tren-rank { position: absolute; bottom: 10px; right: 20px; font-size: 5rem; font-weight: 900; color: rgba(255,255,255,0.05); -webkit-text-stroke: 1px rgba(255,255,255,0.1); font-family: 'Unbounded'; }
+    .rank-badge {
+        position: absolute;
+        top: -10px; left: -10px;
+        width: 50px; height: 50px;
+        background: var(--color-3);
+        border-radius: 15px;
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'Unbounded'; font-weight: 900;
+        box-shadow: 0 10px 20px rgba(255, 175, 204, 0.4);
+    }
 
-    .nav-btn {
-        background: transparent;
-        border: 2px solid var(--y2k-blue);
-        width: 55px; height: 55px;
+    .btn-nav-slider {
+        width: 60px; height: 60px;
         border-radius: 50%;
-        color: var(--y2k-blue);
+        border: 1px solid var(--color-4);
+        background: transparent;
+        color: var(--color-4);
+        font-size: 1.5rem;
         cursor: pointer;
-        font-size: 1.3rem;
         transition: 0.3s;
     }
-    .nav-btn:hover { background: var(--y2k-blue); color: #fff; box-shadow: 0 0 15px var(--y2k-blue); }
+
+    .btn-nav-slider:hover { background: var(--color-4); color: var(--color-black); }
 
     /* ============================================================
-       5. KATALOG SECTION (GRID)
+       5. KOLEKSI BUKU (GRID)
        =========================================================== */
-    #katalog {
-        padding: 100px 0;
-    }
+    #koleksi { padding: 120px 60px; }
 
-    .section-title { margin-bottom: 60px; text-align: center; }
-    .section-title h2 { font-family: 'Unbounded'; font-size: 2rem; color: #fff; }
-    .section-title h2 span { color: var(--y2k-yellow); text-shadow: 0 0 10px var(--y2k-yellow); }
-
-    .search-hush-cyber {
+    .search-aesthetic {
         display: flex;
         justify-content: center;
-        gap: 15px;
-        margin-bottom: 60px;
+        gap: 20px;
+        margin-bottom: 80px;
     }
 
-    .input-cyber {
-        width: 450px;
-        padding: 15px 25px;
-        border-radius: 15px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+    .search-aesthetic input, .search-aesthetic select {
         background: var(--glass);
+        border: 1px solid rgba(255,255,255,0.1);
+        padding: 18px 30px;
+        border-radius: 20px;
         color: #fff;
         outline: none;
+        font-family: 'Plus Jakarta Sans';
+    }
+
+    .btn-cari {
+        background: var(--color-5);
+        color: var(--color-black);
+        border: none;
+        padding: 0 40px;
+        border-radius: 20px;
+        font-weight: 800;
+        text-transform: uppercase;
+        cursor: pointer;
         transition: 0.3s;
     }
-    .input-cyber:focus { border-color: var(--y2k-pink); box-shadow: 0 0 15px var(--y2k-pink); }
 
-    .select-cyber { width: 220px; cursor: pointer; color: rgba(255,255,255,0.7); }
+    .btn-cari:hover { transform: scale(1.05); background: var(--color-4); }
 
-    .katalog-grid {
+    .book-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-        gap: 35px;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 50px;
     }
 
-    .book-node {
-        background: var(--glass);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 20px;
-        padding: 15px;
+    .book-item {
         transition: 0.4s;
-        text-align: center;
+        text-align: left;
     }
 
-    .book-node:hover {
-        background: rgba(255, 255, 255, 0.08);
-        border-color: var(--y2k-purple);
-        transform: translateY(-8px);
-        box-shadow: 0 15px 40px rgba(188, 19, 254, 0.2);
-    }
+    .book-item:hover { transform: translateY(-10px); }
 
-    .node-img {
+    .img-box {
         width: 100%;
-        height: 280px;
-        border-radius: 15px;
-        margin-bottom: 15px;
+        height: 380px;
+        background: #111;
+        border-radius: 40px;
+        display: flex; align-items: center; justify-content: center;
+        margin-bottom: 25px;
+        border: 1px solid rgba(255,255,255,0.05);
+        overflow: hidden;
+        position: relative;
     }
 
-    .node-title { font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 3px; }
-    .node-author { font-size: 0.8rem; color: #aaa; margin-bottom: 10px; }
+    .img-box img { width: 85%; height: 85%; object-fit: cover; border-radius: 15px; transition: 0.5s; }
+    .book-item:hover .img-box img { transform: scale(1.1); }
 
-    .tag-category {
-        display: inline-block;
-        padding: 3px 12px;
-        background: rgba(0, 242, 255, 0.1);
-        color: var(--y2k-blue);
-        border-radius: 20px;
-        font-size: 9px;
-        text-transform: uppercase;
-        border: 1px solid var(--y2k-blue);
-        font-weight: bold;
+    .category-pill {
+        position: absolute;
+        top: 20px; right: 20px;
+        padding: 6px 15px;
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 50px;
+        font-size: 0.65rem;
+        font-weight: 800;
+        color: var(--color-1);
+        border: 1px solid var(--color-1);
     }
 
-    /* Floating Exit Button */
-    .btn-floating-exit { position: fixed; bottom: 30px; left: 30px; background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); color: #fff; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold; z-index: 1000; border: 1px solid rgba(255, 255, 255, 0.1); transition: 0.3s; }
-    .btn-floating-exit:hover { background: var(--y2k-purple); border-color: transparent; box-shadow: 0 0 20px var(--y2k-purple); }
+    .book-title { font-family: 'Unbounded'; font-size: 1.1rem; margin-bottom: 5px; color: #fff; }
+    .book-author { color: rgba(255,255,255,0.4); font-size: 0.85rem; }
+
+    /* ============================================================
+       6. BACK BUTTON (FLOATING)
+       =========================================================== */
+    .btn-kembali {
+        position: fixed;
+        bottom: 40px; left: 40px;
+        background: var(--color-1);
+        color: var(--color-black);
+        padding: 15px 35px;
+        border-radius: 100px;
+        text-decoration: none;
+        font-weight: 800;
+        font-size: 0.85rem;
+        z-index: 1000;
+        box-shadow: 0 15px 30px rgba(205, 180, 219, 0.3);
+        transition: 0.4s;
+        display: flex; align-items: center; gap: 10px;
+    }
+
+    .btn-kembali:hover {
+        transform: translateX(10px) scale(1.05);
+        background: var(--color-2);
+    }
 
 </style>
 
-<div class="nebula-bg"></div>
+<div class="bg-glow" style="top: -10%; right: -5%; background: var(--color-1);"></div>
+<div class="bg-glow" style="bottom: 10%; left: -5%; background: var(--color-4);"></div>
 
-<a href="{{ url('/') }}" class="btn-floating-exit">
-    <i class="fas fa-power-off me-2"></i> KELUAR KE HOME
-</a>
-
-<nav class="y2k-nav">
-    <div class="nav-left">
-        <div class="logo-hush-y2k">Wetan-Lib</div>
-        <div class="school-id">SDN Berat Wetan 1</div>
+<nav class="libwe-nav">
+    <div class="brand-libwe">LIBWE</div>
+    <div class="nav-links">
+        <a href="#">Home</a>
+        <a href="#top10">Top Books</a>
+        <a href="#koleksi">Koleksi</a>
     </div>
-    <div class="nav-center-links">
-        <a href="#">Beranda</a>
-        <a href="#rekomendasi">Rekomendasi</a>
-        <a href="#katalog">Semua Buku</a>
-    </div>
-    <div class="nav-right-icons"><i class="fas fa-search"></i></div>
+    <div style="width: 100px; text-align: right;"><i class="fas fa-search"></i></div>
 </nav>
 
-<section class="hero-section">
-    <div class="hero-text-bg">READ MORE</div>
+<a href="{{ url('/') }}" class="btn-kembali">
+    <i class="fas fa-chevron-left"></i> KEMBALI
+</a>
+
+<section class="hero">
+    <div class="hero-bg-text">LIBRARY.SDN1</div>
     <div class="hero-content">
-        <div class="hero-book-wrapper">
-            <div class="y2k-orb" style="top: -20px; left: -20px;"></div>
-            <div class="y2k-orb" style="bottom: 10px; right: -30px; background: var(--y2k-blue); box-shadow: 0 0 30px var(--y2k-blue);"></div>
-            @if($popularBooks->first())
-                <img src="{{ asset('storage/' . $popularBooks->first()->gambar) }}" alt="Hero Book">
-            @else
-                <img src="https://via.placeholder.com/380x580" alt="Default">
-            @endif
+        <div class="hero-img-container">
+            <img src="{{ asset('web-perpus/img/bukubaru.png') }}" alt="Main Book">
         </div>
-        <div class="hero-desc">
-            <p style="text-transform: uppercase; letter-spacing: 3px; font-weight: 700;"># Trending Minggu Ini</p>
-            <h2>{{ $popularBooks->first()->judul ?? 'Katalog Buku Digital' }}</h2>
-            <p>{{ $popularBooks->first()->penulis ?? 'Tim SDN 1' }} • {{ $popularBooks->first()->kategori->nama ?? 'Umum' }}</p>
-            <a href="#katalog" class="btn-y2k">Jelajahi Sekarang <i class="fas fa-chevron-right ms-2"></i></a>
-        </div>
+        <h1 style="color: var(--color-2)">READ MORE.</h1>
+        <p style="letter-spacing: 5px; color: rgba(255,255,255,0.5)">DISCOVER YOUR FUTURE</p>
     </div>
 </section>
 
-<section id="rekomendasi">
-    <div class="container-custom" style="text-align: center;">
-        <p style="text-transform: uppercase; letter-spacing: 3px; font-weight: 700; color: #fff;">Pilihan Pustakawan</p>
-        <h2 style="font-family: 'Unbounded'; font-size: 2.5rem; color: #fff; margin-bottom: 50px;">NEW ARRIVALS</h2>
-
-        <div class="slider-container">
-            <button class="nav-btn" onclick="slideScroll(-320)"><i class="fas fa-chevron-left"></i></button>
-            
-            <div class="slider-track" id="slider">
-                @foreach($popularBooks as $index => $pb)
-                <div class="slider-item">
-                    <img src="{{ asset('storage/' . $pb->gambar) }}" alt="">
-                    <h3 class="node-title">{{ Str::limit($pb->judul, 30) }}</h3>
-                    <p class="node-author">{{ $pb->penulis ?? 'Tim SDN 1' }}</p>
-                    <span class="tag-category">{{ $pb->kategori->nama ?? 'Umum' }}</span>
-                    <div class="card-tren-rank">{{ $index + 1 }}</div>
-                </div>
-                @endforeach
-            </div>
-
-            <button class="nav-btn" onclick="slideScroll(320)"><i class="fas fa-chevron-right"></i></button>
-        </div>
+<section id="top10">
+    <div style="text-align: center;">
+        <span class="section-label">THE BEST CHOICE</span>
+        <h2 style="font-family: 'Unbounded'; font-size: 2.5rem;">TOP 10 BUKU TERLARIS</h2>
     </div>
-</section>
 
-<section id="katalog">
-    <div class="container-custom">
-        <div class="section-title">
-            <i class="fas fa-swatchbook fa-2x mb-2" style="color: var(--y2k-blue);"></i>
-            <h2><span>Semua</span> Arsip Buku</h2>
-        </div>
-
-        <div class="search-hush-cyber">
-            <input type="text" id="pencarianCanggih" class="input-cyber" placeholder="Scan database for titles, authors, or ISBN...">
-            <select id="kategoriCanggih" class="input-cyber select-cyber">
-                <option value="">Semua Galaxy (Kategori)</option>
-                @foreach($kategoris as $k)
-                    <option value="{{ $k->id }}">{{ $k->nama }}</option>
-                @endforeach
-            </select>
-            <button onclick="scanDatabase()" class="btn-y2k" style="margin: 0;"><i class="fas fa-barcode ms-2"></i> CARI</button>
-        </div>
-
-        <div class="katalog-grid" id="gridKatalog">
-            @foreach($books as $b)
-            <div class="book-node">
-                <img src="{{ asset('storage/' . $b->gambar) }}" class="node-img" alt="">
-                <h3 class="node-title">{{ Str::limit($b->judul, 35) }}</h3>
-                <p class="node-author">{{ $b->penulis ?? 'Tim SDN 1' }}</p>
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                    <span class="tag-category">{{ $b->kategori->nama ?? 'Umum' }}</span>
-                    <span style="font-size: 11px; color: var(--y2k-pink); font-weight: bold;">Stok: {{ $b->stok }}</span>
-                </div>
+    <div class="slider-wrapper">
+        <button class="btn-nav-slider" onclick="moveSlide(-320)"><i class="fas fa-arrow-left"></i></button>
+        
+        <div class="track-container" id="mainSlider">
+            @foreach($popularBooks as $index => $pb)
+            <div class="slider-card">
+                <div class="rank-badge">{{ $index + 1 }}</div>
+                @if($pb->gambar)
+                    <img src="{{ asset('storage/'.$pb->gambar) }}" alt="">
+                @else
+                    <img src="{{ asset('web-perpus/img/bukubaru.png') }}" alt="">
+                @endif
+                <h3 class="book-title">{{ Str::limit($pb->judul, 25) }}</h3>
+                <p class="book-author">{{ $pb->penulis ?? 'Anonymous' }}</p>
             </div>
             @endforeach
         </div>
 
-        <div class="mt-5 d-flex justify-content-center">
-            {{ $books->links() }}
-        </div>
+        <button class="btn-nav-slider" onclick="moveSlide(320)"><i class="fas fa-arrow-right"></i></button>
     </div>
 </section>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<section id="koleksi">
+    <div style="text-align: center; margin-bottom: 60px;">
+        <span class="section-label">EXPLORE ARCHIVE</span>
+        <h2 style="font-family: 'Unbounded'; font-size: 2.5rem;">KOLEKSI BUKU</h2>
+    </div>
+
+    <div class="search-aesthetic">
+        <input type="text" id="keyword" placeholder="Cari judul atau penulis..." style="width: 400px;">
+        <select id="kat_id" style="width: 250px;">
+            <option value="">Semua Kategori</option>
+            @foreach($kategoris as $k)
+                <option value="{{ $k->id }}">{{ $k->nama }}</option>
+            @endforeach
+        </select>
+        <button class="btn-cari" onclick="filterBuku()">TEMUKAN</button>
+    </div>
+
+    <div class="book-grid" id="containerKoleksi">
+        @foreach($books as $b)
+        <div class="book-item">
+            <div class="img-box">
+                <span class="category-pill">{{ $b->kategori->nama ?? 'Umum' }}</span>
+                @if($b->gambar)
+                    <img src="{{ asset('storage/'.$b->gambar) }}" alt="">
+                @else
+                    <img src="{{ asset('web-perpus/img/bukubaru.png') }}" alt="">
+                @endif
+            </div>
+            <h3 class="book-title">{{ Str::limit($b->judul, 40) }}</h3>
+            <p class="book-author">{{ $b->penulis ?? 'Tim SDN 1' }}</p>
+        </div>
+        @endforeach
+    </div>
+
+    <div class="d-flex justify-content-center mt-5">
+        {{ $books->links() }}
+    </div>
+</section>
+
 <script>
-    // Fungsi Slider Rekomendasi
-    function slideScroll(amount) {
-        document.getElementById('slider').scrollBy({
-            left: amount,
-            behavior: 'smooth'
-        });
+    // Slider Logic
+    function moveSlide(offset) {
+        const slider = document.getElementById('mainSlider');
+        slider.scrollBy({ left: offset, behavior: 'smooth' });
     }
 
-    // Fungsi Pencarian AJAX
-    function scanDatabase() {
-        let cari = document.getElementById('pencarianCanggih').value;
-        let kat = document.getElementById('kategoriCanggih').value;
-        let grid = document.getElementById('gridKatalog');
+    // Filter Logic AJAX
+    function filterBuku() {
+        let keyword = document.getElementById('keyword').value;
+        let kategori = document.getElementById('kat_id').value;
+        let container = document.getElementById('containerKoleksi');
 
-        grid.style.opacity = '0.3'; // Efek loading
+        container.style.opacity = '0.3';
 
-        fetch(`{{ route('katalog.filter') }}?search=${cari}&kategori=${kat}`)
-            .then(response => response.json())
+        fetch(`{{ route('katalog.filter') }}?search=${keyword}&kategori=${kategori}`)
+            .then(res => res.json())
             .then(data => {
                 let html = '';
-                if(data.books.length > 0) {
-                    data.books.forEach(b => {
-                        let img = b.gambar ? `/storage/${b.gambar}` : 'https://via.placeholder.com/230x280?text=No+Image';
-                        let katName = b.kategori ? b.kategori.nama : 'Umum';
-                        html += `
-                        <div class="book-node">
-                            <img src="${img}" class="node-img" alt="">
-                            <h3 class="node-title">${b.judul}</h3>
-                            <p class="node-author">${b.penulis || 'Tim SDN 1'}</p>
-                            <div class="d-flex justify-content-between align-items-center mt-3">
-                                <span class="tag-category">${katName}</span>
-                                <span style="font-size: 11px; color: var(--y2k-pink); font-weight: bold;">Stok: ${b.stok}</span>
-                            </div>
-                        </div>`;
-                    });
-                } else {
-                    html = '<div class="text-center w-100 py-5"><h4>DATA NOT FOUND IN ARCHIVE</h4><p>Yah, bukunya tidak ketemu...</p></div>';
-                }
-                grid.innerHTML = html;
-                grid.style.opacity = '1';
+                data.books.forEach(b => {
+                    let img = b.gambar ? `/storage/${b.gambar}` : '{{ asset("web-perpus/img/bukubaru.png") }}';
+                    let kname = b.kategori ? b.kategori.nama : 'Umum';
+                    html += `
+                    <div class="book-item">
+                        <div class="img-box">
+                            <span class="category-pill">${kname}</span>
+                            <img src="${img}">
+                        </div>
+                        <h3 class="book-title">${b.judul}</h3>
+                        <p class="book-author">${b.penulis || 'Tim SDN 1'}</p>
+                    </div>`;
+                });
+                container.innerHTML = html;
+                container.style.opacity = '1';
             });
     }
 </script>
