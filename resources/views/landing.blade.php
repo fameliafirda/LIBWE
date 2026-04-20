@@ -1136,7 +1136,7 @@
       <img class="section-bg" src="{{ asset('web-perpus/img/4.png') }}" alt="Background">
       <div class="section-content" :class="{ 'in-view': isPustakawanInView }">
         <h2>Pustakawan</h2>
-        <img src="{{ asset('web-perpus/img/Screenshot-2025-05-01-180615.png') }}" alt="Foto Pustakawan">
+        <img src="{{ asset('web-perpus/img/pustakawan.png') }}" alt="Foto Pustakawan">
         <p><strong>Nama:</strong> Lilik Nurhayati, S.Pd</p>
         <p><strong>Email:</strong> lilik.nur246@guruku.belajar.id</p>
         <p><strong>Jabatan:</strong> Pustakawan</p>
@@ -1169,7 +1169,7 @@
         </div>
         
         <!-- Denah Gambar -->
-        <img src="{{ asset('web-perpus/img/meja-pustakawan.png') }}" alt="Denah Perpustakaan">
+        <img src="{{ asset('web-perpus/img/perpus.png') }}" alt="Denah Perpustakaan">
       </div>
     </section>
 
