@@ -26,12 +26,11 @@
             --color-black: #0a0a0a;
             --color-1: #cdb4db;
             --color-2: #ffc8dd;
-            --color-3: #ffafcc;
-            --color-4: #bde0fe;
+            --color-3: #ffafcc; /* Hot Pink */
+            --color-4: #bde0fe; /* Cyan/Blue */
             --color-5: #a2d2ff;
-            --glass: rgba(20, 20, 20, 0.4);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --glow: rgba(189, 224, 254, 0.15);
+            --glass: rgba(20, 20, 20, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
 
         * {
@@ -49,9 +48,22 @@
             scroll-behavior: smooth;
         }
 
+        /* Y2K Grid Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -2;
+            pointer-events: none;
+        }
+
         body {
             opacity: 0;
-            animation: fadeIn 1.2s ease-in-out forwards;
+            animation: fadeIn 1s ease-in-out forwards;
         }
 
         @keyframes fadeIn {
@@ -59,18 +71,18 @@
         }
 
         ::selection {
-            background: var(--color-4);
+            background: var(--color-3);
             color: var(--color-black);
         }
 
-        /* Floating Background Glow (Lebih menyebar) */
+        /* Floating Background Glow */
         .bg-glow {
             position: fixed;
-            width: 60vw; height: 60vw;
+            width: 50vw; height: 50vw;
             border-radius: 50%;
-            filter: blur(180px);
+            filter: blur(150px);
             z-index: -1;
-            opacity: 0.12;
+            opacity: 0.15;
             pointer-events: none;
         }
 
@@ -79,50 +91,49 @@
            =========================================================== */
         .libwe-nav {
             position: fixed;
-            top: 25px; 
+            top: 20px; 
             left: 50%; 
             transform: translateX(-50%);
             width: 90%;
-            max-width: 1100px;
-            padding: 15px 40px;
+            max-width: 1000px;
+            padding: 12px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(15, 15, 15, 0.6);
+            background: rgba(10, 10, 10, 0.7);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
             border-radius: 50px;
             z-index: 1000;
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         .libwe-nav.scrolled {
-            top: 15px;
-            background: rgba(10, 10, 10, 0.85);
-            border-color: rgba(189, 224, 254, 0.2);
-            box-shadow: 0 10px 30px rgba(189, 224, 254, 0.05);
-            padding: 12px 35px;
+            top: 10px;
+            background: rgba(5, 5, 5, 0.9);
+            border-color: rgba(189, 224, 254, 0.3);
+            box-shadow: 0 10px 25px rgba(189, 224, 254, 0.1);
         }
 
         .brand-container {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .brand-container img {
-            width: 35px;
+            width: 30px;
             height: auto;
-            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
         }
 
         .brand-libwe {
             font-family: 'Unbounded', sans-serif;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 900;
-            background: linear-gradient(to right, var(--color-4), var(--color-1));
+            background: linear-gradient(to right, var(--color-4), var(--color-3));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: 1px;
@@ -130,7 +141,7 @@
 
         .nav-links { 
             display: flex; 
-            gap: 35px; 
+            gap: 30px; 
             align-items: center;
         }
 
@@ -138,43 +149,38 @@
             text-decoration: none; 
             color: rgba(255,255,255,0.7); 
             font-weight: 600; 
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: 0.3s;
-            position: relative;
         }
 
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px; left: 0; width: 0; height: 2px;
-            background: var(--color-3);
-            transition: 0.3s;
+        .nav-links a:hover { 
+            color: var(--color-3); 
+            text-shadow: 0 0 10px var(--color-3); 
         }
-
-        .nav-links a:hover { color: #fff; }
-        .nav-links a:hover::after { width: 100%; }
 
         .btn-login {
-            background: transparent;
-            color: var(--color-4) !important;
-            padding: 8px 25px;
+            background: var(--color-4);
+            color: var(--color-black) !important;
+            padding: 8px 22px;
             border-radius: 30px;
-            border: 2px solid var(--color-4);
+            border: none;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             font-weight: 800 !important;
-            transition: 0.4s;
+            font-size: 0.8rem;
+            transition: 0.3s;
             cursor: pointer;
-            font-size: 0.85rem;
+            box-shadow: 0 0 15px rgba(189, 224, 254, 0.4);
         }
 
         .btn-login:hover {
-            background: var(--color-4);
+            background: var(--color-3);
             color: var(--color-black) !important;
-            box-shadow: 0 0 20px rgba(189, 224, 254, 0.4);
+            box-shadow: 0 0 20px rgba(255, 175, 204, 0.6);
+            transform: scale(1.05);
         }
 
-        /* Hamburger Menu */
         .hamburger {
             display: none;
             width: 25px;
@@ -191,44 +197,46 @@
             height: 2px;
             background-color: var(--color-4);
             transition: all 0.3s ease;
-            border-radius: 2px;
         }
 
         /* ============================================================
-           3. HERO SECTION & RUNNING TEXT (RAPi & SEIMBANG)
+           3. HERO SECTION (FIT IN 1 SCREEN / 100vh)
            =========================================================== */
         .hero {
-            min-height: 100vh;
+            height: 100vh; /* Kunci agar fit di layar */
+            width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: center; /* Posisikan semua di tengah vertikal */
             position: relative;
-            padding: 150px 20px 80px; /* Jarak aman dari nav bar */
+            overflow: hidden; /* Mencegah elemen keluar dari layar awal */
+            padding-top: 60px; /* Jarak untuk floating nav */
             z-index: 1;
         }
 
+        /* Running Text Y2K Besar di Belakang */
         .marquee-container {
             position: absolute;
-            top: 25vh; /* Berada di belakang, tidak menutupi konten */
+            top: 50%;
+            transform: translateY(-50%);
             width: 100%;
             z-index: -1;
             pointer-events: none;
-            overflow: hidden;
         }
 
         .marquee-content {
             display: flex;
-            animation: scrollText 45s linear infinite;
+            animation: scrollText 40s linear infinite;
         }
 
         .marquee-item {
             font-family: 'Syne', sans-serif;
-            font-size: 15vw;
+            font-size: 14vw;
             font-weight: 800;
             white-space: nowrap;
             color: transparent;
-            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.04);
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.05);
             text-transform: uppercase;
             padding-right: 50px;
         }
@@ -238,80 +246,94 @@
             100% { transform: translateX(-50%); }
         }
 
+        /* Gambar Buku (Skala Otomatis Menyesuaikan Layar) */
         .hero-img-container {
-            width: 100%;
-            max-width: 450px;
-            margin: 0 auto 20px;
+            height: 35vh; /* Proporsional berdasarkan tinggi layar */
+            max-height: 280px; /* Batas maksimal di PC */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2vh; /* Margin pakai VH agar dinamis */
             z-index: 5;
-            animation: floatHero 6s ease-in-out infinite;
+            animation: floatHero 5s ease-in-out infinite;
         }
 
         .hero-img-container img {
-            width: 100%;
-            height: auto;
-            filter: drop-shadow(0 20px 40px rgba(189, 224, 254, 0.25));
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 40px rgba(255, 175, 204, 0.3));
         }
 
         @keyframes floatHero {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(2deg); }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
         }
 
+        /* Konten Teks & Tombol */
         .hero-content {
             text-align: center;
             z-index: 10;
-            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 20px;
         }
 
         .hero-content h1 { 
             font-family: 'Unbounded', sans-serif; 
-            font-size: clamp(2.2rem, 5vw, 4rem); 
+            font-size: clamp(1.8rem, 4vw, 3.5rem); /* Skala responsif */
             color: #fff; 
             margin: 0; 
-            line-height: 1.1;
-            text-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            line-height: 1.2;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.8);
+        }
+
+        .hero-content h1 span {
+            color: var(--color-3);
+            text-shadow: 0 0 20px rgba(255, 175, 204, 0.4);
         }
 
         .hero-content p {
-            font-size: clamp(1rem, 2vw, 1.2rem);
+            font-size: clamp(0.85rem, 1.5vw, 1.1rem);
             color: rgba(255,255,255,0.7);
-            margin: 20px auto 40px;
+            margin: 2vh 0 4vh; /* Jarak proporsional layar */
             max-width: 600px;
-            line-height: 1.6;
         }
 
+        /* Tombol Y2K Style */
         .btn-hero {
             display: inline-block;
-            background: linear-gradient(90deg, var(--color-4), var(--color-1));
+            background: var(--color-3);
             color: var(--color-black);
-            padding: 18px 45px;
+            padding: 15px 40px;
             border-radius: 50px;
             font-family: 'Unbounded', sans-serif;
             font-weight: 800;
-            font-size: 1.1rem;
+            font-size: 1rem;
             text-decoration: none;
-            transition: all 0.4s ease;
-            box-shadow: 0 10px 25px rgba(189, 224, 254, 0.3);
-            border: none;
+            text-transform: uppercase;
+            transition: 0.3s;
+            border: 2px solid var(--color-3);
+            box-shadow: 0 0 20px rgba(255, 175, 204, 0.5), inset 0 0 10px rgba(255,255,255,0.5);
             cursor: pointer;
-            position: relative;
-            z-index: 20; /* Pastikan tombol di atas segalanya */
         }
 
         .btn-hero:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 15px 35px rgba(189, 224, 254, 0.5);
-            letter-spacing: 1px;
+            background: transparent;
+            color: var(--color-3);
+            box-shadow: 0 0 30px rgba(255, 175, 204, 0.8);
+            transform: scale(1.05);
         }
 
         /* ============================================================
-           4. SECTIONS & DIFFERENTIATED GLASSMORPHISM
+           4. SECTIONS (Informasi, Visi Misi, dll)
            =========================================================== */
-        section {
-            padding: 120px 20px;
+        section:not(.hero) {
+            padding: 100px 20px;
             position: relative;
             z-index: 2;
-            scroll-margin-top: 100px;
+            scroll-margin-top: 80px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -323,46 +345,46 @@
         }
 
         .section-subtitle {
-            letter-spacing: 6px; 
+            letter-spacing: 4px; 
             color: var(--color-4); 
             font-weight: 800; 
-            font-size: 0.85rem; 
+            font-size: 0.8rem; 
             text-transform: uppercase;
             background: rgba(189, 224, 254, 0.1);
-            padding: 8px 20px;
-            border-radius: 30px;
+            padding: 6px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(189, 224, 254, 0.3);
         }
 
         .section-title {
             font-family: 'Unbounded', sans-serif; 
-            font-size: clamp(2rem, 4vw, 3rem); 
-            margin-top: 25px;
+            font-size: clamp(1.8rem, 3.5vw, 2.5rem); 
+            margin-top: 20px;
             color: #fff;
+            text-shadow: 0 0 10px rgba(255,255,255,0.2);
         }
 
-        /* Differentiated from Catalog: Rounded Asymmetrical Cards */
         .glass-card {
-            background: linear-gradient(135deg, rgba(30, 30, 30, 0.6), rgba(10, 10, 10, 0.8));
+            background: rgba(15, 15, 15, 0.6);
             border: 1px solid var(--glass-border);
             padding: 50px;
-            border-radius: 40px 10px 40px 10px; /* Sedikit Asimetris */
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            border-radius: 30px;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             width: 100%;
             max-width: 900px;
-            transition: all 0.5s ease;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transition: 0.4s ease;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
         }
 
         .glass-card:hover {
-            border-color: rgba(205, 180, 219, 0.4);
-            transform: translateY(-5px);
-            box-shadow: 0 25px 60px rgba(205, 180, 219, 0.1);
+            border-color: var(--color-3);
+            box-shadow: 0 15px 40px rgba(255, 175, 204, 0.15);
         }
 
         .text-content p {
             line-height: 1.8;
-            font-size: 1.05rem;
+            font-size: 1rem;
             color: rgba(255, 255, 255, 0.85);
             margin-bottom: 20px;
         }
@@ -370,8 +392,7 @@
         .text-content strong {
             color: var(--color-3);
             font-family: 'Unbounded', sans-serif;
-            font-size: 1.1rem;
-            letter-spacing: 0.5px;
+            font-size: 1.05rem;
         }
 
         ul, ol {
@@ -387,125 +408,116 @@
         /* Pustakawan */
         .pustakawan-card {
             text-align: center;
-            max-width: 500px;
-            border-radius: 30px; /* Simetris untuk profil */
+            max-width: 400px;
         }
 
         .pustakawan-card img {
-            width: 180px;
-            height: 180px;
+            width: 150px;
+            height: 150px;
             border-radius: 50%;
             object-fit: cover;
-            margin: 0 auto 30px;
-            border: 5px solid transparent;
-            background: linear-gradient(var(--color-black), var(--color-black)) padding-box,
-                        linear-gradient(45deg, var(--color-4), var(--color-1)) border-box;
-            box-shadow: 0 10px 30px rgba(189, 224, 254, 0.2);
-            transition: 0.5s ease;
+            margin: 0 auto 25px;
+            border: 4px solid var(--color-3);
+            box-shadow: 0 0 20px rgba(255, 175, 204, 0.4);
+            transition: 0.4s ease;
         }
 
         .pustakawan-card img:hover {
-            transform: scale(1.05) rotate(5deg);
+            transform: scale(1.1);
+            border-color: var(--color-4);
+            box-shadow: 0 0 30px rgba(189, 224, 254, 0.6);
         }
 
         .pustakawan-card p {
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            margin-bottom: 10px;
         }
 
-        /* Denah & Peta */
+        /* Denah & Lokasi */
         .maps-wrapper {
             border-radius: 20px;
             overflow: hidden;
             border: 1px solid var(--glass-border);
             margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         iframe {
             width: 100%;
-            height: 400px;
-            filter: grayscale(80%) invert(100%) contrast(80%); /* Dark map lebih soft */
+            height: 350px;
+            filter: grayscale(80%) invert(100%) contrast(90%);
             display: block;
         }
 
         .alamat-info {
             background: rgba(0, 0, 0, 0.4);
-            padding: 30px;
+            padding: 25px;
             border-radius: 20px;
             text-align: center;
-            margin-bottom: 40px;
-            border: 1px dashed rgba(255,255,255,0.1);
+            margin-bottom: 35px;
+            border: 1px solid var(--glass-border);
         }
 
         .alamat-info p {
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             color: rgba(255, 255, 255, 0.8);
-            line-height: 1.6;
+            font-size: 0.95rem;
         }
 
         .alamat-info i {
             color: var(--color-4);
-            margin-right: 10px;
+            margin-right: 8px;
         }
 
         .denah-img {
             width: 100%;
             border-radius: 20px;
             border: 1px solid var(--glass-border);
-            opacity: 0.85;
+            opacity: 0.9;
             transition: 0.4s;
         }
 
         .denah-img:hover {
             opacity: 1;
             border-color: var(--color-1);
-            transform: scale(1.02);
         }
 
-        /* Footer */
         footer {
             text-align: center;
-            padding: 40px;
+            padding: 30px;
             color: rgba(255, 255, 255, 0.4);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 600;
+            border-top: 1px solid var(--glass-border);
             background: transparent;
-            position: relative;
-            z-index: 10;
         }
 
         /* ============================================================
-           5. RESPONSIVE DESIGN
+           5. RESPONSIVE MOBILE
            =========================================================== */
         @media (max-width: 992px) {
-            .libwe-nav { width: 95%; padding: 15px 25px; }
-            .hero-img-container { max-width: 350px; }
             .glass-card { padding: 40px 30px; }
         }
 
         @media (max-width: 768px) {
             .hamburger { display: flex; }
-            
-            .btn-login { display: none; } /* Sembunyikan tombol login di navbar luar saat mobile */
+            .btn-login { display: none; }
             
             .nav-links {
                 position: absolute;
-                top: 80px; left: 0;
+                top: 70px; left: 0;
                 width: 100%;
-                background: rgba(15, 15, 15, 0.95);
+                background: rgba(10, 10, 10, 0.95);
                 backdrop-filter: blur(20px);
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
                 border-radius: 20px;
                 border: 1px solid var(--glass-border);
-                padding: 30px 0;
+                padding: 25px 0;
                 opacity: 0;
                 visibility: hidden;
-                transform: translateY(-20px);
-                transition: all 0.4s ease;
+                transform: translateY(-10px);
+                transition: all 0.3s ease;
             }
 
             .nav-links.active { 
@@ -519,23 +531,22 @@
                 margin-top: 15px;
             }
 
-            .hero { padding-top: 130px; }
-            .hero-img-container { max-width: 280px; }
-            .text-content p, ul, ol { font-size: 1rem; }
-            .glass-card { border-radius: 20px; }
+            .glass-card { border-radius: 20px; padding: 30px 20px; }
+            .hero-img-container { height: 30vh; }
         }
 
         @media (max-width: 480px) {
-            .hero h1 { font-size: 2rem; }
-            .btn-hero { padding: 15px 30px; font-size: 1rem; }
+            .btn-hero { padding: 12px 30px; font-size: 0.9rem; }
+            .hero-content h1 { font-size: 1.8rem; }
+            .hero-content p { margin: 2vh 0 3vh; }
         }
     </style>
 </head>
 <body>
     <div id="app">
-        <div class="bg-glow" style="top: -10%; right: -10%; background: var(--color-1);"></div>
-        <div class="bg-glow" style="bottom: 10%; left: -10%; background: var(--color-4);"></div>
-        <div class="bg-glow" style="top: 50%; left: 10%; background: var(--color-3);"></div>
+        <div class="bg-glow" style="top: -10%; right: -5%; background: var(--color-1);"></div>
+        <div class="bg-glow" style="bottom: 10%; left: -5%; background: var(--color-4);"></div>
+        <div class="bg-glow" style="top: 40%; left: 10%; background: var(--color-3);"></div>
 
         <nav class="libwe-nav" :class="{scrolled: isScrolled}">
             <div class="brand-container">
@@ -571,7 +582,7 @@
             </div>
 
             <div class="hero-content">
-                <h1>Selamat datang di <br><span style="color: var(--color-3)">Perpustakaan Online</span></h1>
+                <h1>Selamat datang di <br><span>Perpustakaan Online</span></h1>
                 <p>SDN Berat Wetan 1 — Membangun generasi cerdas dan berbudaya literasi.</p>
                 <button class="btn-hero" onclick="window.location.href='{{ route('katalog') }}'">TELUSURI BUKU</button>
             </div>
@@ -598,13 +609,13 @@
                     <li>Dengan adanya perpustakaan ini, diharapkan SDN Berat Wetan 1 tidak hanya menjadi tempat belajar akademik, tetapi juga tempat untuk membangun karakter, imajinasi, dan kecintaan terhadap ilmu pengetahuan.</li>
                 </ul>
                 
-                <hr style="border: 0; border-top: 1px dashed rgba(255,255,255,0.2); margin: 35px 0;">
+                <hr style="border: 0; border-top: 1px dashed rgba(255,255,255,0.2); margin: 30px 0;">
                 
                 <p><i class="fas fa-map-marker-alt" style="color: var(--color-4); margin-right: 10px; width: 20px; text-align: center;"></i> <strong>Alamat:</strong> Jl. KH. Abdul Fattah No.04, Berat Wetan, Kec. Gedeg, Kabupaten Mojokerto, Jawa Timur</p>
                 <p><i class="fas fa-envelope" style="color: var(--color-3); margin-right: 10px; width: 20px; text-align: center;"></i> <strong>Email:</strong> berat.wetan1@gmail.com</p>
                 <p><i class="fas fa-id-card" style="color: var(--color-1); margin-right: 10px; width: 20px; text-align: center;"></i> <strong>NPSN:</strong> 20502893</p>
                 <p><i class="fas fa-clock" style="color: var(--color-5); margin-right: 10px; width: 20px; text-align: center;"></i> <strong>Jam Operasional:</strong></p>
-                <ul style="list-style: none; padding-left: 45px; margin-top: 5px;">
+                <ul style="list-style: none; padding-left: 40px; margin-top: 5px;">
                     <li><span style="color: var(--color-4)">•</span> Senin - Kamis: 06:00 - 14:00 WIB</li>
                     <li><span style="color: var(--color-4)">•</span> Jumat - Sabtu: 06:00 - 13:00 WIB</li>
                 </ul>
@@ -671,7 +682,7 @@
                 </div>
                 
                 <div style="text-align: center;">
-                    <p style="margin-bottom: 20px; font-family: 'Unbounded'; color: var(--color-1);">Denah Ruangan Perpustakaan</p>
+                    <p style="margin-bottom: 20px; font-family: 'Unbounded'; color: var(--color-4);">Denah Ruangan Perpustakaan</p>
                     <img src="{{ asset('web-perpus/img/perpus.png') }}" alt="Denah Perpustakaan" class="denah-img">
                 </div>
             </div>
