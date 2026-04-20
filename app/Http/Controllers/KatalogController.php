@@ -18,28 +18,37 @@ class KatalogController extends Controller
         // 1. Ambil semua kategori untuk filter dropdown
         $kategoris = Category::orderBy('nama', 'asc')->get();
 
-        // 2. Ambil Top 10 Buku Populer (Logic anti-error SQLStrict)
+        // 2. Ambil Top 10 Buku Populer (Logic anti-error & Realtime Jumlah Pinjam)
         $popularBooks = Cache::remember('popular_books_katalog_y2k', 1800, function () {
             if (DB::connection()->getSchemaBuilder()->hasTable('pinjamans')) {
-                // Cari ID buku yang paling banyak dipinjam
-                $popularIds = DB::table('pinjamans')
-                    ->select('buku_id', DB::raw('COUNT(id) as total'))
-                    ->groupBy('buku_id')
-                    ->orderBy('total', 'DESC')
+                
+                // Gunakan Subquery agar total pinjam langsung menempel di data buku
+                $popular = Book::with('kategori')
+                    ->select('books.*', DB::raw('(SELECT COUNT(id) FROM pinjamans WHERE pinjamans.buku_id = books.id) as jumlah_dipinjam'))
+                    ->orderByDesc('jumlah_dipinjam')
                     ->limit(10)
-                    ->pluck('buku_id');
+                    ->get();
 
-                if ($popularIds->isNotEmpty()) {
-                    // Ambil detail buku dan jaga urutan rankingnya
-                    $idsOrder = $popularIds->implode(',');
-                    return Book::with('kategori')
-                        ->whereIn('id', $popularIds)
-                        ->orderByRaw("FIELD(id, $idsOrder)")
-                        ->get();
+                // Filter manual di level Collection agar aman dari error SQL Strict Mode
+                // Cuma ambil buku yang jumlah pinjamnya lebih dari 0
+                $filteredPopular = $popular->filter(function ($book) {
+                    return $book->jumlah_dipinjam > 0;
+                });
+
+                if ($filteredPopular->isNotEmpty()) {
+                    return $filteredPopular->values(); // Reset index array
                 }
             }
+            
             // Fallback: Jika belum ada data pinjaman, ambil berdasarkan stok terbanyak
-            return Book::with('kategori')->orderBy('stok', 'DESC')->limit(10)->get();
+            $fallback = Book::with('kategori')->orderBy('stok', 'DESC')->limit(10)->get();
+            
+            // Set default jumlah_dipinjam = 0 agar tidak error (kosong) di view
+            foreach ($fallback as $book) {
+                $book->jumlah_dipinjam = 0;
+            }
+            
+            return $fallback;
         });
 
         // 3. Query Utama untuk Katalog (Grid Bawah)
