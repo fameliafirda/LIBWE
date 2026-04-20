@@ -53,11 +53,11 @@ createApp({
             if (!container) return;
 
             const bookImages = [
-                'web perpus/img/book1.png',
-                'web perpus/img/book2.png',
-                'web perpus/img/book3.png',
-                'web perpus/img/book4.png',
-                'web perpus/img/book5.png'
+                'web-perpus/img/book1.png',
+                'web-perpus/img/book2.png',
+                'web-perpus/img/book3.png',
+                'web-perpus/img/book4.png',
+                'web-perpus/img/book5.png'
             ];
 
             container.innerHTML = '';
