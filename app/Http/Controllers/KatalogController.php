@@ -5,50 +5,78 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Book;
 use App\Models\Category;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class KatalogController extends Controller
 {
+    /**
+     * Menampilkan Halaman Utama Katalog Futuristik
+     */
     public function index(Request $request)
     {
-        // 1. Ambil data kategori untuk filter
-        $kategoris = Category::all();
+        // 1. Ambil semua kategori untuk dropdown filter
+        $kategoris = Category::orderBy('nama', 'asc')->get();
 
-        // 2. Ambil Top 10 Buku Populer (Logika diperbaiki agar tidak SQL Error)
-        $popularBooks = $this->getPopularBooks(10);
+        // 2. Ambil Top 10 Buku Paling Populer (Berdasarkan data peminjaman real)
+        // Kita simpan di Cache selama 30 menit agar database tidak berat
+        $popularBooks = Cache::remember('popular_books_katalog', 1800, function () {
+            // Cek apakah tabel pinjamans ada untuk menghindari error
+            if (DB::connection()->getSchemaBuilder()->hasTable('pinjamans')) {
+                return Book::leftJoin('pinjamans', 'books.id', '=', 'pinjamans.buku_id')
+                    ->select('books.*', DB::raw('COUNT(pinjamans.id) as total_pinjam'))
+                    ->groupBy('books.id')
+                    ->orderBy('total_pinjam', 'DESC')
+                    ->limit(10)
+                    ->get();
+            }
+            // Fallback jika belum ada data peminjaman, ambil berdasarkan stok terbanyak
+            return Book::orderBy('stok', 'DESC')->limit(10)->get();
+        });
 
-        // 3. Query Utama untuk Katalog Bawah
+        // 3. Logika Query untuk Katalog Utama (Grid Bawah)
         $query = Book::with('kategori');
 
+        // Filter Pencarian Judul/Penulis
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
-                $q->where('judul', 'LIKE', '%'.$search.'%')
-                  ->orWhere('penulis', 'LIKE', '%'.$search.'%');
+                $q->where('judul', 'LIKE', "%{$search}%")
+                  ->orWhere('penulis', 'LIKE', "%{$search}%");
             });
         }
 
+        // Filter Berdasarkan Kategori
         if ($request->filled('kategori')) {
             $query->where('kategori_id', $request->kategori);
         }
 
-        // Tampilkan yang terbaru dan paginate 12 buku per halaman
+        // Tampilkan buku terbaru (latest) dengan paginasi 12 buku
         $books = $query->latest()->paginate(12)->withQueryString();
 
-        return view('katalog.index', compact('books', 'kategoris', 'popularBooks'));
+        // Kirim data ke view
+        return view('katalog.index', [
+            'books' => $books,
+            'kategoris' => $kategoris,
+            'popularBooks' => $popularBooks
+        ]);
     }
 
+    /**
+     * Fungsi AJAX Filter (Tanpa Refresh Halaman)
+     * Ini yang bikin tampilan terasa canggih/futuristik
+     */
     public function filter(Request $request)
     {
         try {
             $query = Book::with('kategori');
 
+            // Logika pencarian yang sama dengan index
             if ($request->filled('search')) {
                 $search = $request->search;
                 $query->where(function($q) use ($search) {
-                    $q->where('judul', 'LIKE', '%'.$search.'%')
-                      ->orWhere('penulis', 'LIKE', '%'.$search.'%');
+                    $q->where('judul', 'LIKE', "%{$search}%")
+                      ->orWhere('penulis', 'LIKE', "%{$search}%");
                 });
             }
 
@@ -56,42 +84,21 @@ class KatalogController extends Controller
                 $query->where('kategori_id', $request->kategori);
             }
 
+            // Ambil semua data hasil filter
+            $books = $query->latest()->get();
+
+            // Return dalam format JSON untuk diproses JavaScript di view
             return response()->json([
                 'success' => true,
-                'books' => $query->latest()->get()
+                'message' => 'Data retrieved successfully',
+                'books'   => $books
             ]);
+
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
         }
-    }
-
-    private function getPopularBooks($limit = 10)
-    {
-        $cacheKey = 'popular_books_v1_' . $limit;
-        
-        return Cache::remember($cacheKey, now()->addMinutes(30), function() use ($limit) {
-            // Cek apakah tabel pinjamans ada
-            if (DB::connection()->getSchemaBuilder()->hasTable('pinjamans')) {
-                
-                // Ambil ID buku yang paling banyak dipinjam
-                $popularIds = DB::table('pinjamans')
-                    ->select('buku_id', DB::raw('COUNT(id) as total'))
-                    ->groupBy('buku_id')
-                    ->orderBy('total', 'DESC')
-                    ->limit($limit)
-                    ->pluck('buku_id');
-
-                if ($popularIds->isNotEmpty()) {
-                    // Ambil detail buku berdasarkan ID tersebut dan jaga urutannya
-                    $idsOrder = $popularIds->implode(',');
-                    return Book::whereIn('id', $popularIds)
-                        ->orderByRaw("FIELD(id, $idsOrder)")
-                        ->get();
-                }
-            }
-
-            // Fallback: Jika belum ada data pinjaman, ambil berdasarkan stok terbanyak
-            return Book::orderBy('stok', 'DESC')->limit($limit)->get();
-        });
     }
 }
