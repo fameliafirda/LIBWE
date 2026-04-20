@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Rak Buku Digital')
+@section('title', 'Katalog Buku Digital')
 
 @section('content')
 <style>
@@ -79,82 +79,7 @@
         background: linear-gradient(135deg, #fff, rgba(255,255,255,0.8));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-    }
-
-    .rak-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 24px;
-        margin-bottom: 40px;
-    }
-
-    .rak-card {
-        background: var(--glass-bg);
-        backdrop-filter: blur(12px);
-        border-radius: var(--radius);
-        padding: 0;
-        transition: var(--transition);
-        cursor: pointer;
-        border: 1px solid var(--glass-border);
-        overflow: hidden;
-        box-shadow: var(--shadow-sm);
-    }
-
-    .rak-card:hover {
-        transform: translateY(-8px);
-        box-shadow: var(--shadow-lg);
-        border-color: rgba(179, 141, 255, 0.5);
-    }
-
-    .rak-card.selected {
-        border: 3px solid var(--pastel-purple);
-        box-shadow: 0 0 0 6px rgba(179, 141, 255, 0.2);
-    }
-
-    .rak-header {
-        padding: 24px;
-        background: linear-gradient(135deg, var(--pastel-blue), var(--pastel-purple));
-    }
-
-    .rak-header .rak-title {
-        color: white;
-        font-size: 20px;
-        font-weight: 700;
-        margin-bottom: 8px;
-    }
-
-    .rak-header .rak-number {
-        background: rgba(255,255,255,0.2);
-        display: inline-block;
-        padding: 4px 12px;
-        border-radius: 50px;
-        font-size: 12px;
-        color: white;
-    }
-
-    .rak-header .rak-desc {
-        color: rgba(255,255,255,0.9);
-        font-size: 13px;
-        margin-top: 12px;
-    }
-
-    .rak-stats {
-        padding: 16px 24px;
-        display: flex;
-        justify-content: space-between;
-        background: rgba(0,0,0,0.03);
-        font-size: 13px;
-        color: var(--text-gray);
-    }
-
-    .category-tag {
-        display: inline-block;
-        font-size: 11px;
-        background: linear-gradient(135deg, var(--pastel-pink-light), var(--pastel-blue-light));
-        padding: 4px 10px;
-        border-radius: 50px;
-        color: white;
-        margin: 2px;
+        background-clip: text;
     }
 
     .search-filter-section {
@@ -163,12 +88,6 @@
         border-radius: var(--radius);
         padding: 24px;
         margin-bottom: 32px;
-        display: none;
-    }
-
-    .search-filter-section.show {
-        display: block;
-        animation: fadeInUp 0.4s ease-out;
     }
 
     .search-input {
@@ -230,6 +149,7 @@
         overflow: hidden;
         transition: all 0.3s;
         box-shadow: var(--shadow-sm);
+        cursor: pointer;
     }
 
     .book-card:hover {
@@ -330,17 +250,32 @@
         margin-top: 20px;
     }
 
+    .popular-books-section {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border-radius: var(--radius);
+        padding: 24px;
+        margin-bottom: 32px;
+    }
+
+    .popular-books-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+
     @media (max-width: 768px) {
         .page-header h1 { font-size: 24px; }
-        .rak-container { grid-template-columns: 1fr; }
         .books-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+        .popular-books-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
     }
 </style>
 
 <div class="page-header">
     <div class="container text-center">
-        <h1><i class="fas fa-layer-group me-2"></i>Rak Buku Digital</h1>
-        <p>Klik rak untuk melihat koleksi buku di dalamnya</p>
+        <h1><i class="fas fa-book me-2"></i>Katalog Buku Digital</h1>
+        <p>Temukan koleksi buku terbaik untuk Anda</p>
     </div>
 </div>
 
@@ -352,123 +287,137 @@
         </div>
     @endif
 
-    <div class="rak-container" id="rakContainer">
-        @forelse($raks as $rak)
-            <div class="rak-card" 
-                 data-rak-id="{{ $rak->id }}"
-                 data-rak-judul="{{ $rak->judul }}"
-                 data-rak-nomor="{{ $rak->nomor }}">
-                <div class="rak-header">
-                    <h3 class="rak-title">{{ $rak->judul }}</h3>
-                    <span class="rak-number">Rak {{ $rak->nomor }}</span>
-                    <p class="rak-desc">{{ Str::limit($rak->deskripsi, 80) ?: 'Koleksi buku berkualitas' }}</p>
-                </div>
-                <div class="rak-stats">
-                    <span><i class="fas fa-book"></i> {{ $rak->total_buku ?? 0 }} Buku</span>
-                    <span><i class="fas fa-tag"></i> {{ $rak->categories->count() }} Kategori</span>
-                </div>
-                <div class="px-3 pb-3">
-                    @forelse($rak->categories->take(4) as $cat)
-                        <span class="category-tag">{{ $cat->nama }}</span>
-                    @empty
-                        <span class="category-tag">Belum ada kategori</span>
-                    @endforelse
-                </div>
-            </div>
-        @empty
-            <div class="empty-state" style="grid-column: 1/-1;">
-                <i class="fas fa-layer-group fa-3x mb-3"></i>
-                <h4>Belum Ada Rak</h4>
-                <p>Silahkan tambah rak terlebih dahulu</p>
-            </div>
-        @endforelse
-    </div>
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show mb-4" style="border-radius: 16px;">
+            <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
 
-    <div class="search-filter-section" id="searchFilterSection">
-        <input type="text" id="searchInput" class="search-input" placeholder="🔍 Cari judul atau penulis buku...">
-        <div class="filter-label"><i class="fas fa-tags me-2"></i>Filter Kategori</div>
-        <div class="filter-buttons" id="filterButtons"></div>
-    </div>
-
-    <div id="booksSection">
-        @if($selectedRak && $books->count() > 0)
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4><i class="fas fa-book-open me-2"></i>Buku di {{ $selectedRak->judul }}</h4>
-                <span class="badge bg-primary">{{ $books->count() }} Buku</span>
-            </div>
-            <div class="books-grid">
-                @foreach($books as $book)
-                    <div class="book-card">
-                        @if($book->gambar)
-                            <img src="{{ asset('storage/' . $book->gambar) }}" class="book-cover" alt="{{ $book->judul }}">
-                        @else
-                            <div class="book-cover"><i class="fas fa-book"></i></div>
-                        @endif
-                        <div class="book-info">
-                            <h6 class="book-title">{{ Str::limit($book->judul, 40) }}</h6>
-                            <p class="book-author">{{ Str::limit($book->penulis, 25) ?: 'Penulis tidak diketahui' }}</p>
-                            <span class="book-category">{{ $book->category->nama ?? 'Tanpa Kategori' }}</span>
-                        </div>
+    <!-- Popular Books Section -->
+    @if(isset($popularBooks) && $popularBooks->count() > 0)
+    <div class="popular-books-section">
+        <h4><i class="fas fa-fire text-danger me-2"></i>Rekomendasi Buku Populer</h4>
+        <p class="text-muted small">Buku paling sering dipinjam oleh anggota</p>
+        <div class="popular-books-grid">
+            @foreach($popularBooks as $book)
+            <div class="book-card" onclick="window.location.href='{{ route('books.show', $book->id) }}'">
+                @if($book->gambar)
+                    <img src="{{ asset('storage/' . $book->gambar) }}" class="book-cover" alt="{{ $book->judul }}">
+                @else
+                    <div class="book-cover"><i class="fas fa-book"></i></div>
+                @endif
+                <div class="book-info">
+                    <h6 class="book-title">{{ Str::limit($book->judul, 40) }}</h6>
+                    <p class="book-author">{{ Str::limit($book->penulis, 25) ?: 'Penulis tidak diketahui' }}</p>
+                    <span class="book-category">{{ $book->kategori->nama ?? 'Tanpa Kategori' }}</span>
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <i class="fas fa-chart-line"></i> {{ $book->total_dipinjam ?? 0 }} kali dipinjam
+                        </small>
                     </div>
-                @endforeach
+                </div>
             </div>
-        @elseif($selectedRak)
-            <div class="empty-state">
-                <i class="fas fa-book-open fa-3x mb-3"></i>
-                <h4>Belum Ada Buku</h4>
-                <p>Belum ada buku yang masuk ke rak ini</p>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
+    <!-- Search & Filter Section -->
+    <div class="search-filter-section">
+        <div class="row">
+            <div class="col-md-6">
+                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Cari judul, penulis, atau penerbit...">
             </div>
-        @else
-            <div class="empty-state">
-                <i class="fas fa-hand-point-up fa-3x mb-3"></i>
-                <h4>Pilih Rak</h4>
-                <p>Klik salah satu rak di atas untuk melihat koleksi buku</p>
+            <div class="col-md-6">
+                <div class="filter-label"><i class="fas fa-tags me-2"></i>Filter Kategori</div>
+                <div class="filter-buttons" id="filterButtons">
+                    <button class="filter-chip active" data-category="">📚 Semua Buku</button>
+                    @foreach($kategoris as $kategori)
+                        <button class="filter-chip" data-category="{{ $kategori->id }}">{{ $kategori->nama }}</button>
+                    @endforeach
+                </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Books Section -->
+    <div id="booksSection">
+        <div class="books-grid">
+            @foreach($books as $book)
+            <div class="book-card" onclick="window.location.href='{{ route('books.show', $book->id) }}'">
+                @if($book->gambar)
+                    <img src="{{ asset('storage/' . $book->gambar) }}" class="book-cover" alt="{{ $book->judul }}">
+                @else
+                    <div class="book-cover"><i class="fas fa-book"></i></div>
+                @endif
+                <div class="book-info">
+                    <h6 class="book-title">{{ Str::limit($book->judul, 40) }}</h6>
+                    <p class="book-author">{{ Str::limit($book->penulis, 25) ?: 'Penulis tidak diketahui' }}</p>
+                    <span class="book-category">{{ $book->kategori->nama ?? 'Tanpa Kategori' }}</span>
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <i class="fas fa-box"></i> Stok: {{ $book->stok }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+
+        @if($books->count() == 0)
+        <div class="empty-state">
+            <i class="fas fa-book-open fa-3x mb-3"></i>
+            <h4>Belum Ada Buku</h4>
+            <p>Belum ada buku yang tersedia di katalog</p>
+        </div>
         @endif
     </div>
+
+    <!-- Pagination -->
+    @if($books->count() > 0)
+    <div class="mt-4">
+        {{ $books->links() }}
+    </div>
+    @endif
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    let currentRakId = null;
-    let currentRakJudul = null;
-    let currentCategory = 'all';
+    let currentCategory = '';
     let currentSearch = '';
     let searchTimeout;
 
-    // Base URL untuk AJAX - TIDAK MENGGUNAKAN ROUTE DENGAN PARAMETER
-    const booksAjaxUrl = "{{ url('/rak/books') }}";
+    $(document).ready(function() {
+        // Filter category click
+        $('.filter-chip').on('click', function() {
+            $('.filter-chip').removeClass('active');
+            $(this).addClass('active');
+            currentCategory = $(this).data('category');
+            loadBooks();
+        });
 
-    $(document).on('click', '.rak-card', function() {
-        currentRakId = $(this).data('rak-id');
-        currentRakJudul = $(this).data('rak-judul');
-        currentCategory = 'all';
-        currentSearch = '';
-        $('#searchInput').val('');
-        
-        $('.rak-card').removeClass('selected');
-        $(this).addClass('selected');
-        $('#searchFilterSection').addClass('show');
-        loadBooks();
+        // Search input
+        $('#searchInput').on('input', function() {
+            clearTimeout(searchTimeout);
+            currentSearch = $(this).val();
+            searchTimeout = setTimeout(() => loadBooks(), 500);
+        });
     });
 
     function loadBooks() {
-        if (!currentRakId) return;
-        
         $('#booksSection').html('<div class="loading"><i class="fas fa-spinner fa-spin"></i><p>Memuat buku...</p></div>');
         
         $.ajax({
-            url: booksAjaxUrl,
+            url: '{{ route("katalog.filter") }}',
             method: 'GET',
             data: {
-                rak_id: currentRakId,
-                category_id: currentCategory,
+                kategori: currentCategory,
                 search: currentSearch
             },
             success: function(response) {
                 if (response.success) {
-                    displayBooks(response.books, response.rak);
-                    updateFilters(response.books);
+                    displayBooks(response.books);
                 } else {
                     $('#booksSection').html(`
                         <div class="empty-state">
@@ -491,63 +440,49 @@
         });
     }
 
-    function updateFilters(books) {
-        let categories = new Set();
-        books.forEach(book => {
-            if (book.category_nama) categories.add(book.category_nama);
-        });
-        
-        let html = '<button class="filter-chip active" data-category="all">📚 Semua Buku</button>';
-        categories.forEach(cat => {
-            html += `<button class="filter-chip" data-category="${cat}">📖 ${cat}</button>`;
-        });
-        $('#filterButtons').html(html);
-        
-        $('.filter-chip').off('click').on('click', function() {
-            $('.filter-chip').removeClass('active');
-            $(this).addClass('active');
-            currentCategory = $(this).data('category');
-            loadBooks();
-        });
-    }
-
-    function displayBooks(books, rak) {
+    function displayBooks(books) {
         if (!books || books.length === 0) {
-            let msg = currentSearch ? `Tidak ditemukan "${currentSearch}"` : 
-                      (currentCategory !== 'all' ? `Tidak ada buku kategori "${currentCategory}"` : 'Belum ada buku');
+            let msg = currentSearch ? `Tidak ditemukan "${currentSearch}"` : 'Tidak ada buku';
             $('#booksSection').html(`
                 <div class="empty-state">
                     <i class="fas fa-search fa-3x mb-3"></i>
                     <h4>Tidak Ada Buku</h4>
                     <p>${msg}</p>
-                    ${(currentSearch || currentCategory !== 'all') ? '<button class="btn-reset" onclick="resetFilters()">Reset Filter</button>' : ''}
+                    ${(currentSearch || currentCategory) ? '<button class="btn-reset" onclick="resetFilters()">Reset Filter</button>' : ''}
                 </div>
             `);
             return;
         }
         
-        let html = `
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4><i class="fas fa-book-open me-2"></i>Buku di ${escapeHtml(rak?.judul || currentRakJudul)}</h4>
-                <span class="badge bg-primary">${books.length} Buku</span>
-            </div>
-            <div class="books-grid">
-        `;
+        let html = `<div class="books-grid">`;
         
         books.forEach(book => {
             html += `
-                <div class="book-card">
+                <div class="book-card" onclick="window.location.href='/books/${book.id}'">
                     ${book.gambar ? `<img src="/storage/${book.gambar}" class="book-cover" alt="${escapeHtml(book.judul)}">` : 
                                     `<div class="book-cover"><i class="fas fa-book"></i></div>`}
                     <div class="book-info">
                         <h6 class="book-title">${escapeHtml(book.judul)}</h6>
-                        <p class="book-author">${escapeHtml(book.penulis)}</p>
-                        <span class="book-category">${escapeHtml(book.category_nama)}</span>
+                        <p class="book-author">${escapeHtml(book.penulis) || 'Penulis tidak diketahui'}</p>
+                        <span class="book-category">${escapeHtml(book.kategori?.nama || 'Tanpa Kategori')}</span>
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <i class="fas fa-box"></i> Stok: ${book.stok}
+                            </small>
+                        </div>
                     </div>
                 </div>
             `;
         });
         html += `</div>`;
+        
+        // Add pagination info
+        if (books.length >= 24) {
+            html += `<div class="text-center mt-4">
+                        <small class="text-muted">Menampilkan ${books.length} buku. Gunakan filter untuk pencarian lebih spesifik.</small>
+                     </div>`;
+        }
+        
         $('#booksSection').html(html);
     }
 
@@ -557,16 +492,12 @@
     }
 
     window.resetFilters = function() {
-        currentCategory = 'all';
+        currentCategory = '';
         currentSearch = '';
         $('#searchInput').val('');
+        $('.filter-chip').removeClass('active');
+        $('.filter-chip[data-category=""]').addClass('active');
         loadBooks();
     };
-
-    $('#searchInput').on('input', function() {
-        clearTimeout(searchTimeout);
-        currentSearch = $(this).val();
-        searchTimeout = setTimeout(() => loadBooks(), 500);
-    });
 </script>
 @endsection

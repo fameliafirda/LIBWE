@@ -19,7 +19,6 @@ class KatalogController extends Controller
         $kategoris = Category::all();
 
         // ==================== REKOMENDASI BUKU POPULER ====================
-        // Ambil 10 buku paling sering dipinjam (diurutkan dari tertinggi ke terendah)
         $popularBooks = $this->getPopularBooks(10);
 
         // ==================== QUERY KATALOG BUKU ====================
@@ -51,23 +50,54 @@ class KatalogController extends Controller
     }
 
     /**
+     * Filter books via AJAX
+     */
+    public function filter(Request $request)
+    {
+        try {
+            $query = Book::with('kategori');
+
+            // Search
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function($q) use ($search) {
+                    $q->where('judul', 'LIKE', '%'.$search.'%')
+                      ->orWhere('penulis', 'LIKE', '%'.$search.'%')
+                      ->orWhere('penerbit', 'LIKE', '%'.$search.'%');
+                });
+            }
+
+            // Filter kategori
+            if ($request->filled('kategori') && $request->kategori != '') {
+                $query->where('kategori_id', $request->kategori);
+            }
+
+            $books = $query->latest()->limit(48)->get();
+
+            return response()->json([
+                'success' => true,
+                'books' => $books
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
      * Get popular books based on borrowing history from pinjamans table.
-     * Diurutkan dari yang paling banyak dipinjam ke yang paling sedikit
-     * 
-     * @param int $limit Jumlah buku yang ditampilkan (default 10)
-     * @return \Illuminate\Database\Eloquent\Collection
      */
     private function getPopularBooks($limit = 10)
     {
         $cacheKey = 'popular_books_limit_' . $limit;
         
         return Cache::remember($cacheKey, now()->addMinutes(30), function() use ($limit) {
-            // Cek apakah tabel pinjamans ada
             if (!$this->hasPinjamanTable()) {
                 return collect();
             }
 
-            // Query untuk mendapatkan buku paling sering dipinjam
             $popularBooks = Book::with('kategori')
                 ->leftJoin('pinjamans', function($join) {
                     $join->on('books.id', '=', 'pinjamans.buku_id')
@@ -98,7 +128,6 @@ class KatalogController extends Controller
                 ->limit($limit)
                 ->get();
 
-            // Jika tidak ada data peminjaman, tampilkan berdasarkan stok terbanyak
             if ($popularBooks->isEmpty() || $popularBooks->sum('total_dipinjam') == 0) {
                 return Book::with('kategori')
                     ->orderBy('stok', 'DESC')
@@ -114,9 +143,6 @@ class KatalogController extends Controller
         });
     }
 
-    /**
-     * Check if pinjamans table exists.
-     */
     private function hasPinjamanTable()
     {
         try {
@@ -126,12 +152,8 @@ class KatalogController extends Controller
         }
     }
 
-    /**
-     * Clear popular books cache.
-     */
     public function clearRecommendationCache()
     {
-        // Hapus cache popular books
         Cache::forget('popular_books_limit_10');
         Cache::forget('popular_books_limit_5');
         

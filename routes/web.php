@@ -7,7 +7,6 @@ use App\Http\Controllers\AnggotaController;
 use App\Http\Controllers\PinjamanController;
 use App\Http\Controllers\PengembalianController;
 use App\Http\Controllers\LaporanController;
-use App\Http\Controllers\RakController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\KatalogController;
@@ -24,6 +23,10 @@ Route::view('/', 'landing')->name('landing');
 
 // Katalog publik
 Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog');
+Route::get('/katalog/filter', [KatalogController::class, 'filter'])->name('katalog.filter');
+
+// Detail buku publik
+Route::get('/books/{id}', [KatalogController::class, 'show'])->name('books.show');
 
 // AJAX check book
 Route::get('/check-book', [PinjamanController::class, 'checkBook'])->name('check-book');
@@ -42,27 +45,32 @@ Route::controller(LoginController::class)->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| ADMIN ROUTES
+| ADMIN ROUTES (Protected by Pustakawan Middleware)
 |--------------------------------------------------------------------------
 */
 
 Route::middleware([PustakawanMiddleware::class])->group(function () {
 
+    // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // Books Management
     Route::resource('books', BookController::class);
     Route::get('/books/category/{id}', [BookController::class, 'byCategory'])->name('books.byCategory');
 
+    // Categories Management
     Route::resource('categories', CategoryController::class);
 
+    // Anggota Management
     Route::resource('anggotas', AnggotaController::class);
     Route::get('/anggotas/{anggota}/peminjaman', [AnggotaController::class, 'peminjaman'])->name('anggotas.peminjaman');
-
     Route::delete('/anggotas/delete-all', [AnggotaController::class, 'deleteAll'])->name('anggotas.delete-all');
 
+    // Peminjaman Management
     Route::resource('pinjamans', PinjamanController::class);
     Route::post('/pinjamans/{id}/mark-returned', [PinjamanController::class, 'markAsReturned'])->name('pinjamans.mark-returned');
 
+    // Pengembalian Management
     Route::resource('pengembalians', PengembalianController::class);
 
     /*
@@ -79,26 +87,6 @@ Route::middleware([PustakawanMiddleware::class])->group(function () {
 
         Route::get('/pengembalian', 'laporanPengembalian')->name('pengembalian');
         Route::get('/pengembalian/export', 'exportPengembalian')->name('pengembalian.export');
-    });
-
-    /*
-    |-----------------------------
-    | RAK
-    |-----------------------------
-    */
-    Route::prefix('rak')->name('rak.')->controller(RakController::class)->group(function () {
-
-        Route::get('/', 'index')->name('index');
-
-        Route::post('/', 'store')->name('store');
-        Route::put('/{id}', 'update')->name('update');
-        Route::delete('/{id}', 'destroy')->name('destroy');
-
-        Route::post('/{rakId}/add-category', 'addCategory')->name('addCategory');
-        Route::delete('/{rakId}/remove-category/{kategoriId}', 'removeCategory')->name('removeCategory');
-
-        Route::get('/books', 'getBooks')->name('books');
-        Route::get('/{rakId}/books', 'getBooksByRak')->name('getBooks');
     });
 });
 
