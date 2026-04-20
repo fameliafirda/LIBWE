@@ -75,7 +75,7 @@
             color: var(--color-black);
         }
 
-        /* Floating Background Glow */
+        /* Floating Background Glow with Pulse Animation */
         .bg-glow {
             position: fixed;
             width: 50vw; height: 50vw;
@@ -84,6 +84,18 @@
             z-index: -1;
             opacity: 0.15;
             pointer-events: none;
+            animation: pulseGlow 12s infinite alternate ease-in-out;
+        }
+
+        /* Memberikan delay berbeda agar glow bergerak tidak bersamaan */
+        .bg-glow:nth-child(1) { animation-delay: 0s; }
+        .bg-glow:nth-child(2) { animation-delay: -4s; }
+        .bg-glow:nth-child(3) { animation-delay: -8s; }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(1) translate(0, 0); opacity: 0.12; }
+            50% { transform: scale(1.15) translate(30px, -30px); opacity: 0.25; }
+            100% { transform: scale(0.9) translate(-30px, 30px); opacity: 0.12; }
         }
 
         /* ============================================================
@@ -108,6 +120,12 @@
             z-index: 1000;
             transition: all 0.4s ease;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: slideDownNav 1s ease-out forwards;
+        }
+
+        @keyframes slideDownNav {
+            0% { transform: translate(-50%, -100px); opacity: 0; }
+            100% { transform: translate(-50%, 0); opacity: 1; }
         }
 
         .libwe-nav.scrolled {
@@ -127,6 +145,11 @@
             width: 30px;
             height: auto;
             filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+            transition: 0.5s ease;
+        }
+
+        .brand-container:hover img {
+            transform: rotate(15deg) scale(1.1);
         }
 
         .brand-libwe {
@@ -169,7 +192,7 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             font-weight: 800 !important;
             font-size: 0.8rem;
-            transition: 0.3s;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
             box-shadow: 0 0 15px rgba(189, 224, 254, 0.4);
         }
@@ -203,19 +226,19 @@
            3. HERO SECTION (FIT IN 1 SCREEN / 100vh)
            =========================================================== */
         .hero {
-            height: 100vh; /* Kunci agar fit di layar */
+            height: 100vh;
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center; /* Posisikan semua di tengah vertikal */
+            justify-content: center;
             position: relative;
-            overflow: hidden; /* Mencegah elemen keluar dari layar awal */
-            padding-top: 60px; /* Jarak untuk floating nav */
+            overflow: hidden;
+            padding-top: 60px;
             z-index: 1;
         }
 
-        /* Running Text Y2K Besar di Belakang */
+        /* Running Text Y2K Dipertebal & Futuristik */
         .marquee-container {
             position: absolute;
             top: 50%;
@@ -227,18 +250,20 @@
 
         .marquee-content {
             display: flex;
-            animation: scrollText 40s linear infinite;
+            animation: scrollText 35s linear infinite; /* Sedikit lebih cepat */
         }
 
         .marquee-item {
             font-family: 'Syne', sans-serif;
-            font-size: 14vw;
-            font-weight: 800;
+            font-size: 15vw;
+            font-weight: 900;
+            font-style: italic; /* Menambah kesan cepat/futuristik */
             white-space: nowrap;
             color: transparent;
-            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.05);
+            -webkit-text-stroke: 2.5px rgba(189, 224, 254, 0.25); /* Garis lebih tebal dan berwarna Cyan */
             text-transform: uppercase;
             padding-right: 50px;
+            letter-spacing: 3px;
         }
 
         @keyframes scrollText {
@@ -246,14 +271,14 @@
             100% { transform: translateX(-50%); }
         }
 
-        /* Gambar Buku (Skala Otomatis Menyesuaikan Layar) */
+        /* Gambar Buku */
         .hero-img-container {
-            height: 35vh; /* Proporsional berdasarkan tinggi layar */
-            max-height: 280px; /* Batas maksimal di PC */
+            height: 35vh;
+            max-height: 280px;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 2vh; /* Margin pakai VH agar dinamis */
+            margin-bottom: 2vh;
             z-index: 5;
             animation: floatHero 5s ease-in-out infinite;
         }
@@ -270,7 +295,7 @@
             50% { transform: translateY(-15px); }
         }
 
-        /* Konten Teks & Tombol */
+        /* Animasi Slide-Up Fade untuk Konten Hero */
         .hero-content {
             text-align: center;
             z-index: 10;
@@ -282,11 +307,13 @@
 
         .hero-content h1 { 
             font-family: 'Unbounded', sans-serif; 
-            font-size: clamp(1.8rem, 4vw, 3.5rem); /* Skala responsif */
+            font-size: clamp(1.8rem, 4vw, 3.5rem); 
             color: #fff; 
             margin: 0; 
             line-height: 1.2;
             text-shadow: 0 5px 15px rgba(0,0,0,0.8);
+            opacity: 0;
+            animation: slideUpFade 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards 0.3s;
         }
 
         .hero-content h1 span {
@@ -297,8 +324,20 @@
         .hero-content p {
             font-size: clamp(0.85rem, 1.5vw, 1.1rem);
             color: rgba(255,255,255,0.7);
-            margin: 2vh 0 4vh; /* Jarak proporsional layar */
+            margin: 2vh 0 4vh;
             max-width: 600px;
+            opacity: 0;
+            animation: slideUpFade 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards 0.5s;
+        }
+
+        .hero-content .btn-wrapper {
+            opacity: 0;
+            animation: slideUpFade 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards 0.7s;
+        }
+
+        @keyframes slideUpFade {
+            0% { opacity: 0; transform: translateY(40px); }
+            100% { opacity: 1; transform: none; }
         }
 
         /* Tombol Y2K Style */
@@ -313,7 +352,7 @@
             font-size: 1rem;
             text-decoration: none;
             text-transform: uppercase;
-            transition: 0.3s;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             border: 2px solid var(--color-3);
             box-shadow: 0 0 20px rgba(255, 175, 204, 0.5), inset 0 0 10px rgba(255,255,255,0.5);
             cursor: pointer;
@@ -373,13 +412,23 @@
             -webkit-backdrop-filter: blur(15px);
             width: 100%;
             max-width: 900px;
-            transition: 0.4s ease;
+            transition: 0.5s ease;
             box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            /* Animasi Ambient di Border Card */
+            animation: borderGlow 8s infinite alternate;
+        }
+
+        @keyframes borderGlow {
+            0% { border-color: rgba(255, 255, 255, 0.1); }
+            50% { border-color: rgba(189, 224, 254, 0.25); }
+            100% { border-color: rgba(255, 175, 204, 0.25); }
         }
 
         .glass-card:hover {
-            border-color: var(--color-3);
-            box-shadow: 0 15px 40px rgba(255, 175, 204, 0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8);
+            border-color: var(--color-3) !important;
+            animation: none; /* Matikan animasi ambient saat di-hover */
         }
 
         .text-content p {
@@ -419,11 +468,11 @@
             margin: 0 auto 25px;
             border: 4px solid var(--color-3);
             box-shadow: 0 0 20px rgba(255, 175, 204, 0.4);
-            transition: 0.4s ease;
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .pustakawan-card img:hover {
-            transform: scale(1.1);
+            transform: scale(1.1) rotate(5deg);
             border-color: var(--color-4);
             box-shadow: 0 0 30px rgba(189, 224, 254, 0.6);
         }
@@ -584,7 +633,9 @@
             <div class="hero-content">
                 <h1>Selamat datang di <br><span>Perpustakaan Online</span></h1>
                 <p>SDN Berat Wetan 1 — Membangun generasi cerdas dan berbudaya literasi.</p>
-                <button class="btn-hero" onclick="window.location.href='{{ route('katalog') }}'">TELUSURI BUKU</button>
+                <div class="btn-wrapper">
+                    <button class="btn-hero" onclick="window.location.href='{{ route('katalog') }}'">TELUSURI BUKU</button>
+                </div>
             </div>
         </section>
 
