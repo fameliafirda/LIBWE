@@ -10,34 +10,40 @@ use Illuminate\Support\Facades\Cache;
 
 class KatalogController extends Controller
 {
-    /**
-     * Menampilkan Halaman Utama Katalog Futuristik
-     */
     public function index(Request $request)
     {
         // 1. Ambil semua kategori untuk dropdown filter
         $kategoris = Category::orderBy('nama', 'asc')->get();
 
-        // 2. Ambil Top 10 Buku Paling Populer (Berdasarkan data peminjaman real)
-        // Kita simpan di Cache selama 30 menit agar database tidak berat
+        // 2. Ambil Top 10 Buku Populer (Logic diperbaiki untuk menghindari Error 1055)
         $popularBooks = Cache::remember('popular_books_katalog', 1800, function () {
-            // Cek apakah tabel pinjamans ada untuk menghindari error
             if (DB::connection()->getSchemaBuilder()->hasTable('pinjamans')) {
-                return Book::leftJoin('pinjamans', 'books.id', '=', 'pinjamans.buku_id')
-                    ->select('books.*', DB::raw('COUNT(pinjamans.id) as total_pinjam'))
-                    ->groupBy('books.id')
+                
+                // Langkah A: Cari ID buku yang paling banyak dipinjam
+                $popularIds = DB::table('pinjamans')
+                    ->select('buku_id', DB::raw('COUNT(id) as total_pinjam'))
+                    ->groupBy('buku_id')
                     ->orderBy('total_pinjam', 'DESC')
                     ->limit(10)
-                    ->get();
+                    ->pluck('buku_id');
+
+                if ($popularIds->isNotEmpty()) {
+                    // Langkah B: Ambil detail buku berdasarkan ID tersebut
+                    // Menggunakan orderByRaw agar urutan ranking (1-10) tidak berantakan
+                    $idsOrder = $popularIds->implode(',');
+                    return Book::whereIn('id', $popularIds)
+                        ->orderByRaw("FIELD(id, $idsOrder)")
+                        ->get();
+                }
             }
-            // Fallback jika belum ada data peminjaman, ambil berdasarkan stok terbanyak
+            
+            // Fallback jika belum ada data pinjaman
             return Book::orderBy('stok', 'DESC')->limit(10)->get();
         });
 
-        // 3. Logika Query untuk Katalog Utama (Grid Bawah)
+        // 3. Query Utama untuk Katalog (Data dari Pustakawan)
         $query = Book::with('kategori');
 
-        // Filter Pencarian Judul/Penulis
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -46,15 +52,13 @@ class KatalogController extends Controller
             });
         }
 
-        // Filter Berdasarkan Kategori
         if ($request->filled('kategori')) {
             $query->where('kategori_id', $request->kategori);
         }
 
-        // Tampilkan buku terbaru (latest) dengan paginasi 12 buku
+        // Ambil data terbaru yang diinput pustakawan
         $books = $query->latest()->paginate(12)->withQueryString();
 
-        // Kirim data ke view
         return view('katalog.index', [
             'books' => $books,
             'kategoris' => $kategoris,
@@ -62,16 +66,11 @@ class KatalogController extends Controller
         ]);
     }
 
-    /**
-     * Fungsi AJAX Filter (Tanpa Refresh Halaman)
-     * Ini yang bikin tampilan terasa canggih/futuristik
-     */
     public function filter(Request $request)
     {
         try {
             $query = Book::with('kategori');
 
-            // Logika pencarian yang sama dengan index
             if ($request->filled('search')) {
                 $search = $request->search;
                 $query->where(function($q) use ($search) {
@@ -84,20 +83,17 @@ class KatalogController extends Controller
                 $query->where('kategori_id', $request->kategori);
             }
 
-            // Ambil semua data hasil filter
             $books = $query->latest()->get();
 
-            // Return dalam format JSON untuk diproses JavaScript di view
             return response()->json([
                 'success' => true,
-                'message' => 'Data retrieved successfully',
                 'books'   => $books
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error: ' . $e->getMessage()
+                'message' => $e->getMessage()
             ], 500);
         }
     }
