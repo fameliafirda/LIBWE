@@ -12,7 +12,7 @@
        ============================================================ */
     :root {
         --bg-main: #050508; 
-        --bg-section: #0f0f16; /* Warna pembeda untuk section terpisah */
+        --bg-section: #0f0f16;
         --lavender: #d8b4e2;
         --soft-pink: #ffb3c6;
         --baby-blue: #9bf6ff;
@@ -40,7 +40,6 @@
         scroll-behavior: smooth;
     }
 
-    /* Ambient Background Pattern */
     body::before {
         content: '';
         position: fixed;
@@ -53,7 +52,7 @@
     }
 
     /* ============================================================
-       2. NAVIGASI (SLEEK & MODERN)
+       2. NAVIGASI
        =========================================================== */
     .catalog-nav {
         position: fixed;
@@ -77,121 +76,81 @@
         letter-spacing: 1px;
     }
 
-    .brand-libwe span {
-        color: var(--baby-blue);
-    }
+    .brand-libwe span { color: var(--baby-blue); }
 
     .nav-links { display: flex; gap: 35px; align-items: center; }
     .nav-links a { 
-        text-decoration: none; 
-        color: var(--text-muted); 
-        font-weight: 600; 
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        transition: 0.3s;
+        text-decoration: none; color: var(--text-muted); 
+        font-weight: 600; font-size: 0.85rem;
+        text-transform: uppercase; letter-spacing: 1px; transition: 0.3s;
     }
     .nav-links a:hover, .nav-links a.active { color: var(--soft-pink); }
 
     /* ============================================================
-       3. HERO PENCARIAN (MINIMALIST)
+       3. HERO PENCARIAN
        =========================================================== */
     .hero-catalog {
         padding: 150px 20px 50px;
         text-align: center;
         position: relative;
         z-index: 10;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        display: flex; flex-direction: column; align-items: center;
     }
 
     .hero-catalog h1 { 
         font-family: 'Unbounded', sans-serif; 
-        font-size: clamp(2.5rem, 5vw, 4rem); 
-        color: #fff; 
-        margin-bottom: 5px; 
-        letter-spacing: -1px;
+        font-size: clamp(2.5rem, 5vw, 4rem); color: #fff; 
+        margin-bottom: 5px; letter-spacing: -1px;
     }
 
     .hero-catalog h1 span {
         background: linear-gradient(to right, var(--lavender), var(--soft-pink));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
 
     .hero-catalog p {
-        color: var(--text-muted);
-        font-weight: 500;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        margin-bottom: 40px;
-        font-size: 0.9rem;
+        color: var(--text-muted); font-weight: 500;
+        letter-spacing: 2px; text-transform: uppercase;
+        margin-bottom: 40px; font-size: 0.9rem;
     }
 
-    /* Kotak Pencarian Premium */
     .search-container {
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-        width: 100%;
-        max-width: 850px;
-        background: rgba(25, 25, 35, 0.4);
-        padding: 12px;
-        border-radius: 20px;
-        border: 1px solid var(--glass-border);
-        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        backdrop-filter: blur(10px);
+        display: flex; justify-content: center; gap: 15px;
+        width: 100%; max-width: 850px;
+        background: rgba(25, 25, 35, 0.4); padding: 12px;
+        border-radius: 20px; border: 1px solid var(--glass-border);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4); backdrop-filter: blur(10px);
     }
 
     .search-container input, .search-container select {
-        background: rgba(0, 0, 0, 0.3);
-        border: 1px solid transparent;
-        padding: 16px 20px;
-        border-radius: 12px;
-        color: #fff;
-        outline: none;
-        flex: 1;
-        font-weight: 500;
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        transition: 0.3s;
+        background: rgba(0, 0, 0, 0.3); border: 1px solid transparent;
+        padding: 16px 20px; border-radius: 12px; color: #fff;
+        outline: none; flex: 1; font-weight: 500; font-family: 'Plus Jakarta Sans', sans-serif; transition: 0.3s;
     }
 
     .search-container input:focus, .search-container select:focus {
-        border-color: var(--lavender);
-        background: rgba(0, 0, 0, 0.5);
+        border-color: var(--lavender); background: rgba(0, 0, 0, 0.5);
     }
 
     .btn-cari {
-        background: var(--lavender);
-        color: var(--bg-main);
-        border: none;
-        padding: 0 40px;
-        border-radius: 12px;
-        font-weight: 800;
-        cursor: pointer;
-        transition: 0.3s;
-        font-family: 'Unbounded', sans-serif;
-        font-size: 0.9rem;
+        background: var(--lavender); color: var(--bg-main);
+        border: none; padding: 0 40px; border-radius: 12px;
+        font-weight: 800; cursor: pointer; transition: 0.3s;
+        font-family: 'Unbounded', sans-serif; font-size: 0.9rem;
     }
     .btn-cari:hover { background: #fff; transform: translateY(-2px); }
 
     /* ============================================================
-       4. SECTION REKOMENDASI (ISLAND LAYOUT - SANGAT BERBEDA)
+       4. SECTION REKOMENDASI (ISLAND LAYOUT)
        =========================================================== */
     .recommendation-wrapper {
-        margin: 40px 40px 80px 40px;
-        padding: 60px 0;
+        margin: 40px 40px 80px 40px; padding: 60px 0;
         background: linear-gradient(145deg, var(--bg-section), #0a0a0f);
-        border-radius: 40px;
-        border: 1px solid rgba(216, 180, 226, 0.1);
+        border-radius: 40px; border: 1px solid rgba(216, 180, 226, 0.1);
         box-shadow: 0 25px 50px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.02);
-        position: relative;
-        z-index: 10;
-        overflow: hidden;
+        position: relative; z-index: 10; overflow: hidden;
     }
 
-    /* Ornamen background khusus rekomendasi */
     .recommendation-wrapper::before {
         content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         background: radial-gradient(circle at top right, rgba(255, 179, 198, 0.05), transparent 50%);
@@ -199,12 +158,9 @@
     }
 
     .section-title {
-        text-align: center;
-        margin-bottom: 40px;
-        font-family: 'Unbounded', sans-serif;
-        font-size: 1.8rem;
-        color: #fff;
-        position: relative;
+        text-align: center; margin-bottom: 40px;
+        font-family: 'Unbounded', sans-serif; font-size: 1.8rem;
+        color: #fff; position: relative;
     }
 
     .section-title i { color: var(--soft-pink); margin-right: 10px; }
@@ -213,23 +169,19 @@
 
     .track-container {
         display: flex; gap: 25px; overflow-x: auto;
-        scroll-behavior: smooth; padding: 20px 10px;
-        scrollbar-width: none;
+        scroll-behavior: smooth; padding: 20px 10px; scrollbar-width: none;
     }
     .track-container::-webkit-scrollbar { display: none; }
 
     .slider-card {
         min-width: 180px; max-width: 180px;
-        background: rgba(0, 0, 0, 0.4);
-        border: 1px solid var(--glass-border);
-        padding: 15px; border-radius: 20px;
-        transition: 0.4s; position: relative;
-        display: flex; flex-direction: column;
+        background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border);
+        padding: 15px; border-radius: 20px; transition: 0.4s;
+        position: relative; display: flex; flex-direction: column;
     }
 
     .slider-card:hover { 
-        transform: translateY(-8px); 
-        border-color: var(--soft-pink); 
+        transform: translateY(-8px); border-color: var(--soft-pink); 
         background: rgba(20, 20, 30, 0.8);
     }
 
@@ -249,10 +201,8 @@
     .borrow-stats {
         position: absolute; top: 10px; right: 10px;
         background: rgba(5, 5, 8, 0.8); color: var(--baby-blue);
-        backdrop-filter: blur(5px);
-        padding: 5px 10px; border-radius: 8px;
-        font-size: 0.7rem; font-weight: 700;
-        border: 1px solid rgba(155, 246, 255, 0.2);
+        backdrop-filter: blur(5px); padding: 5px 10px; border-radius: 8px;
+        font-size: 0.7rem; font-weight: 700; border: 1px solid rgba(155, 246, 255, 0.2);
     }
 
     .book-title-small { font-family: 'Unbounded'; font-size: 0.85rem; margin-bottom: 5px; color: #fff; line-height: 1.3; }
@@ -264,8 +214,7 @@
         background: rgba(255,255,255,0.05); color: #fff;
         border: 1px solid rgba(255,255,255,0.1); cursor: pointer;
         z-index: 100; transition: 0.3s;
-        display: flex; align-items: center; justify-content: center;
-        backdrop-filter: blur(5px);
+        display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px);
     }
     .btn-nav-slider:hover { background: #fff; color: var(--bg-main); }
     .btn-prev { left: 20px; }
@@ -277,32 +226,23 @@
     #koleksi { padding: 20px 60px 100px; position: relative; z-index: 10; }
 
     .book-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-        gap: 25px;
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 25px;
     }
 
     .book-item {
-        background: var(--glass);
-        border: 1px solid var(--glass-border);
-        border-radius: 16px;
-        padding: 12px;
-        transition: 0.4s;
-        display: flex;
-        flex-direction: column;
-        position: relative;
+        background: var(--glass); border: 1px solid var(--glass-border);
+        border-radius: 16px; padding: 12px; transition: 0.4s;
+        display: flex; flex-direction: column; position: relative;
     }
 
     .book-item:hover {
-        border-color: var(--baby-blue);
-        box-shadow: 0 10px 30px rgba(155, 246, 255, 0.1);
+        border-color: var(--baby-blue); box-shadow: 0 10px 30px rgba(155, 246, 255, 0.1);
         transform: translateY(-5px);
     }
 
     .img-box {
-        width: 100%; height: 230px; 
-        background: #000; border-radius: 10px; overflow: hidden;
-        position: relative; margin-bottom: 15px;
+        width: 100%; height: 230px; background: #000; border-radius: 10px; 
+        overflow: hidden; position: relative; margin-bottom: 15px;
     }
 
     .img-box img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
@@ -326,30 +266,23 @@
     
     .b-meta {
         margin-top: auto; display: flex; flex-direction: column; gap: 5px;
-        font-size: 0.75rem; padding-top: 12px;
-        border-top: 1px solid rgba(255,255,255,0.05);
+        font-size: 0.75rem; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.05);
     }
 
     .b-meta-row { display: flex; justify-content: space-between; align-items: center; }
     .b-year { color: var(--text-muted); }
     .b-stock { font-weight: 800; color: var(--baby-blue); }
 
-    /* Floating Back Button */
     .btn-kembali {
         position: fixed; bottom: 30px; right: 30px; 
         background: #fff; color: var(--bg-main);
         padding: 12px 25px; border-radius: 50px; 
         text-decoration: none !important; font-weight: 800; z-index: 1000;
         display: flex; align-items: center; gap: 10px;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-        transition: 0.3s; font-size: 0.85rem;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.5); transition: 0.3s; font-size: 0.85rem;
     }
-
     .btn-kembali:hover { transform: scale(1.05); background: var(--lavender); }
 
-    /* ============================================================
-       RESPONSIVE DESIGN
-       =========================================================== */
     @media (max-width: 992px) {
         .catalog-nav { padding: 20px 30px; }
         .search-container { flex-direction: column; }
@@ -407,7 +340,8 @@
             @foreach($popularBooks as $index => $pb)
             <div class="slider-card">
                 <div class="rank-badge">#{{ $index + 1 }}</div>
-                <div class="borrow-stats"><i class="fas fa-book-reader"></i> {{ $pb->jumlah_dipinjam ?? 0 }}x</div>
+                
+                <div class="borrow-stats"><i class="fas fa-book-reader"></i> {{ $pb->pinjamans_count ?? 0 }}x</div>
                 
                 @php
                     $gambarPathPopuler = $pb->gambar ? str_replace('public/', '', $pb->gambar) : null;
@@ -490,7 +424,6 @@
                 
                 if(data.books && data.books.length > 0) {
                     data.books.forEach(b => {
-                        // Pembersihan path gambar dari DB di JavaScript
                         let cleanPath = b.gambar ? b.gambar.replace('public/', '') : null;
                         let img = cleanPath ? `/storage/${cleanPath}` : '{{ asset("web-perpus/img/bukubaru.png") }}';
                         
@@ -525,7 +458,6 @@
                 container.innerHTML = html;
                 container.style.opacity = '1';
                 
-                // Update URL Parameter
                 const url = new URL(window.location);
                 if(keyword) url.searchParams.set('search', keyword); else url.searchParams.delete('search');
                 if(kategori) url.searchParams.set('kategori', kategori); else url.searchParams.delete('kategori');
