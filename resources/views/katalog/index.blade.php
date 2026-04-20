@@ -347,7 +347,7 @@
     <div class="brand-libwe">LIBWE</div>
     <div class="nav-links">
         <a href="#">Beranda</a>
-        <a href="#top10">Populer</a>
+        <a href="#top10">Rekomendasi</a>
         <a href="#koleksi">Koleksi</a>
     </div>
     <div style="width: 100px; text-align: right; font-size: 1.5rem;"><i class="fas fa-search"></i></div>
@@ -370,8 +370,8 @@
     </div>
 
     <div class="hero-content">
-        <h1>BACA <span style="color: var(--color-3)">LAGI.</span></h1>
-        <p style="letter-spacing: 6px; font-weight: 800; color: var(--color-5); margin-top: 10px;">TEMUKAN MASA DEPANMU</p>
+        <h1>PERPUSTAKAAN <span style="color: var(--color-3)">ONLINE</span></h1>
+        <p style="letter-spacing: 6px; font-weight: 800; color: var(--color-5); margin-top: 10px;">SDN BERATWETAN 1</p>
     </div>
 </section>
 
@@ -404,7 +404,7 @@
 
 <section id="koleksi">
     <div style="text-align: center; margin-bottom: 60px;">
-        <h2 style="font-family: 'Unbounded'; font-size: 2.5rem;">EKSPLORASI ARSIP</h2>
+        <h2 style="font-family: 'Unbounded'; font-size: 2.5rem;">Katalog Buku</h2>
     </div>
 
     <div class="search-aesthetic">
