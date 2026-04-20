@@ -1,11 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+
 <style>
     /* ============================================================
-       1. TOTAL RESET & STICKY HEADER SETUP
+       1. RESET & BASE THEME (FUTURISTIC DARK)
        ============================================================ */
-    /* Hapus elemen default AdminLTE / Bootstrap */
     .main-header, .main-sidebar, .content-header, .main-footer, hr, .breadcrumb { 
         display: none !important; 
     }
@@ -13,363 +14,337 @@
     .content-wrapper { 
         margin-left: 0 !important; 
         padding: 0 !important; 
-        background: #050510 !important; 
+        background: #02020a !important; 
         min-height: 100vh;
-        overflow: hidden; /* Untuk partikel background */
     }
 
     :root {
         --neon-pink: #ff00ff;
-        --neon-purple: #9d00ff;
-        --neon-blue: #00d4ff;
-        --glass-bg: rgba(255, 255, 255, 0.05);
-        --glass-border: rgba(255, 255, 255, 0.1);
+        --neon-purple: #bc13fe;
+        --neon-blue: #00f2ff;
+        --deep-space: #02020a;
+        --glass-white: rgba(255, 255, 255, 0.08);
     }
 
     body {
-        background: radial-gradient(circle at top right, #1a0b2e, #050510);
+        background: var(--deep-space);
         color: #fff;
-        font-family: 'Inter', sans-serif;
+        font-family: 'Plus Jakarta Sans', sans-serif;
         overflow-x: hidden;
     }
 
-    .container-custom {
-        max-width: 1350px;
-        margin: 0 auto;
-        padding: 0 40px;
-        position: relative;
-        z-index: 10;
-    }
-
-    /* ============================================================
-       2. NEON PARTICLES BACKGROUND ANIMATION
-       ============================================================ */
-    .particles-container {
+    /* Animasi Latar Belakang Cahaya Bergerak */
+    .nebula-bg {
         position: fixed;
         top: 0; left: 0; width: 100%; height: 100%;
+        background: 
+            radial-gradient(circle at 20% 30%, rgba(255, 0, 255, 0.1), transparent 40%),
+            radial-gradient(circle at 80% 70%, rgba(0, 242, 255, 0.1), transparent 40%);
         z-index: 1;
         pointer-events: none;
     }
 
-    .particle {
-        position: absolute;
-        border-radius: 50%;
-        filter: blur(5px);
-        opacity: 0.1;
-        animation: particleFly 15s linear infinite;
-    }
-
-    @keyframes particleFly {
-        0% { transform: translateY(100vh) scale(0); }
-        100% { transform: translateY(-10vh) scale(1); }
-    }
-
     /* ============================================================
-       3. STICKY TOP BAR & LOGO
+       2. STICKY GLASS NAVIGATION BAR
        =========================================================== */
-    .top-bar-sticky {
+    .navbar-glass {
         position: sticky;
         top: 0;
-        left: 0;
-        width: 100%;
-        background: rgba(5, 5, 16, 0.85);
-        backdrop-filter: blur(20px);
-        border-bottom: 1px solid var(--glass-border);
-        padding: 20px 0;
         z-index: 1000;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        background: rgba(2, 2, 10, 0.7);
+        backdrop-filter: blur(25px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 15px 0;
+        transition: 0.4s;
     }
 
-    .top-bar-content {
+    .nav-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 30px;
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
 
-    .logo-future {
+    .brand-section h1 {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin: 0;
+        background: linear-gradient(to right, var(--neon-blue), var(--neon-pink));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -1px;
+    }
+
+    .brand-section span {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: rgba(255,255,255,0.5);
+    }
+
+    /* Search & Filter Group */
+    .action-group {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        flex: 0.6;
+    }
+
+    .search-box-cyber {
+        flex: 1;
+        background: var(--glass-white);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        padding: 5px 5px 5px 20px;
+        transition: 0.3s;
+    }
+
+    .search-box-cyber:focus-within {
+        border-color: var(--neon-blue);
+        box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+    }
+
+    .search-box-cyber input {
+        background: transparent;
+        border: none;
+        color: white;
+        width: 100%;
+        outline: none;
+        padding: 8px 0;
+        font-size: 0.9rem;
+    }
+
+    .btn-glow {
+        background: linear-gradient(45deg, var(--neon-purple), var(--neon-pink));
+        border: none;
+        color: white;
+        padding: 10px 25px;
+        border-radius: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn-glow:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px var(--neon-pink);
+    }
+
+    .select-cyber {
+        background: var(--glass-white);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 15px;
+        outline: none;
+        cursor: pointer;
+    }
+
+    /* ============================================================
+       3. TRENDING SECTION (HORIZON SLIDER)
+       =========================================================== */
+    .section-title {
+        margin: 40px 0 20px;
         display: flex;
         align-items: center;
         gap: 15px;
     }
 
-    .logo-future img {
-        width: 45px;
-        filter: drop-shadow(0 0 10px var(--neon-pink));
-    }
+    .section-title h2 { font-size: 1.4rem; font-weight: 800; color: var(--neon-blue); margin: 0; }
+    .title-line { height: 2px; flex: 1; background: linear-gradient(to right, var(--neon-blue), transparent); opacity: 0.3; }
 
-    .title-glow {
-        font-size: 2rem;
-        font-weight: 900;
-        letter-spacing: 1px;
-        background: linear-gradient(135deg, var(--neon-pink), var(--neon-blue));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        text-transform: uppercase;
-        filter: drop-shadow(0 0 10px rgba(255, 0, 255, 0.3));
-    }
-
-    .school-desc {
-        font-size: 0.8rem;
-        color: rgba(255,255,255,0.6);
-        letter-spacing: 1px;
-    }
-
-    /* ============================================================
-       4. CYBER SEARCH & FILTER SECTION
-       =========================================================== */
-    .search-filter-box {
+    .trending-wrapper {
         display: flex;
-        align-items: center;
-        gap: 20px;
-        max-width: 800px;
-    }
-
-    .cyber-search {
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        border-radius: 100px;
-        padding: 5px 5px 5px 25px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex: 3;
-        transition: 0.3s;
-    }
-
-    .cyber-search:focus-within {
-        border-color: var(--neon-pink);
-        box-shadow: 0 0 20px rgba(255, 0, 255, 0.2);
-    }
-
-    .cyber-search input {
-        background: transparent;
-        border: none;
-        color: #fff;
-        flex: 1;
-        outline: none;
-        font-size: 14px;
-    }
-
-    .btn-cyber-cari {
-        background: linear-gradient(45deg, var(--neon-pink), var(--neon-purple));
-        color: white;
-        border: none;
-        padding: 10px 25px;
-        border-radius: 100px;
-        font-weight: 800;
-        cursor: pointer;
-        transition: 0.3s;
-    }
-
-    .btn-cyber-cari:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--neon-pink); }
-
-    .cyber-filter {
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        border-radius: 100px;
-        padding: 10px 20px;
-        color: rgba(255,255,255,0.7);
-        outline: none;
-        cursor: pointer;
-        font-size: 13px;
-    }
-
-    /* ============================================================
-       5. TRENDING SECTIONS (HORIZONTAL)
-       =========================================================== */
-    .trending-section {
-        padding: 50px 0;
-    }
-
-    .label-tren {
-        font-weight: 800;
-        font-size: 1.3rem;
-        color: var(--neon-blue);
-        margin-bottom: 30px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .tren-line { flex: 1; height: 1px; background: linear-gradient(to right, var(--neon-blue), transparent); }
-
-    .trending-scroll {
-        display: flex;
-        gap: 30px;
+        gap: 25px;
         overflow-x: auto;
-        padding: 20px 0;
+        padding: 20px 0 40px;
+        scrollbar-width: none;
     }
 
-    .trending-scroll::-webkit-scrollbar { height: 4px; }
-    .trending-scroll::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 10px; }
+    .trending-wrapper::-webkit-scrollbar { display: none; }
 
-    .card-tren {
-        min-width: 180px;
+    .card-popular {
+        min-width: 200px;
+        height: 300px;
         position: relative;
-        transition: all 0.5s;
+        border-radius: 20px;
+        overflow: hidden;
+        transition: 0.5s;
+        cursor: pointer;
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .card-tren:hover { transform: scale(1.1) translateY(-10px); z-index: 20; }
-
-    .card-tren img {
-        width: 180px;
-        height: 270px;
-        object-fit: cover;
-        border-radius: 15px;
-        border: 1px solid var(--glass-border);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    .card-popular:hover {
+        transform: scale(1.05) rotate(2deg);
+        border-color: var(--neon-pink);
+        box-shadow: 0 10px 30px rgba(255, 0, 255, 0.3);
     }
 
-    .badge-rank {
+    .card-popular img { width: 100%; height: 100%; object-fit: cover; }
+
+    .rank-number {
         position: absolute;
-        top: -10px; left: -10px;
-        background: var(--neon-pink);
-        color: white;
-        width: 40px; height: 40px;
-        border-radius: 10px;
-        display: flex; align-items: center; justify-content: center;
+        bottom: 15px; left: 15px;
+        font-size: 4rem;
         font-weight: 900;
-        box-shadow: 0 0 10px var(--neon-pink);
+        line-height: 0.8;
+        color: rgba(255, 255, 255, 0.2);
+        -webkit-text-stroke: 1px rgba(255,255,255,0.5);
     }
 
     /* ============================================================
-       6. MAIN ARCHIVE GRID
+       4. MAIN GRID (KATALOG BUKU)
        =========================================================== */
-    .catalog-grid {
+    .main-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
         gap: 30px;
-        padding-bottom: 80px;
+        padding-bottom: 100px;
     }
 
-    .grid-node {
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        border-radius: 20px;
+    .book-card {
+        background: var(--glass-white);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 24px;
         padding: 15px;
-        transition: 0.3s;
+        transition: 0.4s;
         position: relative;
-        cursor: pointer;
+        animation: fadeInUp 0.8s ease backwards;
     }
 
-    /* Efek hover pada kartu buku utama */
-    .grid-node:hover {
-        background: rgba(255, 255, 255, 0.08);
-        border-color: var(--neon-purple);
-        transform: translateY(-8px);
-        box-shadow: 0 10px 30px rgba(157, 0, 255, 0.2);
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
-    .grid-node img {
+    .book-card:hover {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: var(--neon-blue);
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .img-wrapper {
         width: 100%;
-        height: 250px;
-        object-fit: cover;
-        border-radius: 12px;
-        margin-bottom: 12px;
+        height: 280px;
+        border-radius: 18px;
+        overflow: hidden;
+        margin-bottom: 15px;
+        position: relative;
     }
 
-    .grid-node h5 { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 5px; }
-    .grid-node p { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 12px; }
+    .img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+    .book-card:hover .img-wrapper img { transform: scale(1.1); }
 
-    .node-meta {
+    .category-tag {
+        position: absolute;
+        top: 10px; right: 10px;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(5px);
+        color: var(--neon-blue);
+        font-size: 0.7rem;
+        padding: 5px 12px;
+        border-radius: 10px;
+        font-weight: 700;
+        border: 1px solid var(--neon-blue);
+    }
+
+    .book-info h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 5px; color: #fff; }
+    .book-info p { font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-bottom: 15px; }
+
+    .stock-info {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        padding-top: 12px;
     }
 
-    .pil-kategori {
-        font-size: 9px;
-        padding: 3px 10px;
-        border-radius: 20px;
-        background: rgba(0, 212, 255, 0.1);
-        color: var(--neon-blue);
-        border: 1px solid var(--neon-blue);
-        text-transform: uppercase;
-        font-weight: 700;
-    }
-
-    .qty-stok { font-size: 10px; font-weight: 700; color: var(--neon-pink); }
+    .stock-badge { color: var(--neon-pink); font-weight: 800; font-size: 0.8rem; }
 
 </style>
 
-<div class="particles-container" id="particles"></div>
+<div class="nebula-bg"></div>
 
-<div class="top-bar-sticky">
-    <div class="container-custom">
-        <div class="top-bar-content">
-            <div class="logo-future">
-                <img src="https://img.icons8.com/color/96/open-book.png" alt="book-icon">
-                <div>
-                    <h1 class="title-glow">Katalog Buku</h1>
-                    <p class="school-desc">Perpustakaan Online SDN BERATWETAN 1</p>
-                </div>
+<nav class="navbar-glass">
+    <div class="nav-container">
+        <div class="brand-section">
+            <h1>KATALOG BUKU</h1>
+            <span>Perpustakaan SDN Berat Wetan 1</span>
+        </div>
+
+        <div class="action-group">
+            <div class="search-box-cyber">
+                <i class="fas fa-search" style="color: var(--neon-blue)"></i>
+                <input type="text" id="inputCari" placeholder="Cari judul buku atau penulis...">
+                <button class="btn-glow" onclick="prosesCari()">TEMUKAN</button>
             </div>
 
-            <div class="search-filter-box">
-                <div class="cyber-search">
-                    <i class="fas fa-search text-muted"></i>
-                    <input type="text" id="kunci_cari" placeholder="Masukkan judul buku atau nama penulis...">
-                    <button class="btn-cyber-cari" onclick="temukanBuku()">CARI</button>
-                </div>
-                
-                <select id="kategori_pilih" class="cyber-filter">
-                    <option value="">SEMUA KATEGORI</option>
-                    @foreach($kategoris as $k)
-                        <option value="{{ $k->id }}">{{ $k->nama }}</option>
-                    @endforeach
-                </select>
-            </div>
+            <select id="filterKat" class="select-cyber" onchange="prosesCari()">
+                <option value="">SEMUA KATEGORI</option>
+                @foreach($kategoris as $k)
+                    <option value="{{ $k->id }}">{{ $k->nama }}</option>
+                @endforeach
+            </select>
         </div>
     </div>
-</div>
+</nav>
 
-<div class="container-custom mt-5">
+<div class="container-fluid" style="max-width: 1400px; margin: 0 auto; padding: 0 30px; position: relative; z-index: 10;">
     
     @if($popularBooks->count() > 0)
-    <div class="trending-section">
-        <div class="label-tren">
-            <i class="fas fa-bolt text-warning"></i>
-            TRENDING DATA PUSTAKAWAN
-            <div class="tren-line"></div>
+    <div class="section-title">
+        <i class="fas fa-fire-alt" style="color: var(--neon-pink)"></i>
+        <h2>BUKU PALING SERU</h2>
+        <div class="title-line"></div>
+    </div>
+
+    <div class="trending-wrapper">
+        @foreach($popularBooks as $index => $pb)
+        <div class="card-popular">
+            <div class="rank-number">{{ $index + 1 }}</div>
+            @if($pb->gambar)
+                <img src="{{ asset('storage/'.$pb->gambar) }}" alt="">
+            @else
+                <div style="width:100%; height:100%; background:#1a1a2e; display:flex; align-items:center; justify-content:center">
+                    <i class="fas fa-book fa-3x text-muted"></i>
+                </div>
+            @endif
         </div>
-        <div class="trending-scroll">
-            @foreach($popularBooks as $index => $pb)
-            <div class="card-tren">
-                <div class="badge-rank">#{{ $index + 1 }}</div>
-                @if($pb->gambar)
-                    <img src="{{ asset('storage/'.$pb->gambar) }}" alt="{{ $pb->judul }}">
-                @else
-                    <div style="width:180px;height:270px;background:#222;border-radius:15px;display:flex;align-items:center;justify-content:center">
-                        <i class="fas fa-image fa-3x text-muted"></i>
-                    </div>
-                @endif
-            </div>
-            @endforeach
-        </div>
+        @endforeach
     </div>
     @endif
 
-    <div class="label-tren mt-5">
-        <i class="fas fa-layer-group text-info"></i>
-        SEMUA ARSIP BUKU
-        <div class="tren-line"></div>
+    <div class="section-title">
+        <i class="fas fa-th-large" style="color: var(--neon-blue)"></i>
+        <h2>JELAJAHI SEMUA BUKU</h2>
+        <div class="title-line"></div>
     </div>
 
-    <div id="catalogNodeContainer" class="catalog-grid">
-        @foreach($books as $book)
-        <div class="grid-node">
-            @if($book->gambar)
-                <img src="{{ asset('storage/'.$book->gambar) }}" alt="{{ $book->judul }}">
-            @else
-                <div style="height:250px; background:#222; border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:12px">
-                    <i class="fas fa-image fa-2x text-muted"></i>
+    <div id="gridBuku" class="main-grid">
+        @foreach($books as $key => $book)
+        <div class="book-card" style="animation-delay: {{ $key * 0.1 }}s">
+            <div class="img-wrapper">
+                <span class="category-tag">{{ $book->kategori->nama ?? 'Umum' }}</span>
+                @if($book->gambar)
+                    <img src="{{ asset('storage/'.$book->gambar) }}" alt="{{ $book->judul }}">
+                @else
+                    <div style="height:100%; background:#1a1a2e; display:flex; align-items:center; justify-content:center">
+                        <i class="fas fa-image fa-2x text-muted"></i>
+                    </div>
+                @endif
+            </div>
+            <div class="book-info">
+                <h3>{{ Str::limit($book->judul, 30) }}</h3>
+                <p>{{ $book->penulis ?? 'Penulis Misterius' }}</p>
+                <div class="stock-info">
+                    <span class="stock-badge">Tersedia: {{ $book->stok }}</span>
+                    <i class="fas fa-arrow-right" style="color: var(--neon-blue)"></i>
                 </div>
-            @endif
-            <h5>{{ Str::limit($book->judul, 35) }}</h5>
-            <p>{{ $book->penulis ?? 'Penulis tidak diketahui' }}</p>
-            <div class="node-meta">
-                <span class="pil-kategori">{{ $book->kategori->nama ?? 'Umum' }}</span>
-                <span class="qty-stok">STOK: {{ $book->stok }}</span>
             </div>
         </div>
         @endforeach
@@ -382,78 +357,48 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    // PARTIKEL BACKGROUND ANIMATION SCRIPT
-    function createParticles() {
-        const container = document.getElementById('particles');
-        const colors = ['#ff00ff', '#9d00ff', '#00d4ff'];
-        
-        for (let i = 0; i < 50; i++) {
-            const particle = document.createElement('div');
-            particle.classList.add('particle');
-            
-            // Atur ukuran & warna acak
-            const size = Math.random() * 5 + 2 + 'px';
-            particle.style.width = size;
-            particle.style.height = size;
-            particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-            
-            // Atur posisi & kecepatan acak
-            particle.style.left = Math.random() * 100 + 'vw';
-            particle.style.animationDuration = (Math.random() * 10 + 5) + 's';
-            particle.style.animationDelay = (Math.random() * 5) + 's';
-            
-            container.appendChild(particle);
-        }
-    }
-    createParticles(); // Jalankan partikel
+    function prosesCari() {
+        let keyword = $('#inputCari').val();
+        let kategori = $('#filterKat').val();
+        let grid = $('#gridBuku');
 
-    // AJAX FILTER FUNCTION (UNTUK TOMBOL CARI & DROPDOWN)
-    function temukanBuku() {
-        let keyword = $('#kunci_cari').val();
-        let kategori = $('#kategori_pilih').val();
-        let container = $('#catalogNodeContainer');
-
-        container.style.opacity = '0.4'; // Efek loading
+        grid.css('opacity', '0.3');
 
         $.ajax({
-            url: '{{ route("katalog.filter") }}', // Ganti dengan route filter kamu
+            url: '{{ route("katalog.filter") }}',
             method: 'GET',
             data: { search: keyword, kategori: kategori },
-            success: function(response) {
-                let html = '<div class="catalog-grid">';
-                if(response.books.length > 0) {
-                    response.books.forEach(b => {
-                        let imgUrl = b.gambar ? `/storage/${b.gambar}` : 'https://via.placeholder.com/190x250?text=No+Image';
-                        let katName = b.kategori ? b.kategori.nama : 'Umum';
+            success: function(res) {
+                let html = '';
+                if(res.books.length > 0) {
+                    res.books.forEach((b, i) => {
+                        let img = b.gambar ? `/storage/${b.gambar}` : 'https://via.placeholder.com/220x280';
+                        let kat = b.kategori ? b.kategori.nama : 'Umum';
                         html += `
-                        <div class="grid-node">
-                            <img src="${imgUrl}" alt="${b.judul}">
-                            <h5>${b.judul}</h5>
-                            <p>${b.penulis || 'Penulis tidak diketahui'}</p>
-                            <div class="node-meta">
-                                <span class="pil-kategori">${katName}</span>
-                                <span class="qty-stok">STOK: ${b.stok}</span>
+                        <div class="book-card" style="animation-delay: ${i * 0.05}s">
+                            <div class="img-wrapper">
+                                <span class="category-tag">${kat}</span>
+                                <img src="${img}">
+                            </div>
+                            <div class="book-info">
+                                <h3>${b.judul}</h3>
+                                <p>${b.penulis || 'Penulis Misterius'}</p>
+                                <div class="stock-info">
+                                    <span class="stock-badge">Tersedia: ${b.stok}</span>
+                                    <i class="fas fa-arrow-right" style="color: var(--neon-blue)"></i>
+                                </div>
                             </div>
                         </div>`;
                     });
                 } else {
-                    html = '<div class="text-center w-100 py-5"><h4>Buku tidak ditemukan.</h4></div>';
+                    html = '<div class="text-center w-100 py-5"><h3>Yah, bukunya tidak ketemu...</h3></div>';
                 }
-                html += '</div>';
-                container.innerHTML = html;
-                container.style.opacity = '1';
-            },
-            error: function() {
-                container.innerHTML = '<div class="text-center w-100 py-5"><h4>Error mengambil data.</h4></div>';
-                container.style.opacity = '1';
+                grid.html(html).css('opacity', '1');
             }
         });
     }
 
-    // Listener untuk pencarian otomatis saat dropdown kategori berubah
-    $('#kategori_pilih').on('change', function() { temukanBuku(); });
-
-    // Listener Keypress Enter untuk kolom pencarian
-    $('#kunci_cari').on('keypress', function(e) { if(e.which === 13) temukanBuku(); });
+    // Enter Key Search
+    $('#inputCari').on('keypress', function(e) { if(e.which === 13) prosesCari(); });
 </script>
 @endsection
