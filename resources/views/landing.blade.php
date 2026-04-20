@@ -16,9 +16,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
   
-  {{-- Spline Viewer --}}
-  <script type="module" src="https://unpkg.com/@splinetool/viewer/build/spline-viewer.js"></script>
-  
   {{-- Font Awesome --}}
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
@@ -97,7 +94,7 @@
       height: 140px;
       background-size: cover;
       background-position: center;
-      opacity: 0.4; /* Slightly dimmed for dark mode */
+      opacity: 0.4;
       filter: drop-shadow(0 5px 15px rgba(0, 243, 255, 0.2));
       animation: float 15s infinite ease-in-out;
     }
@@ -608,7 +605,7 @@
       height: 100%;
       object-fit: cover;
       z-index: 0;
-      opacity: 0.05; /* Sangat redup agar terlihat minimalis */
+      opacity: 0.05;
       filter: grayscale(100%) contrast(120%);
     }
 
@@ -870,17 +867,6 @@
       }
     }
 
-    /* Spline Viewer Styles */
-    .spline-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -2; /* Di depan background grid tapi di belakang konten */
-      opacity: 0.6; /* Ditingkatkan sedikit transparansinya untuk kontras di dark mode */
-    }
-
     /* Desktop-specific improvements */
     @media (min-width: 1025px) {
       .hero {
@@ -1020,10 +1006,6 @@
 <body>
   <div id="app">
     <div class="floating-books" id="floatingBooks"></div>
-
-    <div class="spline-container">
-      <spline-viewer url="https://prod.spline.design/PBQQBw8bfXDhBo7w/scene.splinecode" events-target="global"></spline-viewer>
-    </div>
 
     <header :class="{scrolled: isScrolled}">
       <div class="logo-nav">
