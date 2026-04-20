@@ -10,7 +10,7 @@
     {{-- Vue JS --}}
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     
-    {{-- Google Fonts sesuai desain Katalog --}}
+    {{-- Google Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Unbounded:wght@500;700;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
@@ -20,7 +20,7 @@
     
     <style>
         /* ============================================================
-           1. COLOR PALETTE & RESET (SAMA PERSIS DENGAN KATALOG)
+           1. COLOR PALETTE & RESET
            ============================================================ */
         :root {
             --color-black: #0a0a0a;
@@ -29,8 +29,9 @@
             --color-3: #ffafcc;
             --color-4: #bde0fe;
             --color-5: #a2d2ff;
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass: rgba(20, 20, 20, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glow: rgba(189, 224, 254, 0.15);
         }
 
         * {
@@ -50,7 +51,7 @@
 
         body {
             opacity: 0;
-            animation: fadeIn 1s ease-in-out forwards;
+            animation: fadeIn 1.2s ease-in-out forwards;
         }
 
         @keyframes fadeIn {
@@ -58,70 +59,78 @@
         }
 
         ::selection {
-            background: var(--color-3);
+            background: var(--color-4);
             color: var(--color-black);
         }
 
-        /* Floating Background Glow */
+        /* Floating Background Glow (Lebih menyebar) */
         .bg-glow {
             position: fixed;
-            width: 50vw; height: 50vw;
+            width: 60vw; height: 60vw;
             border-radius: 50%;
-            filter: blur(150px);
-            z-index: 0;
-            opacity: 0.15;
+            filter: blur(180px);
+            z-index: -1;
+            opacity: 0.12;
             pointer-events: none;
         }
 
         /* ============================================================
-           2. NAVIGASI (STICKY GLASSMORPHISM)
+           2. NAVIGASI (FLOATING BAR)
            =========================================================== */
         .libwe-nav {
             position: fixed;
-            top: 0; left: 0; width: 100%;
-            padding: 25px 60px;
+            top: 25px; 
+            left: 50%; 
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 1100px;
+            padding: 15px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(10, 10, 10, 0.7);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            background: rgba(15, 15, 15, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
             z-index: 1000;
-            border-bottom: 1px solid var(--glass-border);
-            transition: all 0.4s ease;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
         }
 
         .libwe-nav.scrolled {
-            padding: 15px 60px;
-            background: rgba(10, 10, 10, 0.9);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            top: 15px;
+            background: rgba(10, 10, 10, 0.85);
+            border-color: rgba(189, 224, 254, 0.2);
+            box-shadow: 0 10px 30px rgba(189, 224, 254, 0.05);
+            padding: 12px 35px;
         }
 
         .brand-container {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
         .brand-container img {
-            width: 40px;
+            width: 35px;
             height: auto;
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
         }
 
         .brand-libwe {
             font-family: 'Unbounded', sans-serif;
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 900;
-            background: linear-gradient(to right, var(--color-4), var(--color-3));
+            background: linear-gradient(to right, var(--color-4), var(--color-1));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: -1px;
+            letter-spacing: 1px;
         }
 
         .nav-links { 
             display: flex; 
-            gap: 40px; 
+            gap: 35px; 
             align-items: center;
         }
 
@@ -133,35 +142,43 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: 0.3s;
+            position: relative;
         }
 
-        .nav-links a:hover { 
-            color: var(--color-2); 
-            text-shadow: 0 0 10px var(--color-2); 
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px; left: 0; width: 0; height: 2px;
+            background: var(--color-3);
+            transition: 0.3s;
         }
+
+        .nav-links a:hover { color: #fff; }
+        .nav-links a:hover::after { width: 100%; }
 
         .btn-login {
-            background: var(--color-5);
-            color: var(--color-black) !important;
-            padding: 10px 25px;
-            border-radius: 20px;
+            background: transparent;
+            color: var(--color-4) !important;
+            padding: 8px 25px;
+            border-radius: 30px;
+            border: 2px solid var(--color-4);
             font-weight: 800 !important;
-            transition: 0.3s;
-            border: none;
+            transition: 0.4s;
             cursor: pointer;
+            font-size: 0.85rem;
         }
 
         .btn-login:hover {
-            transform: scale(1.05);
             background: var(--color-4);
-            box-shadow: 0 0 15px var(--color-4);
+            color: var(--color-black) !important;
+            box-shadow: 0 0 20px rgba(189, 224, 254, 0.4);
         }
 
         /* Hamburger Menu */
         .hamburger {
             display: none;
-            width: 30px;
-            height: 20px;
+            width: 25px;
+            height: 18px;
             flex-direction: column;
             justify-content: space-between;
             cursor: pointer;
@@ -174,42 +191,44 @@
             height: 2px;
             background-color: var(--color-4);
             transition: all 0.3s ease;
+            border-radius: 2px;
         }
 
         /* ============================================================
-           3. HERO SECTION & RUNNING TEXT
+           3. HERO SECTION & RUNNING TEXT (RAPi & SEIMBANG)
            =========================================================== */
         .hero {
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             position: relative;
-            overflow: hidden;
-            flex-direction: column;
+            padding: 150px 20px 80px; /* Jarak aman dari nav bar */
+            z-index: 1;
         }
 
         .marquee-container {
             position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
+            top: 25vh; /* Berada di belakang, tidak menutupi konten */
             width: 100%;
-            z-index: 1;
+            z-index: -1;
             pointer-events: none;
+            overflow: hidden;
         }
 
         .marquee-content {
             display: flex;
-            animation: scrollText 40s linear infinite;
+            animation: scrollText 45s linear infinite;
         }
 
         .marquee-item {
             font-family: 'Syne', sans-serif;
-            font-size: 13vw;
+            font-size: 15vw;
             font-weight: 800;
             white-space: nowrap;
             color: transparent;
-            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.08);
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.04);
             text-transform: uppercase;
             padding-right: 50px;
         }
@@ -220,113 +239,125 @@
         }
 
         .hero-img-container {
-            position: relative;
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto 20px;
             z-index: 5;
-            width: 380px;
-            margin-bottom: 20px;
-            transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            animation: floatImg 6s ease-in-out infinite;
+            animation: floatHero 6s ease-in-out infinite;
         }
 
         .hero-img-container img {
             width: 100%;
-            filter: drop-shadow(0 0 50px rgba(189, 224, 254, 0.3));
+            height: auto;
+            filter: drop-shadow(0 20px 40px rgba(189, 224, 254, 0.25));
         }
 
-        @keyframes floatImg {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-25px); }
+        @keyframes floatHero {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
         }
 
         .hero-content {
-            position: relative;
             text-align: center;
             z-index: 10;
-            margin-top: 20px;
             max-width: 800px;
-            padding: 0 20px;
         }
 
         .hero-content h1 { 
             font-family: 'Unbounded', sans-serif; 
-            font-size: clamp(2rem, 4vw, 3.5rem); 
+            font-size: clamp(2.2rem, 5vw, 4rem); 
             color: #fff; 
             margin: 0; 
-            line-height: 1.2;
+            line-height: 1.1;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
 
         .hero-content p {
-            font-size: 1.1rem;
+            font-size: clamp(1rem, 2vw, 1.2rem);
             color: rgba(255,255,255,0.7);
-            margin: 15px 0 30px;
+            margin: 20px auto 40px;
+            max-width: 600px;
+            line-height: 1.6;
         }
 
         .btn-hero {
             display: inline-block;
-            background: linear-gradient(45deg, var(--color-4), var(--color-3));
+            background: linear-gradient(90deg, var(--color-4), var(--color-1));
             color: var(--color-black);
-            padding: 16px 40px;
-            border-radius: 30px;
+            padding: 18px 45px;
+            border-radius: 50px;
             font-family: 'Unbounded', sans-serif;
             font-weight: 800;
-            font-size: 1rem;
+            font-size: 1.1rem;
             text-decoration: none;
-            transition: 0.4s;
-            box-shadow: 0 10px 20px rgba(255, 175, 204, 0.2);
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 25px rgba(189, 224, 254, 0.3);
             border: none;
             cursor: pointer;
+            position: relative;
+            z-index: 20; /* Pastikan tombol di atas segalanya */
         }
 
         .btn-hero:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(255, 175, 204, 0.4);
-            color: var(--color-black);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(189, 224, 254, 0.5);
+            letter-spacing: 1px;
         }
 
         /* ============================================================
-           4. SECTIONS & GLASSMORPHISM LAYOUT
+           4. SECTIONS & DIFFERENTIATED GLASSMORPHISM
            =========================================================== */
         section {
-            padding: 120px 60px;
+            padding: 120px 20px;
             position: relative;
             z-index: 2;
-            scroll-margin-top: 80px;
+            scroll-margin-top: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .section-header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 50px;
         }
 
         .section-subtitle {
-            letter-spacing: 5px; 
-            color: var(--color-3); 
+            letter-spacing: 6px; 
+            color: var(--color-4); 
             font-weight: 800; 
-            font-size: 0.8rem; 
+            font-size: 0.85rem; 
             text-transform: uppercase;
+            background: rgba(189, 224, 254, 0.1);
+            padding: 8px 20px;
+            border-radius: 30px;
         }
 
         .section-title {
             font-family: 'Unbounded', sans-serif; 
-            font-size: clamp(2rem, 3vw, 2.8rem); 
-            margin-top: 10px;
+            font-size: clamp(2rem, 4vw, 3rem); 
+            margin-top: 25px;
+            color: #fff;
         }
 
+        /* Differentiated from Catalog: Rounded Asymmetrical Cards */
         .glass-card {
-            background: var(--glass);
+            background: linear-gradient(135deg, rgba(30, 30, 30, 0.6), rgba(10, 10, 10, 0.8));
             border: 1px solid var(--glass-border);
             padding: 50px;
-            border-radius: 40px;
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            max-width: 1000px;
-            margin: 0 auto;
-            transition: transform 0.4s ease, border-color 0.4s ease;
+            border-radius: 40px 10px 40px 10px; /* Sedikit Asimetris */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            width: 100%;
+            max-width: 900px;
+            transition: all 0.5s ease;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
         .glass-card:hover {
-            border-color: rgba(255, 175, 204, 0.3);
+            border-color: rgba(205, 180, 219, 0.4);
             transform: translateY(-5px);
+            box-shadow: 0 25px 60px rgba(205, 180, 219, 0.1);
         }
 
         .text-content p {
@@ -337,9 +368,10 @@
         }
 
         .text-content strong {
-            color: var(--color-4);
+            color: var(--color-3);
             font-family: 'Unbounded', sans-serif;
             font-size: 1.1rem;
+            letter-spacing: 0.5px;
         }
 
         ul, ol {
@@ -349,143 +381,161 @@
             margin-bottom: 20px;
         }
 
-        ul li {
-            margin-bottom: 15px;
-        }
-        
-        ol li {
-            margin-bottom: 10px;
-            font-weight: 500;
-        }
+        ul li { margin-bottom: 12px; }
+        ol li { margin-bottom: 12px; font-weight: 500; }
 
-        /* Style Khusus Pustakawan */
+        /* Pustakawan */
         .pustakawan-card {
             text-align: center;
+            max-width: 500px;
+            border-radius: 30px; /* Simetris untuk profil */
         }
 
         .pustakawan-card img {
-            width: 160px;
-            height: 160px;
+            width: 180px;
+            height: 180px;
             border-radius: 50%;
             object-fit: cover;
             margin: 0 auto 30px;
-            border: 4px solid var(--color-3);
-            box-shadow: 0 0 30px rgba(255, 175, 204, 0.4);
+            border: 5px solid transparent;
+            background: linear-gradient(var(--color-black), var(--color-black)) padding-box,
+                        linear-gradient(45deg, var(--color-4), var(--color-1)) border-box;
+            box-shadow: 0 10px 30px rgba(189, 224, 254, 0.2);
             transition: 0.5s ease;
         }
 
         .pustakawan-card img:hover {
-            transform: scale(1.05);
-            border-color: var(--color-4);
-            box-shadow: 0 0 40px rgba(189, 224, 254, 0.5);
+            transform: scale(1.05) rotate(5deg);
         }
 
         .pustakawan-card p {
             font-size: 1.1rem;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             color: rgba(255, 255, 255, 0.9);
         }
 
-        /* Style Khusus Denah & Peta */
+        /* Denah & Peta */
         .maps-wrapper {
-            border-radius: 25px;
+            border-radius: 20px;
             overflow: hidden;
             border: 1px solid var(--glass-border);
             margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         iframe {
             width: 100%;
             height: 400px;
-            filter: invert(90%) hue-rotate(180deg) contrast(85%); /* Efek dark mode map */
+            filter: grayscale(80%) invert(100%) contrast(80%); /* Dark map lebih soft */
             display: block;
         }
 
         .alamat-info {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 25px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 30px;
             border-radius: 20px;
             text-align: center;
             margin-bottom: 40px;
-            border: 1px solid var(--glass-border);
+            border: 1px dashed rgba(255,255,255,0.1);
         }
 
         .alamat-info p {
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
         }
 
         .alamat-info i {
-            color: var(--color-3);
+            color: var(--color-4);
             margin-right: 10px;
         }
 
         .denah-img {
             width: 100%;
-            border-radius: 25px;
+            border-radius: 20px;
             border: 1px solid var(--glass-border);
-            opacity: 0.9;
+            opacity: 0.85;
             transition: 0.4s;
         }
 
         .denah-img:hover {
             opacity: 1;
-            border-color: var(--color-4);
+            border-color: var(--color-1);
+            transform: scale(1.02);
         }
 
         /* Footer */
         footer {
             text-align: center;
             padding: 40px;
-            border-top: 1px solid var(--glass-border);
-            color: rgba(255, 255, 255, 0.5);
+            color: rgba(255, 255, 255, 0.4);
             font-size: 0.9rem;
             font-weight: 600;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
+            background: transparent;
             position: relative;
             z-index: 10;
         }
 
         /* ============================================================
-           5. RESPONSIVE DESIGN (MOBILE ADAPTATION)
+           5. RESPONSIVE DESIGN
            =========================================================== */
         @media (max-width: 992px) {
-            .libwe-nav { padding: 20px 30px; }
-            .libwe-nav.scrolled { padding: 15px 30px; }
-            section { padding: 80px 30px; }
-            .hero-img-container { width: 300px; }
+            .libwe-nav { width: 95%; padding: 15px 25px; }
+            .hero-img-container { max-width: 350px; }
+            .glass-card { padding: 40px 30px; }
         }
 
         @media (max-width: 768px) {
             .hamburger { display: flex; }
             
+            .btn-login { display: none; } /* Sembunyikan tombol login di navbar luar saat mobile */
+            
             .nav-links {
-                position: fixed;
-                top: 0; left: -100%;
-                width: 100%; height: 100vh;
-                background: rgba(10, 10, 10, 0.95);
+                position: absolute;
+                top: 80px; left: 0;
+                width: 100%;
+                background: rgba(15, 15, 15, 0.95);
                 backdrop-filter: blur(20px);
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
-                transition: 0.5s ease;
+                border-radius: 20px;
+                border: 1px solid var(--glass-border);
+                padding: 30px 0;
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(-20px);
+                transition: all 0.4s ease;
             }
 
-            .nav-links.active { left: 0; }
-            .nav-links a { font-size: 1.5rem; }
+            .nav-links.active { 
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+            }
             
-            .glass-card { padding: 30px; border-radius: 30px; }
-            .hero-img-container { width: 250px; }
+            .nav-links .btn-login {
+                display: block;
+                margin-top: 15px;
+            }
+
+            .hero { padding-top: 130px; }
+            .hero-img-container { max-width: 280px; }
             .text-content p, ul, ol { font-size: 1rem; }
+            .glass-card { border-radius: 20px; }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 { font-size: 2rem; }
+            .btn-hero { padding: 15px 30px; font-size: 1rem; }
         }
     </style>
 </head>
 <body>
     <div id="app">
-        <div class="bg-glow" style="top: -10%; right: -5%; background: var(--color-1);"></div>
-        <div class="bg-glow" style="bottom: 10%; left: -5%; background: var(--color-4);"></div>
-        <div class="bg-glow" style="top: 40%; left: -10%; background: var(--color-3);"></div>
+        <div class="bg-glow" style="top: -10%; right: -10%; background: var(--color-1);"></div>
+        <div class="bg-glow" style="bottom: 10%; left: -10%; background: var(--color-4);"></div>
+        <div class="bg-glow" style="top: 50%; left: 10%; background: var(--color-3);"></div>
 
         <nav class="libwe-nav" :class="{scrolled: isScrolled}">
             <div class="brand-container">
@@ -503,7 +553,7 @@
                 <a href="#informasi" @click="closeMenu">Informasi</a>
                 <a href="#visi" @click="closeMenu">Visi Misi</a>
                 <a href="#pustakawan" @click="closeMenu">Pustakawan</a>
-                <a href="#denah" @click="closeMenu">Denah & Lokasi</a>
+                <a href="#denah" @click="closeMenu">Lokasi</a>
                 <button class="btn-login" onclick="window.location.href='{{ route('login') }}'">MASUK</button>
             </div>
         </nav>
@@ -548,15 +598,15 @@
                     <li>Dengan adanya perpustakaan ini, diharapkan SDN Berat Wetan 1 tidak hanya menjadi tempat belajar akademik, tetapi juga tempat untuk membangun karakter, imajinasi, dan kecintaan terhadap ilmu pengetahuan.</li>
                 </ul>
                 
-                <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 30px 0;">
+                <hr style="border: 0; border-top: 1px dashed rgba(255,255,255,0.2); margin: 35px 0;">
                 
-                <p><i class="fas fa-map-marker-alt" style="color: var(--color-4); margin-right: 10px;"></i> <strong>Alamat:</strong> Jl. KH. Abdul Fattah No.04, Berat Wetan, Kec. Gedeg, Kabupaten Mojokerto, Jawa Timur</p>
-                <p><i class="fas fa-envelope" style="color: var(--color-3); margin-right: 10px;"></i> <strong>Email:</strong> berat.wetan1@gmail.com</p>
-                <p><i class="fas fa-id-card" style="color: var(--color-1); margin-right: 10px;"></i> <strong>NPSN:</strong> 20502893</p>
-                <p><i class="fas fa-clock" style="color: var(--color-5); margin-right: 10px;"></i> <strong>Jam Operasional:</strong></p>
-                <ul style="list-style: none; padding-left: 35px; margin-top: 0;">
-                    <li>Senin - Kamis: 06:00 - 14:00 WIB</li>
-                    <li>Jumat - Sabtu: 06:00 - 13:00 WIB</li>
+                <p><i class="fas fa-map-marker-alt" style="color: var(--color-4); margin-right: 10px; width: 20px; text-align: center;"></i> <strong>Alamat:</strong> Jl. KH. Abdul Fattah No.04, Berat Wetan, Kec. Gedeg, Kabupaten Mojokerto, Jawa Timur</p>
+                <p><i class="fas fa-envelope" style="color: var(--color-3); margin-right: 10px; width: 20px; text-align: center;"></i> <strong>Email:</strong> berat.wetan1@gmail.com</p>
+                <p><i class="fas fa-id-card" style="color: var(--color-1); margin-right: 10px; width: 20px; text-align: center;"></i> <strong>NPSN:</strong> 20502893</p>
+                <p><i class="fas fa-clock" style="color: var(--color-5); margin-right: 10px; width: 20px; text-align: center;"></i> <strong>Jam Operasional:</strong></p>
+                <ul style="list-style: none; padding-left: 45px; margin-top: 5px;">
+                    <li><span style="color: var(--color-4)">•</span> Senin - Kamis: 06:00 - 14:00 WIB</li>
+                    <li><span style="color: var(--color-4)">•</span> Jumat - Sabtu: 06:00 - 13:00 WIB</li>
                 </ul>
             </div>
         </section>
@@ -615,13 +665,13 @@
                     <p><i class="fas fa-map-marker-alt"></i> <strong>Alamat Lengkap:</strong> Jl. KH. Abdul Fattah No.04, Berat Wetan, Kec. Gedeg, Kabupaten Mojokerto, Jawa Timur 61351</p>
                     <p><i class="fas fa-clock"></i> <strong>Jam Operasional:</strong> Senin-Sabtu, 06:00 - 14:00 WIB</p>
                     <p><i class="fas fa-phone"></i> <strong>Kontak:</strong> (0321) 123456</p>
-                    <a href="https://maps.google.com/?q=SDN+Berat+Wetan+1" target="_blank" class="btn-hero" style="padding: 10px 25px; font-size: 0.8rem; margin-top: 15px;">
+                    <a href="https://maps.google.com/?q=SDN+Berat+Wetan+1" target="_blank" class="btn-login" style="display: inline-block; padding: 10px 25px; margin-top: 15px; border-radius: 50px;">
                         <i class="fas fa-directions" style="margin-right: 5px;"></i> Buka di Google Maps
                     </a>
                 </div>
                 
                 <div style="text-align: center;">
-                    <p style="margin-bottom: 20px; font-family: 'Unbounded'; color: var(--color-4);">Denah Ruangan Perpustakaan</p>
+                    <p style="margin-bottom: 20px; font-family: 'Unbounded'; color: var(--color-1);">Denah Ruangan Perpustakaan</p>
                     <img src="{{ asset('web-perpus/img/perpus.png') }}" alt="Denah Perpustakaan" class="denah-img">
                 </div>
             </div>
@@ -642,21 +692,19 @@
                 
                 const toggleMenu = () => {
                     isMenuActive.value = !isMenuActive.value;
-                    document.body.style.overflow = isMenuActive.value ? 'hidden' : '';
                 };
                 
                 const closeMenu = () => {
                     isMenuActive.value = false;
-                    document.body.style.overflow = '';
                 };
                 
                 const handleScroll = () => {
-                    isScrolled.value = window.scrollY > 50;
+                    isScrolled.value = window.scrollY > 20;
                 };
                 
                 onMounted(() => {
                     window.addEventListener('scroll', handleScroll);
-                    handleScroll(); // Trigger check on load
+                    handleScroll(); 
                 });
                 
                 onUnmounted(() => {
