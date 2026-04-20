@@ -4,6 +4,8 @@
 
 @section('content')
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
     * {
         margin: 0;
         padding: 0;
@@ -11,53 +13,99 @@
     }
 
     body {
-        background: #f5f7fb;
-        font-family: 'Poppins', 'Segoe UI', sans-serif;
+        font-family: 'Inter', sans-serif;
+        background: linear-gradient(135deg, #0f0c29 0%, #1a1a3e 50%, #24243e 100%);
+        min-height: 100vh;
+        color: #fff;
     }
 
-    /* Header */
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #7c9bff, #b38dff, #ff9bc4);
+        border-radius: 10px;
+    }
+
+    /* Header Section */
     .catalog-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 50px 0;
+        position: relative;
+        padding: 60px 0 80px;
         text-align: center;
-        color: white;
-        margin-bottom: 40px;
+        overflow: hidden;
+        background: linear-gradient(135deg, rgba(124, 155, 255, 0.15), rgba(179, 141, 255, 0.15), rgba(255, 155, 196, 0.15));
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .catalog-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(124, 155, 255, 0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
 
     .catalog-header h1 {
-        font-size: 36px;
-        font-weight: 700;
-        margin-bottom: 10px;
+        font-size: 48px;
+        font-weight: 800;
+        background: linear-gradient(135deg, #7c9bff, #b38dff, #ff9bc4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 1;
     }
 
     .catalog-header p {
         font-size: 16px;
-        opacity: 0.9;
+        color: rgba(255, 255, 255, 0.7);
+        position: relative;
+        z-index: 1;
     }
 
     /* Container */
     .container-custom {
-        max-width: 1200px;
+        max-width: 1400px;
         margin: 0 auto;
-        padding: 0 20px;
+        padding: 0 30px;
     }
 
-    /* ========== REKOMENDASI BUKU POPULER ========== */
+    /* ========== REKOMENDASI SECTION ========== */
     .rekomendasi-section {
-        background: white;
-        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
         padding: 30px;
-        margin-bottom: 40px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        margin: -40px 0 40px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        z-index: 2;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     }
 
     .rekomendasi-header {
         display: flex;
-        align-items: center;
+    align-items: center;
         justify-content: space-between;
-        margin-bottom: 25px;
-        padding-bottom: 15px;
-        border-bottom: 2px solid #f0f0f0;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 15px;
     }
 
     .rekomendasi-title {
@@ -67,24 +115,27 @@
     }
 
     .rekomendasi-title i {
-        font-size: 28px;
-        color: #ff6d00;
+        font-size: 32px;
+        background: linear-gradient(135deg, #ffd700, #ff9bc4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
     .rekomendasi-title h2 {
-        font-size: 22px;
+        font-size: 24px;
         font-weight: 700;
-        color: #333;
-        margin: 0;
+        background: linear-gradient(135deg, #fff, rgba(255,255,255,0.8));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
     .rekomendasi-badge {
-        background: #fff3e0;
-        color: #ff6d00;
-        padding: 5px 15px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 500;
+        background: linear-gradient(135deg, rgba(124, 155, 255, 0.2), rgba(179, 141, 255, 0.2));
+        padding: 8px 20px;
+        border-radius: 50px;
+        font-size: 13px;
+        color: #a8c0ff;
+        border: 1px solid rgba(124, 155, 255, 0.3);
     }
 
     /* List Rekomendasi */
@@ -98,45 +149,45 @@
         display: flex;
         align-items: center;
         gap: 20px;
-        padding: 15px;
-        background: #f8f9fa;
-        border-radius: 15px;
+        padding: 18px 20px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 16px;
         transition: all 0.3s ease;
         cursor: pointer;
+        border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .rekomendasi-item:hover {
-        background: #f0f2f5;
-        transform: translateX(5px);
+        background: rgba(124, 155, 255, 0.1);
+        transform: translateX(8px);
+        border-color: rgba(124, 155, 255, 0.3);
     }
 
     .rank-number {
-        width: 45px;
-        height: 45px;
-        background: #667eea;
-        color: white;
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #7c9bff, #b38dff);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 700;
-        font-size: 20px;
+        font-weight: 800;
+        font-size: 22px;
         flex-shrink: 0;
+        box-shadow: 0 5px 15px rgba(124, 155, 255, 0.3);
     }
 
     .rank-1 {
-        background: #ffd700;
-        color: #333;
+        background: linear-gradient(135deg, #ffd700, #ff9bc4);
+        box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
     }
 
     .rank-2 {
-        background: #c0c0c0;
-        color: #333;
+        background: linear-gradient(135deg, #c0c0c0, #a8c0ff);
     }
 
     .rank-3 {
-        background: #cd7f32;
-        color: white;
+        background: linear-gradient(135deg, #cd7f32, #ff9bc4);
     }
 
     .rekomendasi-info {
@@ -145,62 +196,73 @@
 
     .rekomendasi-judul {
         font-weight: 700;
-        font-size: 16px;
-        color: #333;
-        margin-bottom: 5px;
+        font-size: 18px;
+        color: #fff;
+        margin-bottom: 8px;
     }
 
     .rekomendasi-meta {
-        font-size: 12px;
-        color: #666;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.6);
     }
 
     .rekomendasi-meta i {
-        margin-right: 5px;
+        margin-right: 6px;
+        color: #7c9bff;
     }
 
     .rekomendasi-stats {
         font-size: 14px;
         font-weight: 600;
-        color: #667eea;
+        background: linear-gradient(135deg, #7c9bff, #ff9bc4);
+        padding: 8px 16px;
+        border-radius: 30px;
         flex-shrink: 0;
     }
 
     /* ========== SEARCH & FILTER ========== */
     .search-filter-section {
-        background: white;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
         border-radius: 20px;
         padding: 25px;
         margin-bottom: 30px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .search-box {
         display: flex;
         gap: 15px;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
     }
 
     .search-box input {
         flex: 1;
-        padding: 14px 20px;
-        border: 1px solid #e0e0e0;
-        border-radius: 50px;
+        padding: 16px 24px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 60px;
         font-size: 14px;
+        color: #fff;
         transition: all 0.3s;
+    }
+
+    .search-box input::placeholder {
+        color: rgba(255, 255, 255, 0.4);
     }
 
     .search-box input:focus {
         outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: #7c9bff;
+        background: rgba(124, 155, 255, 0.1);
+        box-shadow: 0 0 20px rgba(124, 155, 255, 0.2);
     }
 
     .search-box button {
-        background: #667eea;
+        background: linear-gradient(135deg, #7c9bff, #b38dff);
         border: none;
-        border-radius: 50px;
-        padding: 0 30px;
+        border-radius: 60px;
+        padding: 0 35px;
         color: white;
         font-weight: 600;
         cursor: pointer;
@@ -208,7 +270,8 @@
     }
 
     .search-box button:hover {
-        background: #5a67d8;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(124, 155, 255, 0.4);
     }
 
     .filter-info {
@@ -216,72 +279,85 @@
         align-items: center;
         justify-content: space-between;
         flex-wrap: wrap;
-        gap: 15px;
-        margin-bottom: 15px;
+        gap: 20px;
     }
 
     .total-buku {
         font-size: 14px;
-        color: #666;
+        color: rgba(255, 255, 255, 0.7);
+        padding: 8px 16px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 30px;
     }
 
     .total-buku i {
         margin-right: 8px;
-        color: #667eea;
+        color: #7c9bff;
     }
 
     .kategori-filter {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
         flex-wrap: wrap;
     }
 
     .kategori-label {
         font-size: 14px;
-        font-weight: 600;
-        color: #333;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.8);
     }
 
     .filter-chip {
-        padding: 6px 18px;
+        padding: 8px 22px;
         border-radius: 30px;
-        background: #f0f2f5;
-        border: none;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all 0.3s;
         font-size: 13px;
-        color: #666;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.7);
     }
 
     .filter-chip:hover {
-        background: #667eea;
-        color: white;
+        background: rgba(124, 155, 255, 0.2);
+        border-color: #7c9bff;
+        transform: translateY(-2px);
     }
 
     .filter-chip.active {
-        background: #667eea;
+        background: linear-gradient(135deg, #7c9bff, #b38dff);
         color: white;
+        border-color: transparent;
     }
 
     /* ========== KATALOG BUKU ========== */
     .katalog-section {
-        background: white;
-        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(5px);
+        border-radius: 24px;
         padding: 30px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .katalog-header {
-        margin-bottom: 25px;
-        padding-bottom: 15px;
-        border-bottom: 2px solid #f0f0f0;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .katalog-header h3 {
-        font-size: 20px;
+        font-size: 22px;
         font-weight: 700;
-        color: #333;
+        color: #fff;
+    }
+
+    .katalog-header h3 i {
+        background: linear-gradient(135deg, #7c9bff, #ff9bc4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-right: 10px;
     }
 
     .books-grid {
@@ -291,23 +367,25 @@
     }
 
     .book-card {
-        background: white;
-        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
         overflow: hidden;
-        transition: all 0.3s;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         cursor: pointer;
-        border: 1px solid #f0f0f0;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
     }
 
     .book-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        transform: translateY(-8px);
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(124, 155, 255, 0.4);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     }
 
     .book-cover {
-        height: 180px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        height: 200px;
+        background: linear-gradient(135deg, rgba(124, 155, 255, 0.2), rgba(179, 141, 255, 0.2));
         display: flex;
         align-items: center;
         justify-content: center;
@@ -321,101 +399,109 @@
     }
 
     .book-cover i {
-        font-size: 55px;
-        color: rgba(255, 255, 255, 0.8);
+        font-size: 60px;
+        background: linear-gradient(135deg, #7c9bff, #ff9bc4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
     .stock-badge {
         position: absolute;
-        bottom: 10px;
-        right: 10px;
-        padding: 4px 12px;
+        top: 12px;
+        right: 12px;
+        padding: 5px 14px;
         border-radius: 20px;
         font-size: 11px;
         font-weight: 600;
-        background: rgba(0, 0, 0, 0.7);
-        color: white;
+        backdrop-filter: blur(10px);
     }
 
     .stock-badge.available {
-        background: #10b981;
+        background: rgba(16, 185, 129, 0.9);
+        color: white;
     }
 
     .stock-badge.low {
-        background: #f59e0b;
+        background: rgba(245, 158, 11, 0.9);
+        color: white;
     }
 
     .stock-badge.out {
-        background: #ef4444;
+        background: rgba(239, 68, 68, 0.9);
+        color: white;
     }
 
     .book-info {
-        padding: 15px;
+        padding: 18px;
     }
 
     .book-judul {
-        font-size: 15px;
+        font-size: 16px;
         font-weight: 700;
-        color: #333;
-        margin-bottom: 6px;
+        color: #fff;
+        margin-bottom: 8px;
         line-height: 1.4;
     }
 
     .book-penulis {
         font-size: 12px;
-        color: #666;
-        margin-bottom: 10px;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 12px;
     }
 
     .book-penulis i {
-        margin-right: 5px;
-        font-size: 11px;
+        margin-right: 6px;
+        color: #7c9bff;
     }
 
     .book-kategori {
         display: inline-block;
         font-size: 11px;
-        background: #f0f2f5;
-        padding: 4px 12px;
-        border-radius: 15px;
-        color: #667eea;
+        background: linear-gradient(135deg, rgba(124, 155, 255, 0.2), rgba(179, 141, 255, 0.2));
+        padding: 5px 14px;
+        border-radius: 20px;
+        color: #a8c0ff;
         font-weight: 500;
     }
 
     /* Empty State */
     .empty-state {
         text-align: center;
-        padding: 60px;
-        background: #f8f9fa;
-        border-radius: 15px;
+        padding: 80px 20px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 20px;
     }
 
     .empty-state i {
-        font-size: 64px;
-        color: #ccc;
-        margin-bottom: 15px;
+        font-size: 80px;
+        background: linear-gradient(135deg, #7c9bff, #ff9bc4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 20px;
     }
 
     .empty-state h4 {
-        font-size: 18px;
-        color: #666;
+        font-size: 20px;
+        color: #fff;
         margin-bottom: 10px;
     }
 
     .empty-state p {
         font-size: 14px;
-        color: #999;
+        color: rgba(255, 255, 255, 0.5);
     }
 
     /* Loading */
     .loading {
         text-align: center;
-        padding: 60px;
+        padding: 80px;
     }
 
     .loading i {
-        font-size: 40px;
-        color: #667eea;
+        font-size: 50px;
+        background: linear-gradient(135deg, #7c9bff, #ff9bc4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         animation: spin 1s linear infinite;
     }
 
@@ -426,47 +512,56 @@
 
     /* Pagination */
     .pagination-wrapper {
-        margin-top: 30px;
+        margin-top: 40px;
         display: flex;
         justify-content: center;
     }
 
     .pagination {
         display: flex;
-        gap: 8px;
+        gap: 10px;
         flex-wrap: wrap;
     }
 
     .pagination .page-link {
-        padding: 8px 15px;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        color: #667eea;
+        padding: 10px 18px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        color: rgba(255, 255, 255, 0.7);
         text-decoration: none;
-        transition: all 0.2s;
+        transition: all 0.3s;
     }
 
     .pagination .page-link:hover {
-        background: #667eea;
+        background: linear-gradient(135deg, #7c9bff, #b38dff);
         color: white;
-        border-color: #667eea;
+        transform: translateY(-2px);
     }
 
     .pagination .active .page-link {
-        background: #667eea;
+        background: linear-gradient(135deg, #7c9bff, #b38dff);
         color: white;
-        border-color: #667eea;
+        border-color: transparent;
     }
 
     /* Responsive */
     @media (max-width: 768px) {
-        .catalog-header h1 { font-size: 24px; }
-        .rekomendasi-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+        .container-custom { padding: 0 20px; }
+        .catalog-header h1 { font-size: 32px; }
+        .rekomendasi-header { flex-direction: column; align-items: flex-start; }
         .rekomendasi-item { flex-wrap: wrap; }
-        .rank-number { width: 35px; height: 35px; font-size: 16px; }
+        .rank-number { width: 40px; height: 40px; font-size: 18px; }
+        .rekomendasi-judul { font-size: 15px; }
         .books-grid { grid-template-columns: 1fr; }
         .search-box { flex-direction: column; }
         .filter-info { flex-direction: column; align-items: flex-start; }
+        .kategori-filter { width: 100%; overflow-x: auto; }
+    }
+
+    @media (max-width: 480px) {
+        .rekomendasi-stats { font-size: 11px; padding: 5px 12px; }
+        .rekomendasi-meta { font-size: 11px; }
     }
 </style>
 
@@ -504,7 +599,7 @@
                     </div>
                 </div>
                 <div class="rekomendasi-stats">
-                    <i class="fas fa-chart-line"></i> {{ $book->total_dipinjam ?? 0 }}x dipinjam
+                    <i class="fas fa-chart-line me-1"></i> {{ $book->total_dipinjam ?? 0 }}x dipinjam
                 </div>
             </div>
             @endforeach
@@ -515,8 +610,8 @@
     <!-- ==================== SEARCH & FILTER ==================== -->
     <div class="search-filter-section">
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Cari judul atau penulis...">
-            <button id="searchBtn"><i class="fas fa-search me-1"></i> Cari</button>
+            <input type="text" id="searchInput" placeholder="🔍 Cari judul, penulis, atau penerbit...">
+            <button id="searchBtn"><i class="fas fa-search me-2"></i>Cari</button>
         </div>
         <div class="filter-info">
             <div class="total-buku">
@@ -535,7 +630,7 @@
     <!-- ==================== KATALOG BUKU ==================== -->
     <div class="katalog-section">
         <div class="katalog-header">
-            <h3><i class="fas fa-layer-group me-2"></i>Koleksi Buku</h3>
+            <h3><i class="fas fa-layer-group"></i> Koleksi Buku</h3>
         </div>
         
         <div id="booksSection">
@@ -596,13 +691,11 @@
     let currentSearch = '';
 
     $(document).ready(function() {
-        // Search button click
         $('#searchBtn').on('click', function() {
             currentSearch = $('#searchInput').val();
             loadBooks();
         });
 
-        // Search on enter key
         $('#searchInput').on('keypress', function(e) {
             if (e.which === 13) {
                 currentSearch = $(this).val();
@@ -610,7 +703,6 @@
             }
         });
 
-        // Filter category click
         $('.filter-chip').on('click', function() {
             $('.filter-chip').removeClass('active');
             $(this).addClass('active');
@@ -663,7 +755,7 @@
                     <i class="fas fa-search"></i>
                     <h4>Tidak Ada Buku</h4>
                     <p>${msg}</p>
-                    ${(currentSearch || currentCategory) ? '<button class="btn btn-primary mt-3" onclick="resetFilters()">Reset Filter</button>' : ''}
+                    ${(currentSearch || currentCategory) ? '<button class="btn-reset" onclick="resetFilters()" style="margin-top:20px;padding:10px 25px;background:linear-gradient(135deg,#7c9bff,#b38dff);border:none;border-radius:30px;color:white;cursor:pointer;">Reset Filter</button>' : ''}
                 </div>
             `);
             return;
