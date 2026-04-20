@@ -10,38 +10,39 @@ use Illuminate\Support\Facades\Cache;
 
 class KatalogController extends Controller
 {
+    /**
+     * Menampilkan Halaman Utama Katalog Y2K Futuristic
+     */
     public function index(Request $request)
     {
-        // 1. Ambil semua kategori untuk dropdown filter
+        // 1. Ambil semua kategori untuk filter dropdown
         $kategoris = Category::orderBy('nama', 'asc')->get();
 
-        // 2. Ambil Top 10 Buku Populer (Logic diperbaiki untuk menghindari Error 1055)
-        $popularBooks = Cache::remember('popular_books_katalog', 1800, function () {
+        // 2. Ambil Top 10 Buku Populer (Logic anti-error SQLStrict)
+        $popularBooks = Cache::remember('popular_books_katalog_y2k', 1800, function () {
             if (DB::connection()->getSchemaBuilder()->hasTable('pinjamans')) {
-                
-                // Langkah A: Cari ID buku yang paling banyak dipinjam
+                // Cari ID buku yang paling banyak dipinjam
                 $popularIds = DB::table('pinjamans')
-                    ->select('buku_id', DB::raw('COUNT(id) as total_pinjam'))
+                    ->select('buku_id', DB::raw('COUNT(id) as total'))
                     ->groupBy('buku_id')
-                    ->orderBy('total_pinjam', 'DESC')
+                    ->orderBy('total', 'DESC')
                     ->limit(10)
                     ->pluck('buku_id');
 
                 if ($popularIds->isNotEmpty()) {
-                    // Langkah B: Ambil detail buku berdasarkan ID tersebut
-                    // Menggunakan orderByRaw agar urutan ranking (1-10) tidak berantakan
+                    // Ambil detail buku dan jaga urutan rankingnya
                     $idsOrder = $popularIds->implode(',');
-                    return Book::whereIn('id', $popularIds)
+                    return Book::with('kategori')
+                        ->whereIn('id', $popularIds)
                         ->orderByRaw("FIELD(id, $idsOrder)")
                         ->get();
                 }
             }
-            
-            // Fallback jika belum ada data pinjaman
-            return Book::orderBy('stok', 'DESC')->limit(10)->get();
+            // Fallback: Jika belum ada data pinjaman, ambil berdasarkan stok terbanyak
+            return Book::with('kategori')->orderBy('stok', 'DESC')->limit(10)->get();
         });
 
-        // 3. Query Utama untuk Katalog (Data dari Pustakawan)
+        // 3. Query Utama untuk Katalog (Grid Bawah)
         $query = Book::with('kategori');
 
         if ($request->filled('search')) {
@@ -56,16 +57,15 @@ class KatalogController extends Controller
             $query->where('kategori_id', $request->kategori);
         }
 
-        // Ambil data terbaru yang diinput pustakawan
+        // Tampilkan buku terbaru (latest) dengan paginasi
         $books = $query->latest()->paginate(12)->withQueryString();
 
-        return view('katalog.index', [
-            'books' => $books,
-            'kategoris' => $kategoris,
-            'popularBooks' => $popularBooks
-        ]);
+        return view('katalog.index', compact('books', 'kategoris', 'popularBooks'));
     }
 
+    /**
+     * Fungsi AJAX Filter (Tanpa Refresh Halaman)
+     */
     public function filter(Request $request)
     {
         try {
@@ -91,10 +91,7 @@ class KatalogController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 }
