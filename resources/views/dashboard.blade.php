@@ -8,7 +8,7 @@
 
     {{-- Statistik Cards --}}
     <div class="row mb-4">
-        <div class="col-md-3 mb-3">
+        <div class="col-sm-6 col-md-3 mb-3">
             <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                 <div class="card-body text-white">
                     <div class="d-flex justify-content-between align-items-center">
@@ -22,7 +22,7 @@
             </div>
         </div>
         
-        <div class="col-md-3 mb-3">
+        <div class="col-sm-6 col-md-3 mb-3">
             <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);">
                 <div class="card-body text-white">
                     <div class="d-flex justify-content-between align-items-center">
@@ -36,7 +36,7 @@
             </div>
         </div>
         
-        <div class="col-md-3 mb-3">
+        <div class="col-sm-6 col-md-3 mb-3">
             <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);">
                 <div class="card-body text-white">
                     <div class="d-flex justify-content-between align-items-center">
@@ -50,7 +50,7 @@
             </div>
         </div>
         
-        <div class="col-md-3 mb-3">
+        <div class="col-sm-6 col-md-3 mb-3">
             <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
                 <div class="card-body text-dark">
                     <div class="d-flex justify-content-between align-items-center">
@@ -67,7 +67,7 @@
 
     <div class="row">
         <!-- Grafik Aktivitas Perpustakaan (2 dataset) -->
-        <div class="col-md-8 mb-4">
+        <div class="col-sm-12 col-md-8 mb-4">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-header bg-white border-0 py-3">
                     <h5 class="card-title mb-0">📈 Aktivitas Perpustakaan Tahun {{ $currentYear }}</h5>
@@ -87,7 +87,7 @@
         </div>
 
         <!-- Grafik Kategori Buku -->
-        <div class="col-md-4 mb-4">
+        <div class="col-sm-12 col-md-4 mb-4">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-header bg-white border-0 py-3">
                     <h5 class="card-title mb-0">📚 Buku per Kategori</h5>

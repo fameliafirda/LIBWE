@@ -74,21 +74,21 @@
         height: auto;
         position: relative;
         padding-top: 20px;
+        overflow-y: visible;
       }
 
-      /* Adjust brand image and text */
-      .brand-link {
+      .main-sidebar .brand-link {
         display: flex;
         justify-content: center;
         padding: 10px 0;
       }
 
-      .brand-image {
+      .main-sidebar .brand-image {
         width: 35px;
         margin-right: 10px;
       }
 
-      .brand-text {
+      .main-sidebar .brand-text {
         font-size: 1.2rem;
         text-align: center;
       }
@@ -125,6 +125,15 @@
       .nav-item.menu-open > .nav-link {
         border-radius: 5px;
         background-color: rgba(0, 0, 0, 0.1);
+      }
+
+      /* Collapse Sidebar by Default */
+      .main-sidebar.collapsed {
+        width: 50px;
+      }
+
+      .main-sidebar.collapsed .nav-link {
+        padding-left: 15px;
       }
     }
 
@@ -281,7 +290,6 @@
 
 <!-- CSS untuk mengatur konten utama agar tidak ketimpa sidebar fixed -->
 <style>
- 
   .main-sidebar {
     width: 250px;
     left: 0;
