@@ -53,9 +53,6 @@ Route::middleware([PustakawanMiddleware::class])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // ==================== MANAJEMEN BUKU ====================
-    // Route Filter AJAX (Wajib diletakkan DI ATAS resource agar tidak dianggap sebagai ID)
-    Route::get('/books/filter', [BookController::class, 'filter'])->name('books.filter');
-    
     Route::resource('books', BookController::class);
     Route::get('/books/category/{id}', [BookController::class, 'byCategory'])->name('books.byCategory');
 

@@ -4,29 +4,31 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
-        Schema::create('books', function (Blueprint $table) {
+        Schema::create('pengembalians', function (Blueprint $table) {
             $table->id();
-            $table->string('judul');
-            $table->string('penulis');
-            $table->string('penerbit')->nullable();
-            $table->year('tahun_terbit');
-            $table->string('cover')->nullable(); // Kolom untuk menyimpan path gambar
-            $table->integer('stok')->default(0);
-            $table->unsignedBigInteger('kategori_id');
+            $table->unsignedBigInteger('pinjaman_id');
+            $table->string('nama');
+            $table->string('kelas');
+            $table->string('judul_buku');
+            $table->date('tanggal_kembali')->nullable();
+            $table->date('tanggal_pengembalian');
+            $table->integer('keterlambatan')->default(0);
+            $table->integer('denda')->default(0);
             $table->timestamps();
 
-            // Relasi ke tabel categories
-            $table->foreign('kategori_id')->references('id')->on('categories')->onDelete('cascade');
+            $table->foreign('pinjaman_id')->references('id')->on('pinjamans')->onDelete('cascade');
+            $table->index('pinjaman_id');
+            $table->index('nama');
+            $table->index('kelas');
+            $table->index('tanggal_pengembalian');
         });
     }
 
     public function down(): void
     {
-        // Menghapus tabel books jika rollback dilakukan
-        Schema::dropIfExists('books');
+        Schema::dropIfExists('pengembalians');
     }
 };

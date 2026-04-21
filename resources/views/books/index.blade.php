@@ -1,231 +1,292 @@
 @extends('layouts.app')
 
-@section('title', 'Manajemen Buku')
+@section('title', 'Daftar Buku')
 
 @section('content')
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Unbounded:wght@500;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-<style>
-    :root {
-        --bg-main: #050508; 
-        --bg-island: #0f0f16;
-        --lavender: #d8b4e2;
-        --soft-pink: #ffb3c6;
-        --baby-blue: #9bf6ff;
-        --glass-border: rgba(255, 255, 255, 0.08);
-        --text-muted: rgba(255, 255, 255, 0.5);
-    }
-
-    /* Reset AdminLTE / Default Styles */
-    .main-header, .main-sidebar, .content-header, .main-footer, hr, .breadcrumb { display: none !important; }
-    .content-wrapper { margin-left: 0 !important; padding: 0 !important; background: var(--bg-main) !important; min-height: 100vh; }
-    
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-main); color: #ffffff; overflow-x: hidden; scroll-behavior: smooth; }
-
-    /* Navigasi */
-    .catalog-nav {
-        position: fixed; top: 0; left: 0; width: 100%; padding: 20px 60px; display: flex; justify-content: space-between; align-items: center;
-        background: rgba(5, 5, 8, 0.85); backdrop-filter: blur(15px); z-index: 1000; border-bottom: 1px solid var(--glass-border);
-    }
-    .brand-libwe { font-family: 'Unbounded', sans-serif; font-size: 1.5rem; font-weight: 900; color: #fff; text-decoration: none; }
-    .brand-libwe span { color: var(--baby-blue); }
-
-    .nav-actions { display: flex; gap: 15px; align-items: center; }
-    .btn-tambah {
-        background: var(--lavender); color: #000; padding: 10px 20px; border-radius: 50px;
-        font-weight: 800; font-size: 0.8rem; text-decoration: none; transition: 0.3s;
-    }
-    .btn-tambah:hover { background: #fff; transform: scale(1.05); }
-
-    /* Hero Search */
-    .hero-catalog { padding: 140px 20px 40px; text-align: center; position: relative; z-index: 10; }
-    .hero-catalog h1 { font-family: 'Unbounded', sans-serif; font-size: clamp(2rem, 5vw, 3.5rem); color: #fff; margin-bottom: 15px; }
-    .hero-catalog h1 span { background: linear-gradient(to right, var(--lavender), var(--soft-pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-    .search-container {
-        display: flex; justify-content: center; gap: 15px; width: 100%; max-width: 850px; margin: 0 auto;
-        background: rgba(255, 255, 255, 0.03); padding: 12px; border-radius: 20px; border: 1px solid var(--glass-border); backdrop-filter: blur(10px);
-    }
-    .search-container input, .search-container select {
-        background: rgba(0, 0, 0, 0.4); border: 1px solid transparent; padding: 14px 20px; border-radius: 12px; color: #fff; outline: none; flex: 1;
-    }
-    .btn-cari { background: var(--lavender); color: #000; border: none; padding: 0 40px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.3s; font-family: 'Unbounded'; font-size: 0.9rem; }
-
-    /* RECOMMENDATION ISLAND */
-    .recommendation-island {
-        margin: 40px; padding: 50px 20px; background: var(--bg-island); border-radius: 40px;
-        border: 1px solid rgba(216, 180, 226, 0.15); position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-    }
-    .island-title { text-align: center; font-family: 'Unbounded'; font-size: 1.8rem; margin-bottom: 40px; color: #fff; letter-spacing: 2px; }
-
-    .slider-wrapper { position: relative; width: 100%; padding: 0 60px; }
-    .nav-arrow {
-        position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px;
-        background: var(--lavender); color: #000; border-radius: 50%; border: none;
-        display: flex; align-items: center; justify-content: center; cursor: pointer;
-        z-index: 100; transition: 0.3s;
-    }
-    .arrow-left { left: 0; } .arrow-right { right: 0; }
-
-    .track-container { display: flex; gap: 25px; overflow-x: auto; scroll-behavior: smooth; padding: 15px 5px; scrollbar-width: none; }
-    .track-container::-webkit-scrollbar { display: none; }
-
-    .slider-card {
-        min-width: 200px; max-width: 200px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border);
-        padding: 15px; border-radius: 20px; transition: 0.4s; position: relative;
-    }
-    .slider-card img { width: 100%; height: 260px; object-fit: cover; border-radius: 15px; margin-bottom: 15px; }
-    .borrow-count { position: absolute; top: 25px; right: 25px; background: var(--baby-blue); color: #000; padding: 5px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 800; }
-
-    /* KATALOG GRID */
-    .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 30px; padding: 20px 60px 100px; }
-    .book-item { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 22px; transition: 0.3s; position: relative; }
-    .book-item:hover { border-color: var(--baby-blue); transform: translateY(-5px); }
-    
-    .img-box { width: 100%; height: 240px; border-radius: 15px; overflow: hidden; margin-bottom: 15px; position: relative; }
-    .img-box img { width: 100%; height: 100%; object-fit: cover; }
-
-    .b-title { font-family: 'Unbounded'; font-size: 0.9rem; margin-bottom: 10px; height: 2.8em; overflow: hidden; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-    
-    /* Tombol Aksi */
-    .action-tools { display: flex; gap: 10px; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; }
-    .btn-tool { flex: 1; padding: 8px; border-radius: 10px; text-align: center; font-size: 0.8rem; text-decoration: none !important; transition: 0.2s; }
-    .btn-edit { background: rgba(155, 246, 255, 0.1); color: var(--baby-blue); border: 1px solid var(--baby-blue); }
-    .btn-edit:hover { background: var(--baby-blue); color: #000; }
-    .btn-delete { background: rgba(255, 179, 198, 0.1); color: var(--soft-pink); border: 1px solid var(--soft-pink); cursor: pointer; }
-    .btn-delete:hover { background: var(--soft-pink); color: #000; }
-
-    .btn-back { position: fixed; bottom: 30px; right: 30px; background: #fff; color: #000; padding: 15px 35px; border-radius: 50px; text-decoration: none !important; font-weight: 800; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-
-    @media (max-width: 768px) {
-        .catalog-nav { padding: 15px 30px; }
-        .book-grid { padding: 20px 20px; }
-        .nav-arrow { display: none; }
-    }
-</style>
-
-<nav class="catalog-nav">
-    <a href="{{ url('/') }}" class="brand-libwe">LIB<span>WE</span></a>
-    <div class="nav-actions">
-        <a href="{{ url('/dashboard') }}" style="color: #fff; text-decoration: none; font-weight: 600; font-size: 0.8rem;">DASHBOARD</a>
-        <a href="{{ route('books.create') }}" class="btn-tambah"><i class="fas fa-plus"></i> TAMBAH BUKU</a>
-    </div>
-</nav>
-
-<section class="hero-catalog">
-    <h1>MANAJEMEN <span>BUKU</span></h1>
-    <div class="search-container">
-        <input type="text" id="keyword" placeholder="Cari judul atau penulis...">
-        <select id="kat_id">
-            <option value="">Semua Kategori</option>
-            @foreach($kategoris as $k)
-                <option value="{{ $k->id }}">{{ $k->nama }}</option>
-            @endforeach
-        </select>
-        <button class="btn-cari" onclick="filterBuku()">CARI</button>
-    </div>
-</section>
-
-@if($popularBooks->count() > 0)
-<div class="recommendation-island" id="top10">
-    <div class="island-title">🔥 TERPOPULER</div>
-    <div class="slider-wrapper">
-        <button class="nav-arrow arrow-left" onclick="scrollSlider(-240)"><i class="fas fa-chevron-left"></i></button>
-        <button class="nav-arrow arrow-right" onclick="scrollSlider(240)"><i class="fas fa-chevron-right"></i></button>
-        <div class="track-container" id="mainSlider">
-            @foreach($popularBooks as $index => $pb)
-            <div class="slider-card">
-                <div class="borrow-count">{{ $pb->total_dipinjam }}x Pinjam</div>
-                @php $imgP = $pb->cover ? str_replace('public/', '', $pb->cover) : ''; @endphp
-                <img src="{{ asset('storage/' . $imgP) }}" onerror="this.src='{{ asset('web-perpus/img/bukubaru.png') }}'">
-                <div class="b-title" style="height: auto; -webkit-line-clamp: 1;">{{ $pb->judul }}</div>
+<div class="container-fluid px-4 py-3">
+    <!-- Header Gradient -->
+    <div class="row g-0 mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 0 20px 20px 0;">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h3 class="text-white mb-2" style="font-weight: 600;">
+                                <i class="fas fa-book me-2"></i> Daftar Buku Perpustakaan
+                            </h3>
+                            <p class="text-white opacity-75 mb-0">Kelola koleksi buku perpustakaan SDN Berat Wetan 1</p>
+                        </div>
+                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                            <a href="{{ route('books.create') }}" class="btn btn-light" style="border-radius: 50px; padding: 10px 25px; font-weight: 500; color: #667eea; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+                                <i class="fas fa-plus-circle me-2"></i> Tambah Buku
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            @endforeach
+        </div>
+    </div>
+
+    <!-- Alert Success -->
+    @if(session('success'))
+    <div class="row g-0 mb-4">
+        <div class="col-12">
+            <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 15px; border-left: 5px solid #28a745;">
+                <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Notifikasi Stok Habis -->
+    @php
+        $bukuHabis = App\Models\Book::where('stok', '<=', 0)->get();
+    @endphp
+    @if($bukuHabis->count() > 0)
+    <div class="row g-0 mb-4">
+        <div class="col-12">
+            <div class="alert alert-warning alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 15px; border-left: 5px solid #f39c12;">
+                <div class="d-flex align-items-start">
+                    <div class="me-3">
+                        <i class="fas fa-exclamation-triangle fa-2x" style="color: #f39c12;"></i>
+                    </div>
+                    <div>
+                        <strong class="d-block mb-2">⚠️ Perhatian! Stok Buku Habis</strong>
+                        <ul class="mb-0 ps-3">
+                            @foreach($bukuHabis as $buku)
+                                <li class="mb-1">
+                                    <span class="fw-semibold">{{ $buku->judul }}</span> 
+                                    <span class="badge bg-secondary ms-2">{{ $buku->kategori->nama ?? 'Tanpa Kategori' }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Filter Kategori -->
+    @if(isset($filterKategori))
+    <div class="row g-0 mb-4">
+        <div class="col-12">
+            <div class="alert alert-info d-flex justify-content-between align-items-center" style="border-radius: 15px; background: rgba(139, 92, 246, 0.1); border-left: 5px solid #8b5cf6;">
+                <div>
+                    <i class="fas fa-filter me-2" style="color: #8b5cf6;"></i>
+                    Menampilkan buku kategori: <strong class="ms-1">{{ $filterKategori }}</strong>
+                </div>
+                <a href="{{ route('books.index') }}" class="btn btn-sm" style="background-color: #ff6b6b; color: white; border-radius: 50px; padding: 5px 15px;">
+                    <i class="fas fa-times me-1"></i> Reset
+                </a>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Search & Filter Bar -->
+    <div class="row g-0 mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm" style="border-radius: 20px;">
+                <div class="card-body p-3">
+                    <form method="GET" action="{{ route('books.index') }}" class="d-flex flex-wrap align-items-center gap-3">
+                        <div class="d-flex align-items-center flex-grow-1">
+                            <label class="fw-semibold text-muted mb-0 me-3" style="min-width: 70px;">
+                                <i class="fas fa-search me-2" style="color: #8b5cf6;"></i>Cari:
+                            </label>
+                            <input type="text" name="search" class="form-control" placeholder="Cari judul atau penulis..." value="{{ request('search') }}" style="border-radius: 50px; border: 1px solid #e0e0e0; max-width: 300px;">
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <label class="fw-semibold text-muted mb-0 me-3">
+                                <i class="fas fa-tags me-2" style="color: #8b5cf6;"></i>Kategori:
+                            </label>
+                            <select name="kategori" class="form-control" style="border-radius: 50px; border: 1px solid #e0e0e0; min-width: 200px;">
+                                <option value="">Semua Kategori</option>
+                                @foreach($categories as $kategori)
+                                    <option value="{{ $kategori->id }}" {{ request('kategori') == $kategori->id ? 'selected' : '' }}>
+                                        {{ $kategori->nama }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <button type="submit" class="btn" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000; border-radius: 50px; padding: 8px 25px;">
+                            <i class="fas fa-filter me-2"></i> Filter
+                        </button>
+                        @if(request('search') || request('kategori'))
+                            <a href="{{ route('books.index') }}" class="btn btn-sm" style="background-color: #ff6b6b; color: white; border-radius: 50px; padding: 8px 20px;">
+                                <i class="fas fa-times me-1"></i> Reset
+                            </a>
+                        @endif
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabel Buku -->
+    <div class="row g-0">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                <div class="card-header bg-white border-0 py-3 px-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0" style="color: #2d3436; font-weight: 600;">
+                            <i class="fas fa-list me-2" style="color: #8b5cf6;"></i> Koleksi Buku
+                            <span class="badge ms-2" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000;">{{ $books->total() }} buku</span>
+                        </h5>
+                        <span class="text-muted small">
+                            <i class="fas fa-info-circle me-1"></i> Halaman {{ $books->currentPage() }} dari {{ $books->lastPage() }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" style="min-width: 1200px;">
+                            <thead style="background: linear-gradient(45deg, #f7c0ec, #a7bdea);">
+                                <tr>
+                                    <th class="text-center" style="width: 50px;">#</th>
+                                    <th style="width: 250px;">Judul</th>
+                                    <th style="width: 200px;">Penulis</th>
+                                    <th style="width: 150px;">Kategori</th>
+                                    <th style="width: 100px;" class="text-center">Tahun Terbit</th>
+                                    <th style="width: 100px;" class="text-center">Stok</th>
+                                    <th style="width: 100px;" class="text-center">Cover</th>
+                                    <th style="width: 150px;" class="text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($books as $index => $book)
+                                <tr style="vertical-align: middle;">
+                                    <td class="text-center fw-bold">{{ $books->firstItem() + $index }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-2">
+                                                <i class="fas fa-book" style="color: #8b5cf6;"></i>
+                                            </div>
+                                            <span class="fw-semibold">{{ $book->judul }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-user-edit me-2" style="color: #f472b6;"></i>
+                                            {{ $book->penulis }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000; padding: 6px 12px;">
+                                            {{ $book->kategori->nama ?? '-' }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-light text-dark px-3 py-2">
+                                            <i class="fas fa-calendar-alt me-1" style="color: #8b5cf6;"></i>
+                                            {{ $book->tahun_terbit }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        @if($book->stok > 5)
+                                            <span class="badge bg-success px-3 py-2">
+                                                <i class="fas fa-check-circle me-1"></i> {{ $book->stok }}
+                                            </span>
+                                        @elseif($book->stok > 0)
+                                            <span class="badge bg-warning text-dark px-3 py-2">
+                                                <i class="fas fa-exclamation-circle me-1"></i> {{ $book->stok }}
+                                            </span>
+                                        @else
+                                            <span class="badge bg-danger px-3 py-2">
+                                                <i class="fas fa-times-circle me-1"></i> Habis
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        @if($book->gambar)
+                                            <div class="position-relative d-inline-block">
+                                                <img src="{{ asset('storage/' . $book->gambar) }}" 
+                                                     width="50" 
+                                                     height="70" 
+                                                     alt="Cover {{ $book->judul }}"
+                                                     style="object-fit: cover; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
+                                                     data-bs-toggle="tooltip" 
+                                                     data-bs-placement="top" 
+                                                     title="{{ $book->judul }}">
+                                            </div>
+                                        @else
+                                            <div class="bg-light d-inline-flex align-items-center justify-content-center" 
+                                                 style="width: 50px; height: 70px; border-radius: 8px; border: 1px dashed #ccc;">
+                                                <i class="fas fa-image text-muted"></i>
+                                            </div>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ route('books.edit', $book->id) }}" 
+                                               class="btn btn-sm" 
+                                               style="background-color: #ffe066; color: #000; border: none; border-radius: 8px 0 0 8px; padding: 8px 12px;">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form action="{{ route('books.destroy', $book->id) }}" 
+                                                  method="POST" 
+                                                  class="d-inline"
+                                                  onsubmit="return confirm('Yakin ingin menghapus buku ini? Data terkait seperti peminjaman mungkin terpengaruh.');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" 
+                                                        class="btn btn-sm" 
+                                                        style="background-color: #ff6b6b; color: white; border: none; border-radius: 0 8px 8px 0; padding: 8px 12px;">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="8" class="text-center py-5">
+                                        <div class="text-muted">
+                                            <i class="fas fa-book-open fa-4x mb-3" style="color: #dfe6e9;"></i>
+                                            <h6>Belum ada data buku</h6>
+                                            <p class="small mb-3">Silakan tambah buku baru</p>
+                                            <a href="{{ route('books.create') }}" class="btn btn-sm" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000;">
+                                                <i class="fas fa-plus-circle me-1"></i> Tambah Buku
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                @if(method_exists($books, 'links') && $books->hasPages())
+                <div class="card-footer bg-white border-0 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-muted small">
+                            Menampilkan {{ $books->firstItem() }} - {{ $books->lastItem() }} dari {{ $books->total() }} buku
+                        </div>
+                        <div>
+                            {{ $books->links() }}
+                        </div>
+                    </div>
+                </div>
+                @endif
+            </div>
         </div>
     </div>
 </div>
-@endif
+@endsection
 
-<section id="koleksi">
-    <div class="book-grid" id="containerKoleksi">
-        @foreach($books as $b)
-        <div class="book-item">
-            <div class="img-box">
-                <span class="category-label">{{ $b->kategori->nama ?? 'Umum' }}</span>
-                @php $imgB = $b->cover ? str_replace('public/', '', $b->cover) : ''; @endphp
-                <img src="{{ asset('storage/' . $imgB) }}" onerror="this.src='{{ asset('web-perpus/img/bukubaru.png') }}'">
-            </div>
-            <div class="b-title">{{ $b->judul }}</div>
-            <div style="font-size: 0.75rem; color: var(--baby-blue); font-weight: 700;">Stok: {{ $b->stok }}</div>
-            
-            <div class="action-tools">
-                <a href="{{ route('books.edit', $b->id) }}" class="btn-tool btn-edit"><i class="fas fa-edit"></i></a>
-                <form action="{{ route('books.destroy', $b->id) }}" method="POST" style="flex: 1;" onsubmit="return confirm('Hapus buku ini?')">
-                    @csrf @method('DELETE')
-                    <button type="submit" class="btn-tool btn-delete" style="width: 100%;"><i class="fas fa-trash"></i></button>
-                </form>
-            </div>
-        </div>
-        @endforeach
-    </div>
-
-    <div class="d-flex justify-content-center mt-4 mb-5">
-        {{ $books->links('pagination::bootstrap-4') }}
-    </div>
-</section>
-
-<a href="{{ url('/dashboard') }}" class="btn-back"><i class="fas fa-arrow-left"></i> DASHBOARD</a>
-
+@push('scripts')
 <script>
-    function scrollSlider(offset) {
-        document.getElementById('mainSlider').scrollBy({ left: offset, behavior: 'smooth' });
-    }
-
-    function filterBuku() {
-        let keyword = document.getElementById('keyword').value;
-        let kategori = document.getElementById('kat_id').value;
-        let container = document.getElementById('containerKoleksi');
-        container.style.opacity = '0.3';
-
-        fetch(`{{ route('books.filter') }}?search=${keyword}&kategori=${kategori}`)
-            .then(res => res.json())
-            .then(data => {
-                let html = '';
-                if(data.success && data.books.length > 0) {
-                    data.books.forEach(b => {
-                        let cleanImg = b.cover ? b.cover.replace('public/', '') : '';
-                        let img = cleanImg ? `/storage/${cleanImg}` : '{{ asset("web-perpus/img/bukubaru.png") }}';
-                        let kname = b.kategori ? b.kategori.nama : 'Umum';
-                        
-                        html += `
-                        <div class="book-item">
-                            <div class="img-box">
-                                <span class="category-label">${kname}</span>
-                                <img src="${img}" onerror="this.src='{{ asset("web-perpus/img/bukubaru.png") }}'">
-                            </div>
-                            <div class="b-title">${b.judul}</div>
-                            <div style="font-size: 0.75rem; color: var(--baby-blue); font-weight: 700;">Stok: ${b.stok}</div>
-                            <div class="action-tools">
-                                <a href="/books/${b.id}/edit" class="btn-tool btn-edit"><i class="fas fa-edit"></i></a>
-                                <form action="/books/${b.id}" method="POST" style="flex: 1;" onsubmit="return confirm('Hapus buku ini?')">
-                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                    <input type="hidden" name="_method" value="DELETE">
-                                    <button type="submit" class="btn-tool btn-delete" style="width: 100%;"><i class="fas fa-trash"></i></button>
-                                </form>
-                            </div>
-                        </div>`;
-                    });
-                } else {
-                    html = '<div style="grid-column: 1/-1; text-align: center; padding: 60px;"><h3>Buku tidak ditemukan</h3></div>';
-                }
-                container.innerHTML = html;
-                container.style.opacity = '1';
-            });
-    }
-
-    document.getElementById('keyword').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') filterBuku();
+    // Tooltip initialization
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
     });
 </script>
-@endsection
+@endpush

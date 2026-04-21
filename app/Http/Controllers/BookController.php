@@ -6,8 +6,7 @@ use App\Models\Book;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class BookController extends Controller
 {
@@ -16,85 +15,50 @@ class BookController extends Controller
      */
     public function index(Request $request)
     {
-        // 1. Ambil data kategori untuk dropdown
-        $kategoris = Category::orderBy('nama', 'asc')->get();
+        $query = Book::with('kategori')->latest();
 
-        // 2. Ambil data buku populer (Anti-Error SQL)
-        $popularBooks = $this->getPopularBooks(10);
-
-        // 3. Query Utama untuk Grid/Daftar Buku
-        $query = Book::with('kategori')->withCount(['pinjamans as total_dipinjam' => function($q) {
-            $q->where('status', 'sudah dikembalikan');
-        }]);
-
+        // Pencarian
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('judul', 'LIKE', '%' . $search . '%')
-                  ->orWhere('penulis', 'LIKE', '%' . $search . '%')
-                  ->orWhere('penerbit', 'LIKE', '%' . $search . '%');
+            $query->where(function($q) use ($search) {
+                $q->where('judul', 'LIKE', '%'.$search.'%')
+                  ->orWhere('penulis', 'LIKE', '%'.$search.'%');
             });
         }
 
+        // Filter kategori
         if ($request->filled('kategori')) {
             $query->where('kategori_id', $request->kategori);
         }
 
-        $books = $query->latest()->paginate(24)->withQueryString();
+        $books = $query->paginate(12);
+        $categories = Category::all();
 
-        return view('books.index', compact('books', 'kategoris', 'popularBooks'));
+        return view('books.index', compact('books', 'categories'));
     }
 
     /**
-     * Helper Method: Ambil buku terpopuler (Tanpa GROUP BY manual agar tidak error)
+     * Tampilkan buku berdasarkan kategori
      */
-    private function getPopularBooks($limit = 10)
+    public function byCategory($id)
     {
-        $cacheKey = 'popular_books_admin_safe_' . $limit;
-        
-        return Cache::remember($cacheKey, now()->addMinutes(10), function() use ($limit) {
-            return Book::with('kategori')
-                ->withCount(['pinjamans as total_dipinjam' => function($q) {
-                    $q->where('status', 'sudah dikembalikan');
-                }])
-                ->having('total_dipinjam', '>', 0)
-                ->orderBy('total_dipinjam', 'desc')
-                ->limit($limit)
-                ->get();
-        });
+        $kategori = Category::findOrFail($id);
+        $books = $kategori->books()->with('kategori')->latest()->paginate(12);
+
+        return view('books.index', [
+            'books' => $books,
+            'categories' => Category::all(),
+            'selectedCategory' => $id
+        ]);
     }
 
     /**
-     * Fitur AJAX Filter (Pencarian Live)
+     * Form tambah buku
      */
-    public function filter(Request $request)
+    public function create()
     {
-        try {
-            $query = Book::with('kategori')->withCount(['pinjamans as total_dipinjam' => function($q) {
-                $q->where('status', 'sudah dikembalikan');
-            }]);
-
-            if ($request->filled('search')) {
-                $search = $request->search;
-                $query->where(function ($q) use ($search) {
-                    $q->where('judul', 'LIKE', "%{$search}%")
-                      ->orWhere('penulis', 'LIKE', "%{$search}%");
-                });
-            }
-
-            if ($request->filled('kategori')) {
-                $query->where('kategori_id', $request->kategori);
-            }
-
-            $books = $query->latest()->get();
-
-            return response()->json([
-                'success' => true,
-                'books'   => $books
-            ]);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-        }
+        $categories = Category::all();
+        return view('books.create', compact('categories'));
     }
 
     /**
@@ -102,68 +66,108 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
+        // Validasi input
         $validated = $request->validate([
-            'judul'        => 'required|string|max:255',
-            'penulis'      => 'required|string|max:255',
-            'penerbit'     => 'nullable|string|max:255',
-            'tahun_terbit' => 'required|integer|min:1900|max:' . date('Y'),
-            'kategori_id'  => 'required|exists:categories,id',
-            'stok'         => 'required|integer|min:0',
-            'cover'        => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'judul'         => 'required|string|max:255',
+            'penulis'       => 'required|string|max:255',
+            'penerbit'      => 'nullable|string|max:255',
+            'tahun_terbit'  => 'required|integer|min:1900|max:' . date('Y'),
+            'kategori_id'   => 'required|exists:categories,id',
+            'stok'          => 'required|integer|min:0',
+            'gambar'        => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        if ($request->hasFile('cover')) {
-            $file = $request->file('cover');
-            $path = $file->store('buku', 'public');
+        // 🔥 PROSES UPLOAD GAMBAR
+        if ($request->hasFile('gambar')) {
+            $file = $request->file('gambar');
+            
+            // Buat nama file unik: timestamp_nama_original.jpg
+            $filename = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            
+            // Simpan ke folder storage/app/public/gambar_buku/
+            $path = $file->storeAs('gambar_buku', $filename, 'public');
+            
+            // Simpan path ke database (kolom 'cover')
             $validated['cover'] = $path;
+            
+            // Debug: catat log jika berhasil
+            Log::info('Gambar berhasil diupload: ' . $path);
+        } else {
+            Log::info('Tidak ada file gambar yang diupload');
         }
 
+        // Simpan ke database
         Book::create($validated);
-        Cache::forget('popular_books_admin_safe_10'); // Reset cache biar data baru masuk
 
         return redirect()->route('books.index')->with('success', 'Buku berhasil ditambahkan.');
     }
 
-    public function create()
-    {
-        $kategoris = Category::all();
-        return view('books.create', compact('kategoris'));
-    }
-
+    /**
+     * Form edit buku
+     */
     public function edit(Book $book)
     {
-        $kategoris = Category::all();
-        return view('books.edit', compact('book', 'kategoris'));
+        $categories = Category::all();
+        return view('books.edit', compact('book', 'categories'));
     }
 
+    /**
+     * Update data buku
+     */
     public function update(Request $request, Book $book)
     {
+        // Validasi input
         $validated = $request->validate([
-            'judul'        => 'required|string|max:255',
-            'penulis'      => 'required|string|max:255',
-            'penerbit'     => 'nullable|string|max:255',
-            'tahun_terbit' => 'required|integer|min:1900|max:' . date('Y'),
-            'kategori_id'  => 'required|exists:categories,id',
-            'stok'         => 'required|integer|min:0',
-            'cover'        => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'judul'         => 'required|string|max:255',
+            'penulis'       => 'required|string|max:255',
+            'penerbit'      => 'nullable|string|max:255',
+            'tahun_terbit'  => 'required|integer|min:1900|max:' . date('Y'),
+            'kategori_id'   => 'required|exists:categories,id',
+            'stok'          => 'required|integer|min:0',
+            'gambar'        => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        if ($request->hasFile('cover')) {
-            if ($book->cover) { Storage::disk('public')->delete($book->cover); }
-            $validated['cover'] = $request->file('cover')->store('buku', 'public');
+        // 🔥 PROSES UPLOAD GAMBAR BARU
+        if ($request->hasFile('gambar')) {
+            // Hapus gambar lama jika ada
+            if ($book->cover && Storage::disk('public')->exists($book->cover)) {
+                Storage::disk('public')->delete($book->cover);
+                Log::info('Gambar lama dihapus: ' . $book->cover);
+            }
+
+            $file = $request->file('gambar');
+            
+            // Buat nama file unik
+            $filename = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            
+            // Simpan ke folder storage/app/public/gambar_buku/
+            $path = $file->storeAs('gambar_buku', $filename, 'public');
+            
+            // Simpan path ke database (kolom 'cover')
+            $validated['cover'] = $path;
+            
+            Log::info('Gambar baru diupload: ' . $path);
         }
 
+        // Update database
         $book->update($validated);
-        Cache::forget('popular_books_admin_safe_10');
 
         return redirect()->route('books.index')->with('success', 'Buku berhasil diperbarui.');
     }
 
+    /**
+     * Hapus buku
+     */
     public function destroy(Book $book)
     {
-        if ($book->cover) { Storage::disk('public')->delete($book->cover); }
+        // Hapus file gambar jika ada
+        if ($book->cover && Storage::disk('public')->exists($book->cover)) {
+            Storage::disk('public')->delete($book->cover);
+            Log::info('Gambar dihapus: ' . $book->cover);
+        }
+
         $book->delete();
-        Cache::forget('popular_books_admin_safe_10');
+
         return redirect()->route('books.index')->with('success', 'Buku berhasil dihapus.');
     }
 }
