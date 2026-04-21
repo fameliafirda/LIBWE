@@ -157,7 +157,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($books as $index => $book)
+                                @forelse($books as $index => $book)
                                 <tr style="vertical-align: middle;">
                                     <td class="text-center fw-bold">{{ $books->firstItem() + $index }}</td>
                                     <td>
