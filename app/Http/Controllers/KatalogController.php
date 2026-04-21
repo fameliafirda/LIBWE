@@ -12,16 +12,12 @@ use Illuminate\Support\Facades\Log;
 class KatalogController extends Controller
 {
     /**
-     * Display a listing of the books with recommendations.
+     * Display a listing of the books.
      */
     public function index(Request $request)
     {
         // Ambil semua kategori
         $kategoris = Category::all();
-
-        // ==================== REKOMENDASI BUKU POPULER ====================
-        // Ambil daftar buku paling banyak dipinjam
-        $popularBooks = $this->getPopularBooks(10);
 
         // ==================== QUERY KATALOG BUKU ====================
         $query = Book::with('kategori');
@@ -47,73 +43,7 @@ class KatalogController extends Controller
         return view('katalog.index', [
             'books' => $books,
             'kategoris' => $kategoris,
-            'popularBooks' => $popularBooks,
         ]);
-    }
-
-    /**
-     * Get popular books based on borrowing history from pinjamans table.
-     * Diurutkan dari yang paling banyak dipinjam ke yang paling sedikit
-     * Buku yang belum dipinjam tidak akan masuk rekomendasi
-     * 
-     * @param int $limit Jumlah buku yang ditampilkan (default 10)
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    private function getPopularBooks($limit = 10)
-    {
-        $cacheKey = 'popular_books_limit_' . $limit;
-
-        return Cache::remember($cacheKey, now()->addMinutes(30), function () use ($limit) {
-            // Pastikan tabel pinjamans ada
-            if (!$this->hasPinjamanTable()) {
-                Log::warning('Tabel pinjamans tidak ditemukan.');
-                return collect(); // Kosong, karena data pinjamans tidak ditemukan
-            }
-
-            // Ambil data buku berdasarkan jumlah peminjaman terbanyak
-            $popularBooks = Book::with('kategori')
-                ->join('pinjamans', 'books.id', '=', 'pinjamans.buku_id')
-                ->select(
-                    'books.id',
-                    'books.judul',
-                    'books.penulis',
-                    'books.penerbit',
-                    'books.tahun_terbit',
-                    'books.cover',
-                    'books.stok',
-                    'books.kategori_id',
-                    DB::raw('COUNT(pinjamans.id) as total_dipinjam')
-                )
-                ->where('pinjamans.status', 'sudah dikembalikan')  // Hanya yang sudah dikembalikan
-                ->groupBy(
-                    'books.id',
-                    'books.judul',
-                    'books.penulis',
-                    'books.penerbit',
-                    'books.tahun_terbit',
-                    'books.cover',
-                    'books.stok',
-                    'books.kategori_id'
-                )
-                ->orderByDesc('total_dipinjam')  // Mengurutkan berdasarkan peminjaman terbanyak
-                ->limit($limit)
-                ->get();
-
-            return $popularBooks;
-        });
-    }
-
-    /**
-     * Check if pinjamans table exists.
-     */
-    private function hasPinjamanTable()
-    {
-        try {
-            return DB::connection()->getSchemaBuilder()->hasTable('pinjamans');
-        } catch (\Exception $e) {
-            Log::error('Error checking pinjamans table: ' . $e->getMessage());
-            return false;
-        }
     }
 
     /**
