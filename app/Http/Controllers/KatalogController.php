@@ -64,13 +64,13 @@ class KatalogController extends Controller
         $cacheKey = 'popular_books_limit_' . $limit;
 
         return Cache::remember($cacheKey, now()->addMinutes(30), function () use ($limit) {
-            // Cek apakah tabel pinjamans ada
+            // Pastikan tabel pinjamans ada
             if (!$this->hasPinjamanTable()) {
                 Log::warning('Tabel pinjamans tidak ditemukan.');
-                return collect(); // kosong, bukan fallback dummy
+                return collect(); // Kosong, karena data pinjamans tidak ditemukan
             }
 
-            // Query untuk mendapatkan buku paling sering dipinjam dari data peminjaman
+            // Ambil data buku berdasarkan jumlah peminjaman terbanyak
             $popularBooks = Book::with('kategori')
                 ->join('pinjamans', 'books.id', '=', 'pinjamans.buku_id')
                 ->select(
@@ -84,7 +84,7 @@ class KatalogController extends Controller
                     'books.kategori_id',
                     DB::raw('COUNT(pinjamans.id) as total_dipinjam')
                 )
-                ->where('pinjamans.status', 'sudah dikembalikan') // Hanya yang sudah dikembalikan
+                ->where('pinjamans.status', 'sudah dikembalikan')  // Hanya yang sudah dikembalikan
                 ->groupBy(
                     'books.id',
                     'books.judul',
@@ -95,11 +95,10 @@ class KatalogController extends Controller
                     'books.stok',
                     'books.kategori_id'
                 )
-                ->orderByDesc('total_dipinjam')
+                ->orderByDesc('total_dipinjam')  // Mengurutkan berdasarkan peminjaman terbanyak
                 ->limit($limit)
                 ->get();
 
-            // Jika hasil query kosong, kembalikan koleksi kosong
             return $popularBooks;
         });
     }
