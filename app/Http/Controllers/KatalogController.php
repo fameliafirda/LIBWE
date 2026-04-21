@@ -11,21 +11,20 @@ use Illuminate\Support\Facades\DB;
 class KatalogController extends Controller
 {
     /**
-     * Display a listing of the books with recommendations.
+     * Menampilkan halaman katalog dengan rekomendasi dan grid buku.
      */
     public function index(Request $request)
     {
-        // Ambil semua kategori
+        // 1. Ambil semua kategori untuk dropdown
         $kategoris = Category::all();
 
-        // ==================== REKOMENDASI BUKU POPULER ====================
-        // Ambil 10 buku paling sering dipinjam (diurutkan dari tertinggi ke terendah)
+        // 2. Ambil 10 buku paling sering dipinjam (Rekomendasi)
         $popularBooks = $this->getPopularBooks(10);
 
-        // ==================== QUERY KATALOG BUKU ====================
+        // 3. Query Utama untuk Katalog Buku (Grid)
         $query = Book::with('kategori');
 
-        // Pencarian
+        // Fitur Pencarian
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -35,12 +34,12 @@ class KatalogController extends Controller
             });
         }
 
-        // Filter kategori
+        // Fitur Filter Kategori
         if ($request->filled('kategori')) {
             $query->where('kategori_id', $request->kategori);
         }
 
-        // Paginate
+        // Pagination 24 buku per halaman
         $books = $query->latest()->paginate(24)->withQueryString();
 
         return view('katalog.index', [
@@ -51,20 +50,17 @@ class KatalogController extends Controller
     }
 
     /**
-     * Get popular books based on borrowing history from pinjamans table.
-     * Diurutkan dari yang paling banyak dipinjam ke yang paling sedikit
+     * Logika mengambil buku populer berdasarkan history peminjaman.
      */
     private function getPopularBooks($limit = 10)
     {
         $cacheKey = 'popular_books_limit_' . $limit;
         
         return Cache::remember($cacheKey, now()->addMinutes(30), function() use ($limit) {
-            // Cek apakah tabel pinjamans ada
             if (!$this->hasPinjamanTable()) {
                 return collect();
             }
 
-            // Query untuk mendapatkan buku paling sering dipinjam
             $popularBooks = Book::with('kategori')
                 ->leftJoin('pinjamans', function($join) {
                     $join->on('books.id', '=', 'pinjamans.buku_id')
@@ -91,11 +87,11 @@ class KatalogController extends Controller
                     'books.stok',
                     'books.kategori_id'
                 )
-                ->orderBy('total_dipinjam', 'DESC') // 🔥 URUTAN DARI TERBANYAK KE TERSEDIKIT
+                ->orderBy('total_dipinjam', 'DESC')
                 ->limit($limit)
                 ->get();
 
-            // Jika tidak ada data peminjaman sama sekali, tampilkan berdasarkan stok terbanyak
+            // Jika belum ada data pinjam, ambil berdasarkan stok terbanyak (Fallback)
             if ($popularBooks->isEmpty() || $popularBooks->sum('total_dipinjam') == 0) {
                 return Book::with('kategori')
                     ->orderBy('stok', 'DESC')
@@ -111,9 +107,6 @@ class KatalogController extends Controller
         });
     }
 
-    /**
-     * Check if pinjamans table exists.
-     */
     private function hasPinjamanTable()
     {
         try {
@@ -124,21 +117,7 @@ class KatalogController extends Controller
     }
 
     /**
-     * Clear popular books cache.
-     */
-    public function clearRecommendationCache()
-    {
-        Book::clearPopularBooksCache();
-        
-        if (request()->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Cache rekomendasi berhasil dihapus']);
-        }
-        
-        return back()->with('success', 'Cache rekomendasi berhasil dihapus');
-    }
-
-    /**
-     * Fungsi AJAX Filter untuk Pencarian Live di UI Baru
+     * Fungsi AJAX Filter (Tanpa Refresh Halaman)
      */
     public function filter(Request $request)
     {
@@ -164,7 +143,6 @@ class KatalogController extends Controller
                 'success' => true,
                 'books'   => $books
             ]);
-
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
