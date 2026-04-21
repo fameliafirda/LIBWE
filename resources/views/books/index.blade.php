@@ -41,7 +41,7 @@
 
     <!-- Notifikasi Stok Habis -->
     @php
-        $bukuHabis = App\Models\Book::where('stok', '<=', 0)->get();
+        $bukuHabis = \App\Models\Book::with('kategori')->where('stok', '<=', 0)->get();
     @endphp
     @if($bukuHabis->count() > 0)
     <div class="row g-0 mb-4">
@@ -201,9 +201,9 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        @if($book->gambar)
+                                        @if($book->cover)
                                             <div class="position-relative d-inline-block">
-                                                <img src="{{ asset('storage/' . $book->gambar) }}" 
+                                                <img src="{{ asset('storage/' . $book->cover) }}" 
                                                      width="50" 
                                                      height="70" 
                                                      alt="Cover {{ $book->judul }}"
