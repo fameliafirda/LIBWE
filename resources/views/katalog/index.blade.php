@@ -351,9 +351,9 @@
                     data.books.forEach(b => {
                         let hasCover = b.cover ? true : false;
                         let imgHtml = hasCover ? `<img src="/storage/${b.cover}" alt="${escapeHtml(b.judul)}">` : 
-                            `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#1a1a2e;"><i class="fas fa-book" style="font-size: 2.5rem; color: #94a3b8; opacity: 0.3;"></i></div>`;
+                            `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#1a1a2e;"><i class="fas fa-book" style="font-size: 2.5rem; color: #94a3b8; opacity: 0.3;"></i></div>`; 
                         
-                        html += `
+                        html += ` 
                         <div class="book-item">
                             <div class="img-box">
                                 <span class="category-pill">${escapeHtml(b.kategori?.nama || 'Umum')}</span>
@@ -369,37 +369,19 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>`;
-                    });
-                } else {
-                    html = '<div style="grid-column: 1/-1; text-align: center; padding: 80px 20px;"><i class="fas fa-search" style="font-size: 4rem; color: var(--text-muted); margin-bottom: 20px; display: block;"></i><h3 style="color: var(--text-muted);">Buku tidak ditemukan</h3></div>';
-                }
-                container.innerHTML = html;
-                container.style.opacity = '1';
-                const url = new URL(window.location);
-                if(keyword) url.searchParams.set('search', keyword); else url.searchParams.delete('search');
-                if(kategori) url.searchParams.set('kategori', kategori); else url.searchParams.delete('kategori');
-                window.history.pushState({}, '', url);
-            })
-            .catch(err => {
-                console.error('Error:', err);
-                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 80px 20px;"><i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: var(--soft-pink); margin-bottom: 20px; display: block;"></i><h3 style="color: var(--text-muted);">Terjadi kesalahan</h3></div>';
-                container.style.opacity = '1';
-            });
-    }
-
-    function escapeHtml(str) {
-        if(!str) return '';
-        return String(str).replace(/[&<>]/g, function(m) {
-            if(m === '&') return '&amp;';
-            if(m === '<') return '&lt;';
-            if(m === '>') return '&gt;';
-            return m;
-        });
-    }
-
-    document.getElementById('keyword')?.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') filterBuku();
-    });
-</script>
+                        </div>`;}
+                    container.innerHTML = html;
+                    container.style.opacity = '1';
+                    const url = new URL(window.location);
+                    if(keyword) url.searchParams.set('search', keyword); else url.searchParams.delete('search');
+                    if(kategori) url.searchParams.set('kategori', kategori); else url.searchParams.delete('kategori');
+                    window.history.pushState({}, '', url);
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 80px 20px;"><i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: var(--soft-pink); margin-bottom: 20px; display: block;"></i><h3 style="color: var(--text-muted);">Terjadi kesalahan</h3></div>';
+                    container.style.opacity = '1';
+                });
+            }
+    </script>
 @endsection

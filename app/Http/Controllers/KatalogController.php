@@ -177,7 +177,7 @@ class KatalogController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Filter error: ' . $e->getMessage());
-            return response()->json([
+            return response()->json([ 
                 'success' => false, 
                 'message' => $e->getMessage()
             ], 500);
