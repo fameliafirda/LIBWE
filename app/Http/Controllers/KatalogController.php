@@ -11,21 +11,16 @@ use Illuminate\Support\Facades\Log;
 
 class KatalogController extends Controller
 {
-    /**
-     * Display a listing of the books with recommendations.
-     */
     public function index(Request $request)
     {
-        // Ambil semua kategori
         $kategoris = Category::all();
 
-        // ==================== REKOMENDASI BUKU POPULER ====================
+        // 🔥 rekomendasi
         $popularBooks = $this->getPopularBooks(10);
 
-        // ==================== QUERY KATALOG BUKU ====================
         $query = Book::with('kategori');
 
-        // Pencarian
+        // search
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -35,51 +30,36 @@ class KatalogController extends Controller
             });
         }
 
-        // Filter kategori
+        // filter kategori
         if ($request->filled('kategori')) {
             $query->where('kategori_id', $request->kategori);
         }
 
-        // Paginate 24 buku per halaman
         $books = $query->latest()->paginate(24)->withQueryString();
 
-        return view('katalog.index', [
-            'books' => $books,
-            'kategoris' => $kategoris,
-            'popularBooks' => $popularBooks,
-        ]);
+        return view('katalog.index', compact('books', 'kategoris', 'popularBooks'));
     }
 
-    /**
-     * Get popular books based on borrowing history from pinjamans table.
-     * Diurutkan dari yang paling banyak dipinjam ke yang paling sedikit
-     * 
-     * @param int $limit Jumlah buku yang ditampilkan (default 10)
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
+    // 🔥 FIX DI SINI
     private function getPopularBooks($limit = 10)
     {
         $cacheKey = 'popular_books_limit_' . $limit;
         
         return Cache::remember($cacheKey, now()->addMinutes(30), function() use ($limit) {
-            // Cek apakah tabel pinjamans ada
+
             if (!$this->hasPinjamanTable()) {
-                Log::info('Tabel pinjamans tidak ditemukan, menggunakan fallback stok terbanyak');
                 return $this->getFallbackPopularBooks($limit);
             }
 
-            // Cek apakah ada data peminjaman yang sudah dikembalikan
             $totalPinjaman = DB::table('pinjamans')
                 ->where('status', 'sudah dikembalikan')
                 ->count();
 
             if ($totalPinjaman == 0) {
-                Log::info('Tidak ada data peminjaman dengan status "sudah dikembalikan", menggunakan fallback stok terbanyak');
                 return $this->getFallbackPopularBooks($limit);
             }
 
-            // Query untuk mendapatkan buku paling sering dipinjam
-            $popularBooks = Book::with('kategori')
+            return Book::with('kategori')
                 ->leftJoin('pinjamans', function($join) {
                     $join->on('books.id', '=', 'pinjamans.buku_id')
                          ->where('pinjamans.status', '=', 'sudah dikembalikan');
@@ -90,10 +70,10 @@ class KatalogController extends Controller
                     'books.penulis',
                     'books.penerbit',
                     'books.tahun_terbit',
-                    'books.gambar',
+                    'books.cover', // 🔥 FIX DI SINI
                     'books.stok',
                     'books.kategori_id',
-                    DB::raw('COALESCE(COUNT(pinjamans.id), 0) as total_dipinjam')
+                    DB::raw('COUNT(pinjamans.id) as total_dipinjam')
                 )
                 ->groupBy(
                     'books.id',
@@ -101,30 +81,20 @@ class KatalogController extends Controller
                     'books.penulis',
                     'books.penerbit',
                     'books.tahun_terbit',
-                    'books.gambar',
+                    'books.cover', // 🔥 FIX DI SINI
                     'books.stok',
                     'books.kategori_id'
                 )
-                ->orderBy('total_dipinjam', 'DESC')
+                ->orderByDesc('total_dipinjam')
                 ->limit($limit)
                 ->get();
-
-            // Jika hasil query kosong atau semua total_dipinjam 0, fallback
-            if ($popularBooks->isEmpty() || $popularBooks->sum('total_dipinjam') == 0) {
-                return $this->getFallbackPopularBooks($limit);
-            }
-
-            return $popularBooks;
         });
     }
 
-    /**
-     * Fallback: Ambil buku berdasarkan stok terbanyak
-     */
     private function getFallbackPopularBooks($limit = 10)
     {
         return Book::with('kategori')
-            ->orderBy('stok', 'DESC')
+            ->orderByDesc('stok')
             ->limit($limit)
             ->get()
             ->map(function($book) {
@@ -133,22 +103,17 @@ class KatalogController extends Controller
             });
     }
 
-    /**
-     * Check if pinjamans table exists.
-     */
     private function hasPinjamanTable()
     {
         try {
             return DB::connection()->getSchemaBuilder()->hasTable('pinjamans');
         } catch (\Exception $e) {
-            Log::error('Error checking pinjamans table: ' . $e->getMessage());
+            Log::error($e->getMessage());
             return false;
         }
     }
 
-    /**
-     * Fungsi AJAX Filter (Tanpa Refresh Halaman)
-     */
+    // AJAX filter
     public function filter(Request $request)
     {
         try {
@@ -173,27 +138,21 @@ class KatalogController extends Controller
                 'success' => true,
                 'books'   => $books
             ]);
+
         } catch (\Exception $e) {
-            Log::error('Filter error: ' . $e->getMessage());
+            Log::error($e->getMessage());
+
             return response()->json([
-                'success' => false, 
-                'message' => $e->getMessage()
+                'success' => false,
+                'message' => 'Terjadi kesalahan'
             ], 500);
         }
     }
 
-    /**
-     * Clear popular books cache.
-     */
     public function clearRecommendationCache()
     {
-        Cache::forget('popular_books_limit_10');
-        Cache::forget('popular_books_limit_5');
-        
-        if (request()->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Cache rekomendasi berhasil dihapus']);
-        }
-        
+        Cache::flush(); // 🔥 lebih simpel
+
         return back()->with('success', 'Cache rekomendasi berhasil dihapus');
     }
 }

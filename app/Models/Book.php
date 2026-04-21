@@ -17,11 +17,10 @@ class Book extends Model
         'penulis',
         'penerbit',
         'tahun_terbit',
-        'cover',
-        'gambar',
+        'cover', // 🔥 pakai ini aja
         'stok',
         'kategori_id',
-        'rak_id', // Tambahkan rak_id
+        'rak_id',
     ];
 
     protected $casts = [
@@ -29,110 +28,120 @@ class Book extends Model
         'stok' => 'integer',
     ];
 
-    /**
-     * Get the category that owns the book.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | RELATION
+    |--------------------------------------------------------------------------
+    */
+
     public function kategori()
     {
         return $this->belongsTo(Category::class, 'kategori_id');
     }
 
-    /**
-     * Alias for kategori() for consistency
-     */
     public function category()
     {
         return $this->belongsTo(Category::class, 'kategori_id');
     }
 
-    /**
-     * Get the rak that owns the book.
-     */
     public function rak()
     {
         return $this->belongsTo(Rak::class, 'rak_id');
     }
 
-    /**
-     * Get the pinjaman records for the book.
-     */
     public function pinjamans()
     {
         return $this->hasMany(Pinjaman::class, 'buku_id');
     }
 
-    /**
-     * Get completed pinjaman (yang sudah dikembalikan)
-     */
     public function pinjamanSelesai()
     {
-        return $this->hasMany(Pinjaman::class, 'buku_id')->where('status', 'sudah dikembalikan');
+        return $this->hasMany(Pinjaman::class, 'buku_id')
+                    ->where('status', 'sudah dikembalikan');
     }
 
-    /**
-     * Get active pinjaman (yang masih dipinjam)
-     */
     public function pinjamanAktif()
     {
-        return $this->hasMany(Pinjaman::class, 'buku_id')->where('status', 'belum dikembalikan');
+        return $this->hasMany(Pinjaman::class, 'buku_id')
+                    ->where('status', 'belum dikembalikan');
     }
 
-    /**
-     * Accessor: Get total times this book has been borrowed (selesai)
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | ACCESSOR
+    |--------------------------------------------------------------------------
+    */
+
     public function getTotalDipinjamAttribute()
     {
         return $this->pinjamanSelesai()->count();
     }
 
-    /**
-     * Accessor: Get currently borrowed count
-     */
     public function getSedangDipinjamAttribute()
     {
         return $this->pinjamanAktif()->count();
     }
 
-    /**
-     * Accessor: Get available stock (physical stock - currently borrowed)
-     */
     public function getStokTersediaAttribute()
     {
         return max(0, $this->stok - $this->sedang_dipinjam);
     }
 
-    /**
-     * Check if stock is available
-     */
-    public function stokTersedia()
-    {
-        return $this->stok_tersedia > 0;
-    }
-
-    /**
-     * Check if book is popular (dipinjam > 10 kali)
-     */
     public function getIsPopularAttribute()
     {
         return $this->total_dipinjam > 10;
     }
 
-    /**
-     * Get popularity level
-     */
     public function getPopularityLevelAttribute()
     {
         $total = $this->total_dipinjam;
+
         if ($total >= 50) return 'very_hot';
         if ($total >= 25) return 'hot';
         if ($total >= 10) return 'popular';
         if ($total >= 5) return 'trending';
+
         return 'normal';
     }
 
-    /**
-     * Decrease stock when book is borrowed
-     */
+    // 🔥 INI TAMBAHAN PENTING BUAT GAMBAR
+    public function getCoverUrlAttribute()
+    {
+        if ($this->cover) {
+            return asset('storage/' . $this->cover);
+        }
+
+        // fallback kalau tidak ada gambar
+        return asset('images/no-image.png');
+    }
+
+    public function getLokasiAttribute()
+    {
+        return $this->rak ? "Rak {$this->rak->nomor}" : 'Belum ditempatkan';
+    }
+
+    public function getFullLocationAttribute()
+    {
+        if ($this->rak && $this->category) {
+            return "{$this->rak->judul} (Rak {$this->rak->nomor}) - Kategori: {$this->category->nama}";
+        } elseif ($this->rak) {
+            return "{$this->rak->judul} (Rak {$this->rak->nomor})";
+        }
+
+        return 'Belum ditempatkan';
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | METHOD
+    |--------------------------------------------------------------------------
+    */
+
+    public function stokTersedia()
+    {
+        return $this->stok_tersedia > 0;
+    }
+
     public function kurangiStok()
     {
         if ($this->stok > 0) {
@@ -143,39 +152,18 @@ class Book extends Model
         return false;
     }
 
-    /**
-     * Increase stock when book is returned
-     */
     public function tambahStok()
     {
         $this->increment('stok');
         self::clearPopularBooksCache();
     }
 
-    /**
-     * Get book location (rak nomor)
-     */
-    public function getLokasiAttribute()
-    {
-        return $this->rak ? "Rak {$this->rak->nomor}" : 'Belum ditempatkan';
-    }
+    /*
+    |--------------------------------------------------------------------------
+    | SCOPE
+    |--------------------------------------------------------------------------
+    */
 
-    /**
-     * Get full location info
-     */
-    public function getFullLocationAttribute()
-    {
-        if ($this->rak && $this->category) {
-            return "{$this->rak->judul} (Rak {$this->rak->nomor}) - Kategori: {$this->category->nama}";
-        } elseif ($this->rak) {
-            return "{$this->rak->judul} (Rak {$this->rak->nomor})";
-        }
-        return 'Belum ditempatkan';
-    }
-
-    /**
-     * Scope: Get most popular books based on borrowing history
-     */
     public function scopeMostPopular($query, $limit = 10)
     {
         return $query->withCount(['pinjamanSelesai as total_dipinjam'])
@@ -183,9 +171,6 @@ class Book extends Model
                      ->limit($limit);
     }
 
-    /**
-     * Scope: Get trending books (popular in last 30 days)
-     */
     public function scopeTrending($query, $limit = 10)
     {
         return $query->withCount(['pinjamanSelesai as total_dipinjam' => function($q) {
@@ -195,28 +180,16 @@ class Book extends Model
                      ->limit($limit);
     }
 
-    /**
-     * Scope: Get books with stock available
-     */
     public function scopeTersedia($query)
     {
         return $query->where('stok', '>', 0);
     }
 
-    /**
-     * Scope: Get books by rak
-     */
     public function scopeByRak($query, $rakId)
     {
-        if ($rakId) {
-            return $query->where('rak_id', $rakId);
-        }
-        return $query;
+        return $rakId ? $query->where('rak_id', $rakId) : $query;
     }
 
-    /**
-     * Scope: Search by title or author
-     */
     public function scopeSearch($query, $search)
     {
         if ($search) {
@@ -227,24 +200,21 @@ class Book extends Model
         return $query;
     }
 
-    /**
-     * Scope: Filter by category
-     */
     public function scopeByCategory($query, $categoryId)
     {
-        if ($categoryId) {
-            return $query->where('kategori_id', $categoryId);
-        }
-        return $query;
+        return $categoryId ? $query->where('kategori_id', $categoryId) : $query;
     }
 
-    /**
-     * Static method: Get cached popular books
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | CACHE
+    |--------------------------------------------------------------------------
+    */
+
     public static function getPopularBooks($limit = 10, $cacheMinutes = 30)
     {
         $cacheKey = 'popular_books_' . $limit;
-        
+
         return Cache::remember($cacheKey, now()->addMinutes($cacheMinutes), function() use ($limit) {
             return self::with(['kategori', 'rak'])
                 ->withCount(['pinjamanSelesai as total_dipinjam'])
@@ -254,26 +224,8 @@ class Book extends Model
         });
     }
 
-    /**
-     * Static method: Clear popular books cache
-     */
     public static function clearPopularBooksCache()
     {
-        Cache::forget('popular_books_10');
-        Cache::forget('popular_books_6');
-        Cache::forget('popular_books_8');
-        Cache::forget('popular_books_limit_10');
-        Cache::forget('popular_books_limit_6');
-        Cache::forget('popular_books_limit_8');
-        Cache::forget('popular_books_by_title_10');
-        Cache::forget('popular_books_by_title_6');
-        Cache::forget('popular_books_by_title_8');
-        
-        $periods = ['week', 'month', 'year', 'all'];
-        foreach ($periods as $period) {
-            Cache::forget('popular_books_' . $period . '_10');
-            Cache::forget('popular_books_' . $period . '_6');
-            Cache::forget('popular_books_' . $period . '_8');
-        }
+        Cache::flush(); // 🔥 lebih simpel & bersih
     }
 }
