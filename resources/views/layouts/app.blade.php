@@ -88,6 +88,82 @@
     font-size: 22px;
     font-weight: 600;
   }
+
+  /* Responsive Design Adjustments */
+  @media (max-width: 768px) {
+    .content-wrapper {
+      padding: 15px;
+    }
+
+    .container-fluid {
+      padding-left: 15px;
+      padding-right: 15px;
+    }
+
+    .card-header, .card-body {
+      padding: 10px;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    .nav-link {
+      font-size: 14px;
+    }
+
+    .btn {
+      font-size: 14px;
+      padding: 8px 15px;
+    }
+
+    /* Ensure the table takes full width on smaller screens */
+    .table {
+      width: 100% !important;
+      margin-bottom: 15px;
+    }
+
+    .container-fluid {
+      padding: 0 10px;
+    }
+
+    .content-header h1 {
+      font-size: 20px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .nav-link {
+      font-size: 12px;
+      padding: 8px 10px;
+    }
+
+    .sidebar .nav-link {
+      font-size: 14px;
+    }
+
+    .content-wrapper {
+      padding: 10px;
+    }
+
+    /* Adjust table layout for mobile */
+    .table th, .table td {
+      padding: 8px;
+    }
+
+    .table thead {
+      font-size: 14px;
+    }
+
+    .card-header h5 {
+      font-size: 18px;
+    }
+
+    .btn {
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+  }
 </style>
 
 </head>
