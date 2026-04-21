@@ -295,8 +295,8 @@
                 <div class="borrow-stats"><i class="fas fa-book-reader"></i> {{ $pb->total_dipinjam ?? 0 }}x</div>
                 
                 @php
-                    // PERBAIKAN: Langsung pakai asset storage
-                    $imageUrlPopuler = $pb->gambar ? asset('storage/' . $pb->gambar) : asset('web-perpus/img/bukubaru.png');
+                    // 🔥 FIX: Gunakan 'cover' bukan 'gambar'
+                    $imageUrlPopuler = $pb->cover ? asset('storage/' . $pb->cover) : asset('web-perpus/img/bukubaru.png');
                 @endphp
                 
                 <div class="img-box" style="height: 240px; margin-bottom: 10px;">
@@ -317,8 +317,8 @@
         @forelse($books as $b)
         <div class="book-item">
             @php
-                // PERBAIKAN: Langsung pakai asset storage
-                $imageUrl = $b->gambar ? asset('storage/' . $b->gambar) : asset('web-perpus/img/bukubaru.png');
+                // 🔥 FIX: Gunakan 'cover' bukan 'gambar'
+                $imageUrl = $b->cover ? asset('storage/' . $b->cover) : asset('web-perpus/img/bukubaru.png');
             @endphp
             
             <div class="img-box">
@@ -382,8 +382,8 @@
                 
                 if(data.success && data.books && data.books.length > 0) {
                     data.books.forEach(b => {
-                        // PERBAIKAN: Langsung pakai /storage/ + nama file
-                        let img = b.gambar ? `/storage/${b.gambar}` : '{{ asset("web-perpus/img/bukubaru.png") }}';
+                        // 🔥 FIX: Gunakan 'cover' bukan 'gambar'
+                        let img = b.cover ? `/storage/${b.cover}` : '{{ asset("web-perpus/img/bukubaru.png") }}';
                         
                         let kname = b.kategori ? b.kategori.nama : 'Umum';
                         let tahun = b.tahun_terbit ? b.tahun_terbit : '-';
