@@ -40,7 +40,7 @@ class KatalogController extends Controller
             $query->where('kategori_id', $request->kategori);
         }
 
-        // Paginate
+        // Paginate 24 buku per halaman
         $books = $query->latest()->paginate(24)->withQueryString();
 
         return view('katalog.index', [
@@ -169,12 +169,6 @@ class KatalogController extends Controller
 
             $books = $query->latest()->get();
 
-            // Format gambar path untuk response JSON
-            $books->transform(function($book) {
-                $book->gambar_url = $this->getImageUrl($book->gambar);
-                return $book;
-            });
-
             return response()->json([
                 'success' => true,
                 'books'   => $books
@@ -186,31 +180,6 @@ class KatalogController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
-    }
-
-    /**
-     * Helper function to get correct image URL
-     */
-    private function getImageUrl($gambar)
-    {
-        if (!$gambar) {
-            return null;
-        }
-
-        // Remove 'public/' if exists
-        $cleanPath = str_replace('public/', '', $gambar);
-        
-        // Check if file exists in storage
-        if (file_exists(storage_path('app/public/' . $cleanPath))) {
-            return asset('storage/' . $cleanPath);
-        }
-        
-        // Try with original path
-        if (file_exists(public_path($gambar))) {
-            return asset($gambar);
-        }
-        
-        return null;
     }
 
     /**

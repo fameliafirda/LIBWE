@@ -295,11 +295,8 @@
                 <div class="borrow-stats"><i class="fas fa-book-reader"></i> {{ $pb->total_dipinjam ?? 0 }}x</div>
                 
                 @php
-                    // Helper untuk path gambar
-                    $gambarPathPopuler = $pb->gambar ? str_replace('public/', '', $pb->gambar) : null;
-                    $imageUrlPopuler = $gambarPathPopuler && file_exists(storage_path('app/public/' . $gambarPathPopuler)) 
-                        ? asset('storage/' . $gambarPathPopuler) 
-                        : asset('web-perpus/img/bukubaru.png');
+                    // PERBAIKAN: Langsung pakai asset storage
+                    $imageUrlPopuler = $pb->gambar ? asset('storage/' . $pb->gambar) : asset('web-perpus/img/bukubaru.png');
                 @endphp
                 
                 <div class="img-box" style="height: 240px; margin-bottom: 10px;">
@@ -320,10 +317,8 @@
         @forelse($books as $b)
         <div class="book-item">
             @php
-                $gambarPath = $b->gambar ? str_replace('public/', '', $b->gambar) : null;
-                $imageUrl = $gambarPath && file_exists(storage_path('app/public/' . $gambarPath)) 
-                    ? asset('storage/' . $gambarPath) 
-                    : asset('web-perpus/img/bukubaru.png');
+                // PERBAIKAN: Langsung pakai asset storage
+                $imageUrl = $b->gambar ? asset('storage/' . $b->gambar) : asset('web-perpus/img/bukubaru.png');
             @endphp
             
             <div class="img-box">
@@ -371,12 +366,6 @@
         }
     }
 
-    function getImageUrl(gambar) {
-        if(!gambar) return '{{ asset("web-perpus/img/bukubaru.png") }}';
-        let cleanPath = gambar.replace('public/', '');
-        return '/storage/' + cleanPath;
-    }
-
     function filterBuku() {
         let keyword = document.getElementById('keyword').value;
         let kategori = document.getElementById('kat_id').value;
@@ -393,7 +382,9 @@
                 
                 if(data.success && data.books && data.books.length > 0) {
                     data.books.forEach(b => {
-                        let img = b.gambar_url ? b.gambar_url : getImageUrl(b.gambar);
+                        // PERBAIKAN: Langsung pakai /storage/ + nama file
+                        let img = b.gambar ? `/storage/${b.gambar}` : '{{ asset("web-perpus/img/bukubaru.png") }}';
+                        
                         let kname = b.kategori ? b.kategori.nama : 'Umum';
                         let tahun = b.tahun_terbit ? b.tahun_terbit : '-';
                         let stok = b.stok !== null ? b.stok : '0';
@@ -441,7 +432,7 @@
     // Escape HTML untuk keamanan
     function escapeHtml(str) {
         if(!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
+        return String(str).replace(/[&<>]/g, function(m) {
             if(m === '&') return '&amp;';
             if(m === '<') return '&lt;';
             if(m === '>') return '&gt;';
