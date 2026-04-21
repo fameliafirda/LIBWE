@@ -590,11 +590,12 @@
             <div class="popular-badge"><i class="fas fa-chart-line"></i> POPULER</div>
             @endif
             <div class="rec-cover">
-              @if($book->gambar)
-                <img src="{{ asset('storage/' . $book->gambar) }}" class="rec-cover-img" alt="{{ $book->judul }}">
+              @if($book->cover)
+                <img src="{{ asset('storage/' . $book->cover) }}" class="rec-cover-img" alt="{{ $book->judul }}">
               @else
-                <div class="rec-cover-img" style="display: flex; align-items: center; justify-content: center;">
+                <div class="rec-cover-img" style="display: flex; align-items: center; justify-content: center; flex-direction: column;">
                   <i class="fas fa-book fa-3x" style="color: var(--text-secondary); opacity: 0.3;"></i>
+                  <span style="font-size: 10px; margin-top: 5px; color: var(--text-secondary);">No Cover</span>
                 </div>
               @endif
             </div>
@@ -695,11 +696,12 @@
         <div class="col-6 col-sm-4 col-md-3 col-lg-2">
           <div class="book-card">
             <div class="cover-container">
-              @if($book->gambar)
-                <img src="{{ asset('storage/' . $book->gambar) }}" class="cover-img" alt="{{ $book->judul }}">
+              @if($book->cover)
+                <img src="{{ asset('storage/' . $book->cover) }}" class="cover-img" alt="{{ $book->judul }}">
               @else
-                <div class="cover-img" style="display: flex; align-items: center; justify-content: center;">
+                <div class="cover-img" style="display: flex; align-items: center; justify-content: center; flex-direction: column;">
                   <i class="fas fa-book fa-3x" style="color: var(--text-secondary); opacity: 0.3;"></i>
+                  <span style="font-size: 10px; margin-top: 5px; color: var(--text-secondary);">No Cover</span>
                 </div>
               @endif
             </div>
