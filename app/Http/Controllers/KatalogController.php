@@ -60,7 +60,7 @@ class KatalogController extends Controller
         return view('katalog.index', [
             'books' => $books,
             'kategoris' => $kategoris,
-            'popularBooks' => $popularBooks,
+            'popularBooks' => $popularBooks,  // Menambahkan variabel rekomendasi buku
         ]);
     }
 
@@ -125,7 +125,7 @@ class KatalogController extends Controller
     }
 
     /**
-     * AJAX Filter
+     * Fungsi AJAX Filter
      */
     public function filter(Request $request)
     {

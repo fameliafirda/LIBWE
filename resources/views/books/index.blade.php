@@ -73,7 +73,6 @@
     }
     .nav-links a:hover, .nav-links a.active { color: var(--soft-pink); }
     
-    /* Style untuk rekomendasi buku */
     .recommendation-wrapper {
         margin: 40px 40px 80px 40px; padding: 60px 0;
         background: linear-gradient(145deg, var(--bg-section), #0a0a0f);
@@ -92,7 +91,6 @@
     .track-container {
         display: flex; gap: 25px; overflow-x: auto; scroll-behavior: smooth; padding: 20px 10px; scrollbar-width: none;
     }
-    .track-container::-webkit-scrollbar { display: none; }
 
     .slider-card {
         min-width: 180px; max-width: 180px; background: rgba(0, 0, 0, 0.4);
@@ -117,16 +115,51 @@
     .book-title-small { font-family: 'Unbounded'; font-size: 0.85rem; margin-bottom: 5px; color: #fff; }
     .book-author-small { color: var(--text-muted); font-size: 0.75rem; }
 
-    /* Style lainnya tetap... */
+    #koleksi { padding: 20px 60px 100px; position: relative; z-index: 10; }
+
+    .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 25px; }
+
+    .book-item { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 16px; padding: 12px; transition: 0.4s; display: flex; flex-direction: column; }
+    .book-item:hover { border-color: var(--baby-blue); transform: translateY(-5px); }
+
+    .category-pill {
+        position: absolute; top: 10px; right: 10px; padding: 4px 10px; background: rgba(0,0,0,0.8);
+        backdrop-filter: blur(5px); border-radius: 6px; font-size: 0.65rem; font-weight: 700; color: var(--lavender);
+        border: 1px solid var(--lavender); z-index: 2;
+    }
+
+    .book-info-container { display: flex; flex-direction: column; flex-grow: 1; }
+    .b-title { font-family: 'Unbounded'; font-size: 0.9rem; margin-bottom: 5px; color: #fff; }
+    .b-author { color: var(--text-muted); font-size: 0.75rem; margin-bottom: 12px; }
+    
+    .b-meta { margin-top: auto; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.05); }
+    .b-meta-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; }
+    .b-year { color: var(--text-muted); }
+    .b-stock { font-weight: 800; color: var(--baby-blue); }
+
+    .btn-kembali { position: fixed; bottom: 30px; right: 30px; background: #fff; color: var(--bg-main); padding: 12px 25px; border-radius: 50px; text-decoration: none; font-weight: 800; z-index: 1000; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); transition: 0.3s; }
+    .btn-kembali:hover { transform: scale(1.05); background: var(--lavender); color: var(--bg-main); }
+
+    .pagination { justify-content: center; gap: 8px; margin-top: 60px; }
+    .pagination .page-item .page-link {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid var(--glass-border);
+        color: #fff;
+        border-radius: 12px !important;
+        padding: 10px 16px;
+    }
+    .pagination .page-item.active .page-link {
+        background: var(--lavender);
+        border-color: var(--lavender);
+        color: var(--bg-main);
+    }
 </style>
 
-<!-- Hero Section -->
 <section class="hero-catalog">
     <h1>KATALOG <span>BUKU</span></h1>
     <p>Eksplorasi Koleksi Perpustakaan</p>
 </section>
 
-<!-- Recomendation Section -->
 @if($popularBooks->count() > 0)
 <div class="recommendation-wrapper">
     <div class="section-title"><i class="fas fa-fire"></i> BUKU TERPOPULER</div>
@@ -154,7 +187,6 @@
 </div>
 @endif
 
-<!-- Buku Koleksi -->
 <section id="koleksi">
     <div class="book-grid" id="containerKoleksi">
         @forelse($books as $b)
@@ -205,54 +237,5 @@
         const slider = document.getElementById('mainSlider');
         if(slider) slider.scrollBy({ left: offset, behavior: 'smooth' });
     }
-
-    function filterBuku() {
-        let keyword = document.getElementById('keyword').value;
-        let kategori = document.getElementById('kat_id').value;
-        let container = document.getElementById('containerKoleksi');
-        if(!container) return;
-        
-        container.style.opacity = '0.3';
-        fetch(`{{ route('katalog.filter') }}?search=${encodeURIComponent(keyword)}&kategori=${encodeURIComponent(kategori)}`)
-            .then(res => res.json())
-            .then(data => {
-                let html = '';
-                if(data.success && data.books && data.books.length > 0) {
-                    data.books.forEach(b => {
-                        let hasCover = b.cover ? true : false;
-                        let imgHtml = hasCover ? `<img src="/storage/${b.cover}" alt="${escapeHtml(b.judul)}">` : 
-                            `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#1a1a2e;"><i class="fas fa-book" style="font-size: 2.5rem; color: #94a3b8; opacity: 0.3;"></i></div>`; 
-                        
-                        html += ` 
-                        <div class="book-item">
-                            <div class="img-box">
-                                <span class="category-pill">${escapeHtml(b.kategori?.nama || 'Umum')}</span>
-                                ${imgHtml}
-                            </div>
-                            <div class="book-info-container">
-                                <h3 class="b-title">${escapeHtml(b.judul.length > 40 ? b.judul.substring(0,40) + '...' : b.judul)}</h3>
-                                <p class="b-author">${escapeHtml(b.penulis ? (b.penulis.length > 25 ? b.penulis.substring(0,25) + '...' : b.penulis) : 'Anonim')}</p>
-                                <div class="b-meta">
-                                    <div class="b-meta-row">
-                                        <span class="b-year"><i class="fas fa-calendar-alt"></i> ${escapeHtml(b.tahun_terbit || '-')}</span>
-                                        <span class="b-stock"><i class="fas fa-box"></i> ${escapeHtml(b.stok ?? '0')}</span>
-                                        <span class="b-dipinjam"><i class="fas fa-book-reader"></i> ${escapeHtml(b.total_dipinjam)}x</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>`;}
-                    container.innerHTML = html;
-                    container.style.opacity = '1';
-                    const url = new URL(window.location);
-                    if(keyword) url.searchParams.set('search', keyword); else url.searchParams.delete('search');
-                    if(kategori) url.searchParams.set('kategori', kategori); else url.searchParams.delete('kategori');
-                    window.history.pushState({}, '', url);
-                })
-                .catch(err => {
-                    console.error('Error:', err);
-                    container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 80px 20px;"><i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: var(--soft-pink); margin-bottom: 20px; display: block;"></i><h3 style="color: var(--text-muted);">Terjadi kesalahan</h3></div>';
-                    container.style.opacity = '1';
-                });
-            }
 </script>
 @endsection
