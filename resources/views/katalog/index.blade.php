@@ -323,7 +323,7 @@
             
             <div class="img-box">
                 <span class="category-pill">{{ $b->kategori->nama ?? 'Umum' }}</span>
-                <img src="{{ $imageUrl }}" alt="{{ $b->judul }}" onerror="this.src='{{ asset('web-perpus/img/bukubaru.png') }}'">
+                <img src="{{ $imageUrl }}" alt="{{ $b->judul }}" onerror="this.src='{{ asset('') }}'">
             </div>
             
             <div class="book-info-container">
@@ -383,7 +383,7 @@
                 if(data.success && data.books && data.books.length > 0) {
                     data.books.forEach(b => {
                         // 🔥 FIX: Gunakan 'cover' bukan 'gambar'
-                        let img = b.cover ? `/storage/${b.cover}` : '{{ asset(" ") }}';
+                        let img = b.cover ? `/storage/${b.cover}` : '{{ asset("web-perpus/img/bukubaru.png") }}';
                         
                         let kname = b.kategori ? b.kategori.nama : 'Umum';
                         let tahun = b.tahun_terbit ? b.tahun_terbit : '-';
