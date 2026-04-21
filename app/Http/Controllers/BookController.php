@@ -9,11 +9,14 @@ use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
 {
-    // Tampilkan semua buku
+    /**
+     * Tampilkan semua buku dengan fitur pencarian dan filter
+     */
     public function index(Request $request)
     {
         $query = Book::with('kategori')->latest();
 
+        // Pencarian
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -22,6 +25,7 @@ class BookController extends Controller
             });
         }
 
+        // Filter kategori
         if ($request->filled('kategori')) {
             $query->where('kategori_id', $request->kategori);
         }
@@ -32,7 +36,9 @@ class BookController extends Controller
         return view('books.index', compact('books', 'categories'));
     }
 
-    // Filter kategori
+    /**
+     * Tampilkan buku berdasarkan kategori
+     */
     public function byCategory($id)
     {
         $kategori = Category::findOrFail($id);
@@ -45,30 +51,34 @@ class BookController extends Controller
         ]);
     }
 
-    // Form tambah
+    /**
+     * Form tambah buku
+     */
     public function create()
     {
         $categories = Category::all();
         return view('books.create', compact('categories'));
     }
 
-    // 🔥 STORE (FIX DI SINI)
+    /**
+     * Simpan buku baru
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'judul'         => 'required|string|max:255',
             'penulis'       => 'required|string|max:255',
             'penerbit'      => 'nullable|string|max:255',
-            'tahun_terbit'  => 'required|integer',
+            'tahun_terbit'  => 'required|integer|min:1900|max:' . date('Y'),
             'kategori_id'   => 'required|exists:categories,id',
             'stok'          => 'required|integer|min:0',
             'gambar'        => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // Upload gambar
+        // Upload gambar ke storage dan simpan path ke kolom 'cover'
         if ($request->hasFile('gambar')) {
             $path = $request->file('gambar')->store('gambar_buku', 'public');
-            $validated['cover'] = $path; // 🔥 SIMPAN KE COVER
+            $validated['cover'] = $path;  // 🔥 SIMPAN KE KOLOM 'cover'
         }
 
         Book::create($validated);
@@ -76,35 +86,40 @@ class BookController extends Controller
         return redirect()->route('books.index')->with('success', 'Buku berhasil ditambahkan.');
     }
 
-    // Form edit
+    /**
+     * Form edit buku
+     */
     public function edit(Book $book)
     {
         $categories = Category::all();
         return view('books.edit', compact('book', 'categories'));
     }
 
-    // 🔥 UPDATE (FIX DI SINI)
+    /**
+     * Update data buku
+     */
     public function update(Request $request, Book $book)
     {
         $validated = $request->validate([
             'judul'         => 'required|string|max:255',
             'penulis'       => 'required|string|max:255',
             'penerbit'      => 'nullable|string|max:255',
-            'tahun_terbit'  => 'required|integer',
+            'tahun_terbit'  => 'required|integer|min:1900|max:' . date('Y'),
             'kategori_id'   => 'required|exists:categories,id',
             'stok'          => 'required|integer|min:0',
             'gambar'        => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
+        // Proses upload gambar baru
         if ($request->hasFile('gambar')) {
-
-            // hapus gambar lama
+            // Hapus gambar lama jika ada
             if ($book->cover && Storage::disk('public')->exists($book->cover)) {
                 Storage::disk('public')->delete($book->cover);
             }
 
+            // Simpan gambar baru
             $path = $request->file('gambar')->store('gambar_buku', 'public');
-            $validated['cover'] = $path; // 🔥 SIMPAN KE COVER
+            $validated['cover'] = $path;  // 🔥 SIMPAN KE KOLOM 'cover'
         }
 
         $book->update($validated);
@@ -112,9 +127,12 @@ class BookController extends Controller
         return redirect()->route('books.index')->with('success', 'Buku berhasil diperbarui.');
     }
 
-    // 🔥 DELETE (FIX DI SINI)
+    /**
+     * Hapus buku
+     */
     public function destroy(Book $book)
     {
+        // Hapus file gambar jika ada
         if ($book->cover && Storage::disk('public')->exists($book->cover)) {
             Storage::disk('public')->delete($book->cover);
         }
