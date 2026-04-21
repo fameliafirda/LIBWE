@@ -1,453 +1,860 @@
-@extends('layouts.app')
-
-@section('title', 'Katalog Buku')
-
-@section('content')
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Unbounded:wght@500;700;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-<style>
-    /* ============================================================
-       1. COLOR PALETTE (PREMIUM SOFT Y2K) & RESET
-       ============================================================ */
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Katalog Buku LIBWE - Dengan Rekomendasi Populer</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
     :root {
-        --bg-main: #050508; 
-        --bg-section: #0f0f16;
-        --lavender: #d8b4e2;
-        --soft-pink: #ffb3c6;
-        --baby-blue: #9bf6ff;
-        --glass: rgba(20, 20, 30, 0.5);
-        --glass-border: rgba(255, 255, 255, 0.08);
-        --text-muted: rgba(255, 255, 255, 0.5);
+      --primary: #8b5cf6;
+      --primary-dark: #7c3aed;
+      --pink: #ec4899;
+      --blue: #3b82f6;
+      --dark: #0f172a;
+      --darker: #020617;
+      --card-bg: rgba(15, 23, 42, 0.8);
+      --text: #e2e8f0;
+      --text-secondary: #94a3b8;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(139, 92, 246, 0.5);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --glow: 0 0 30px rgba(139, 92, 246, 0.3);
+      --gold: #fbbf24;
     }
 
-    .main-header, .main-sidebar, .content-header, .main-footer, hr, .breadcrumb { 
-        display: none !important; 
-    }
-    
-    .content-wrapper { 
-        margin-left: 0 !important; 
-        padding: 0 !important; 
-        background: var(--bg-main) !important; 
-        min-height: 100vh;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
     body {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        background-color: var(--bg-main);
-        color: #ffffff;
-        overflow-x: hidden;
-        scroll-behavior: smooth;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+      color: var(--text);
+      min-height: 100vh;
     }
 
-    /* Ambient Background Pattern */
-    body::before {
-        content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background-image: 
-            radial-gradient(circle at 10% 20%, rgba(216, 180, 226, 0.05) 0%, transparent 40%),
-            radial-gradient(circle at 90% 80%, rgba(155, 246, 255, 0.05) 0%, transparent 40%);
-        z-index: 0; pointer-events: none;
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, var(--pink), var(--primary));
+      border-radius: 10px;
     }
 
-    /* ============================================================
-       2. NAVIGASI (SLEEK)
-       =========================================================== */
-    .catalog-nav {
-        position: fixed; top: 0; left: 0; width: 100%;
-        padding: 20px 60px; display: flex; justify-content: space-between; align-items: center;
-        background: rgba(5, 5, 8, 0.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-        z-index: 1000; border-bottom: 1px solid var(--glass-border);
+    /* Sticky Header */
+    .sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: linear-gradient(135deg, rgba(2, 6, 23, 0.95), rgba(15, 23, 42, 0.95));
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 20px 0;
+      margin-bottom: 30px;
     }
 
-    .brand-libwe { font-family: 'Unbounded', sans-serif; font-size: 1.5rem; font-weight: 900; color: #fff; letter-spacing: 1px; }
-    .brand-libwe span { color: var(--baby-blue); }
-
-    .nav-links { display: flex; gap: 35px; align-items: center; }
-    .nav-links a { 
-        text-decoration: none; color: var(--text-muted); font-weight: 600; font-size: 0.85rem;
-        text-transform: uppercase; letter-spacing: 1px; transition: 0.3s;
-    }
-    .nav-links a:hover, .nav-links a.active { color: var(--soft-pink); }
-
-    /* ============================================================
-       3. HERO PENCARIAN
-       =========================================================== */
-    .hero-catalog {
-        padding: 150px 20px 50px; text-align: center; position: relative;
-        z-index: 10; display: flex; flex-direction: column; align-items: center;
+    .header-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--pink), var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 5px;
+      text-align: center;
     }
 
-    .hero-catalog h1 { 
-        font-family: 'Unbounded', sans-serif; font-size: clamp(2.5rem, 5vw, 4rem); 
-        color: #fff; margin-bottom: 5px; letter-spacing: -1px;
-    }
-    .hero-catalog h1 span {
-        background: linear-gradient(to right, var(--lavender), var(--soft-pink));
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    .header-subtitle {
+      color: var(--text-secondary);
+      text-align: center;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
     }
 
-    .hero-catalog p { color: var(--text-muted); font-weight: 500; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 40px; font-size: 0.9rem; }
-
-    .search-container {
-        display: flex; justify-content: center; gap: 15px; width: 100%; max-width: 850px;
-        background: rgba(25, 25, 35, 0.4); padding: 12px; border-radius: 20px;
-        border: 1px solid var(--glass-border); box-shadow: 0 20px 40px rgba(0,0,0,0.4); backdrop-filter: blur(10px);
-    }
-    .search-container input, .search-container select {
-        background: rgba(0, 0, 0, 0.3); border: 1px solid transparent; padding: 16px 20px; border-radius: 12px;
-        color: #fff; outline: none; flex: 1; font-weight: 500; font-family: 'Plus Jakarta Sans', sans-serif; transition: 0.3s;
-    }
-    .search-container input:focus, .search-container select:focus { border-color: var(--lavender); background: rgba(0, 0, 0, 0.5); }
-    
-    .btn-cari {
-        background: var(--lavender); color: var(--bg-main); border: none; padding: 0 40px;
-        border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.3s; font-family: 'Unbounded', sans-serif; font-size: 0.9rem;
-    }
-    .btn-cari:hover { background: #fff; transform: translateY(-2px); }
-
-    /* ============================================================
-       4. SECTION REKOMENDASI (ISLAND LAYOUT)
-       =========================================================== */
+    /* Recommendation Section */
     .recommendation-wrapper {
-        margin: 40px 40px 80px 40px; padding: 60px 0;
-        background: linear-gradient(145deg, var(--bg-section), #0a0a0f);
-        border-radius: 40px; border: 1px solid rgba(216, 180, 226, 0.1);
-        box-shadow: 0 25px 50px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.02);
-        position: relative; z-index: 10; overflow: hidden;
+      margin-bottom: 50px;
     }
 
-    .recommendation-wrapper::before {
-        content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background: radial-gradient(circle at top right, rgba(255, 179, 198, 0.05), transparent 50%); pointer-events: none;
+    .recommendation-container {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(236, 72, 153, 0.05));
+      border-radius: 30px;
+      padding: 30px 25px;
+      border: 1px solid rgba(139, 92, 246, 0.2);
+      position: relative;
+      overflow: hidden;
     }
 
-    .section-title {
-        text-align: center; margin-bottom: 40px; font-family: 'Unbounded', sans-serif;
-        font-size: 1.8rem; color: #fff; position: relative;
+    .recommendation-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--pink), var(--primary), var(--gold));
     }
-    .section-title i { color: var(--soft-pink); margin-right: 10px; }
 
-    .slider-wrapper { position: relative; width: 100%; padding: 0 60px; }
-
-    .track-container {
-        display: flex; gap: 25px; overflow-x: auto; scroll-behavior: smooth; padding: 20px 10px; scrollbar-width: none;
+    .recommendation-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      gap: 15px;
     }
-    .track-container::-webkit-scrollbar { display: none; }
 
-    .slider-card {
-        min-width: 180px; max-width: 180px; background: rgba(0, 0, 0, 0.4);
-        border: 1px solid var(--glass-border); padding: 15px; border-radius: 20px;
-        transition: 0.4s; position: relative; display: flex; flex-direction: column;
+    .recommendation-title-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
-    .slider-card:hover { transform: translateY(-8px); border-color: var(--soft-pink); background: rgba(20, 20, 30, 0.8); }
 
-    .slider-card img {
-        width: 100%; height: 240px; object-fit: cover; border-radius: 12px; margin-bottom: 15px; background: #050505;
+    .recommendation-icon {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(139, 92, 246, 0.2));
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+    }
+
+    .recommendation-icon i {
+      background: linear-gradient(135deg, var(--gold), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .recommendation-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      font-family: 'Playfair Display', serif;
+      margin: 0;
+      background: linear-gradient(135deg, var(--gold), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .recommendation-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 5px;
+    }
+
+    .recommendation-badge {
+      background: rgba(251, 191, 36, 0.15);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      border-radius: 50px;
+      padding: 8px 18px;
+      font-size: 0.8rem;
+      color: var(--gold);
+    }
+
+    /* Horizontal Scroll */
+    .recommendation-scroll {
+      position: relative;
+    }
+
+    .recommendation-track {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      padding: 10px 5px 20px 5px;
+      scrollbar-width: thin;
+    }
+
+    .recommendation-track::-webkit-scrollbar {
+      height: 5px;
+    }
+
+    .recommendation-track::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+    }
+
+    .recommendation-track::-webkit-scrollbar-thumb {
+      background: linear-gradient(90deg, var(--pink), var(--primary));
+      border-radius: 10px;
+    }
+
+    .rec-card {
+      flex: 0 0 200px;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .rec-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--gold);
+      box-shadow: 0 15px 30px rgba(251, 191, 36, 0.15);
     }
 
     .rank-badge {
-        position: absolute; top: -10px; left: 15px; background: var(--soft-pink); color: var(--bg-main);
-        padding: 6px 15px; border-radius: 10px; font-family: 'Unbounded'; font-size: 0.7rem; font-weight: 900; z-index: 2; box-shadow: 0 5px 15px rgba(255, 179, 198, 0.3);
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--gold), #f59e0b);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--darker);
+      z-index: 2;
     }
 
-    .borrow-stats {
-        position: absolute; top: 10px; right: 10px; background: rgba(5, 5, 8, 0.8); color: var(--baby-blue);
-        backdrop-filter: blur(5px); padding: 5px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; border: 1px solid rgba(155, 246, 255, 0.2);
+    .rank-badge.rank-1 { background: linear-gradient(135deg, #ffd700, #ff8c00); }
+    .rank-badge.rank-2 { background: linear-gradient(135deg, #e0e0e0, #b0b0b0); }
+    .rank-badge.rank-3 { background: linear-gradient(135deg, #cd7f32, #b87333); }
+
+    .hot-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(239, 68, 68, 0.9);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 50px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      z-index: 2;
     }
 
-    .book-title-small { font-family: 'Unbounded'; font-size: 0.85rem; margin-bottom: 5px; color: #fff; line-height: 1.3; }
-    .book-author-small { color: var(--text-muted); font-size: 0.75rem; font-weight: 600; margin-bottom: 0; }
-
-    .btn-nav-slider {
-        position: absolute; top: 50%; transform: translateY(-50%); width: 45px; height: 45px; border-radius: 50%;
-        background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1); cursor: pointer;
-        z-index: 100; transition: 0.3s; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px);
-    }
-    .btn-nav-slider:hover { background: #fff; color: var(--bg-main); }
-    .btn-prev { left: 20px; }
-    .btn-next { right: 20px; }
-
-    /* ============================================================
-       5. KOLEKSI BUKU (GRID)
-       =========================================================== */
-    #koleksi { padding: 20px 60px 100px; position: relative; z-index: 10; }
-
-    .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 25px; }
-
-    .book-item {
-        background: var(--glass); border: 1px solid var(--glass-border); border-radius: 16px;
-        padding: 12px; transition: 0.4s; display: flex; flex-direction: column; position: relative;
-    }
-    .book-item:hover { border-color: var(--baby-blue); box-shadow: 0 10px 30px rgba(155, 246, 255, 0.1); transform: translateY(-5px); }
-
-    .img-box {
-        width: 100%; height: 230px; background: #000; border-radius: 10px; overflow: hidden; position: relative; margin-bottom: 15px;
-    }
-    .img-box img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-    .book-item:hover .img-box img { transform: scale(1.05); }
-
-    .category-pill {
-        position: absolute; top: 10px; right: 10px; padding: 4px 10px; background: rgba(0,0,0,0.8);
-        backdrop-filter: blur(5px); border-radius: 6px; font-size: 0.65rem; font-weight: 700; color: var(--lavender); border: 1px solid var(--lavender);
-        z-index: 2;
+    .popular-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(245, 158, 11, 0.9);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 50px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      z-index: 2;
     }
 
-    .book-info-container { display: flex; flex-direction: column; flex-grow: 1; }
-    .b-title { font-family: 'Unbounded'; font-size: 0.9rem; margin-bottom: 5px; color: #fff; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .b-author { color: var(--text-muted); font-size: 0.75rem; margin-bottom: 12px; font-weight: 500; }
-    
-    .b-meta { margin-top: auto; display: flex; flex-direction: column; gap: 5px; font-size: 0.75rem; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.05); }
-    .b-meta-row { display: flex; justify-content: space-between; align-items: center; }
-    .b-year { color: var(--text-muted); }
-    .b-stock { font-weight: 800; color: var(--baby-blue); }
-
-    .btn-kembali {
-        position: fixed; bottom: 30px; right: 30px; background: #fff; color: var(--bg-main);
-        padding: 12px 25px; border-radius: 50px; text-decoration: none !important; font-weight: 800; z-index: 1000;
-        display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); transition: 0.3s; font-size: 0.85rem;
+    .rec-cover {
+      position: relative;
+      padding-top: 140%;
+      overflow: hidden;
+      background: linear-gradient(45deg, var(--darker), var(--dark));
     }
-    .btn-kembali:hover { transform: scale(1.05); background: var(--lavender); }
 
-    /* PAGINATION STYLE */
+    .rec-cover-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .rec-card:hover .rec-cover-img {
+      transform: scale(1.08);
+    }
+
+    .rec-info {
+      padding: 12px;
+    }
+
+    .rec-title {
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: 38px;
+    }
+
+    .rec-author {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .rec-stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.7rem;
+    }
+
+    .borrow-count {
+      background: rgba(251, 191, 36, 0.15);
+      color: var(--gold);
+      padding: 3px 8px;
+      border-radius: 50px;
+    }
+
+    .scroll-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      background: rgba(139, 92, 246, 0.8);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+
+    .scroll-btn:hover {
+      background: var(--primary);
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .scroll-left { left: -20px; }
+    .scroll-right { right: -20px; }
+
+    /* Section Divider */
+    .section-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 30px 0 40px;
+      gap: 15px;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+
+    .divider-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(139, 92, 246, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+    }
+
+    /* Sticky Filter */
+    .sticky-filter {
+      position: sticky;
+      top: 120px;
+      z-index: 99;
+      margin-bottom: 30px;
+    }
+
+    .filter-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: var(--glow);
+    }
+
+    .filter-input, .filter-select {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 12px 20px;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .filter-input:focus, .filter-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--border-focus);
+    }
+
+    .btn-search {
+      background: linear-gradient(135deg, var(--pink), var(--primary));
+      border: none;
+      border-radius: 50px;
+      padding: 12px 30px;
+      color: white;
+      font-weight: 500;
+      width: 100%;
+    }
+
+    .btn-reset {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 8px 20px;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    /* Book Cards */
+    .book-grid {
+      margin-top: 30px;
+    }
+
+    .book-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      height: 100%;
+    }
+
+    .book-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary);
+    }
+
+    .cover-container {
+      position: relative;
+      padding-top: 140%;
+      overflow: hidden;
+      background: linear-gradient(45deg, var(--darker), var(--dark));
+    }
+
+    .cover-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .book-info {
+      padding: 15px;
+    }
+
+    .book-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 5px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .book-author {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .book-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .book-category {
+      background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(139, 92, 246, 0.2));
+      padding: 4px 12px;
+      border-radius: 50px;
+      font-size: 0.7rem;
+    }
+
+    .stock-available { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+    .stock-low { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+    .stock-empty { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+
+    /* Pagination */
     .pagination {
-        justify-content: center;
-        gap: 8px;
-    }
-    .pagination .page-item .page-link {
-        background: rgba(255,255,255,0.05);
-        border: 1px solid var(--glass-border);
-        color: #fff;
-        border-radius: 12px !important;
-        padding: 10px 16px;
-        font-weight: 500;
-        transition: 0.3s;
-    }
-    .pagination .page-item.active .page-link {
-        background: var(--lavender);
-        border-color: var(--lavender);
-        color: var(--bg-main);
-    }
-    .pagination .page-item .page-link:hover {
-        background: var(--soft-pink);
-        color: var(--bg-main);
-        transform: translateY(-2px);
+      justify-content: center;
+      margin-top: 40px;
+      gap: 5px;
     }
 
-    /* RESPONSIVE */
-    @media (max-width: 992px) {
-        .catalog-nav { padding: 20px 30px; }
-        .search-container { flex-direction: column; }
-        .btn-cari { padding: 15px; }
-        .recommendation-wrapper { margin: 20px 20px 60px 20px; border-radius: 30px; }
+    .page-item .page-link {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 12px !important;
+      color: var(--text);
     }
+
+    .page-item.active .page-link {
+      background: linear-gradient(135deg, var(--pink), var(--primary));
+      color: white;
+    }
+
+    /* Floating Back Button */
+    .btn-back {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      background: linear-gradient(135deg, var(--pink), var(--primary));
+      color: white;
+      padding: 12px 30px;
+      border-radius: 50px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 1000;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     @media (max-width: 768px) {
-        #koleksi, .slider-wrapper { padding-left: 20px; padding-right: 20px; }
-        .book-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
-        .img-box { height: 200px; }
-        .slider-card { min-width: 150px; max-width: 150px; }
-        .slider-card img { height: 210px; }
-        .hero-catalog h1 { font-size: 2rem; }
-        .btn-nav-slider { display: none; } 
-        .recommendation-wrapper { margin: 10px 10px 40px 10px; padding: 40px 0; border-radius: 20px;}
+      .rec-card { flex: 0 0 160px; }
+      .scroll-left { left: -10px; }
+      .scroll-right { right: -10px; }
+      .recommendation-title { font-size: 1.2rem; }
+      .recommendation-icon { width: 40px; height: 40px; font-size: 1.3rem; }
+      .btn-back { bottom: 20px; left: 20px; padding: 10px 20px; font-size: 0.9rem; }
     }
-</style>
+  </style>
+</head>
+<body>
 
-<nav class="catalog-nav">
-    <div class="brand-libwe">LIB<span>WE</span></div>
-    <div class="nav-links">
-        <a href="{{ url('/') }}">Beranda</a>
-        <a href="#top10">Populer</a>
-        <a href="#koleksi" class="active">Katalog</a>
-    </div>
-</nav>
-
-<section class="hero-catalog">
-    <h1>KATALOG <span>BUKU</span></h1>
-    <p>Eksplorasi Koleksi Perpustakaan</p>
-
-    <div class="search-container">
-        <input type="text" id="keyword" placeholder="Cari judul, penulis..." value="{{ request('search') }}">
-        <select id="kat_id">
-            <option value="">Semua Kategori</option>
-            @foreach($kategoris as $k)
-                <option value="{{ $k->id }}" {{ request('kategori') == $k->id ? 'selected' : '' }}>{{ $k->nama }}</option>
-            @endforeach
-        </select>
-        <button class="btn-cari" onclick="filterBuku()">
-            <i class="fas fa-search"></i> CARI
-        </button>
-    </div>
-</section>
-
-@if($popularBooks->count() > 0)
-<div class="recommendation-wrapper" id="top10">
-    <div class="section-title"><i class="fas fa-fire"></i> BUKU TERPOPULER</div>
-
-    <div class="slider-wrapper">
-        <button class="btn-nav-slider btn-prev" onclick="moveSlide(-200)"><i class="fas fa-chevron-left"></i></button>
-        <button class="btn-nav-slider btn-next" onclick="moveSlide(200)"><i class="fas fa-chevron-right"></i></button>
-
-        <div class="track-container" id="mainSlider">
-            @foreach($popularBooks as $index => $pb)
-            <div class="slider-card">
-                <div class="rank-badge">#{{ $index + 1 }}</div>
-                
-                <div class="borrow-stats"><i class="fas fa-book-reader"></i> {{ $pb->total_dipinjam ?? 0 }}x</div>
-                
-                @php
-                    // 🔥 FIX: Gunakan 'cover' bukan 'gambar'
-                    $imageUrlPopuler = $pb->cover ? asset('storage/' . $pb->cover) : asset('web-perpus/img/bukubaru.png');
-                @endphp
-                
-                <div class="img-box" style="height: 240px; margin-bottom: 10px;">
-                    <img src="{{ $imageUrlPopuler }}" alt="{{ $pb->judul }}" onerror="this.src='{{ asset('web-perpus/img/bukubaru.png') }}'">
-                </div>
-                
-                <h3 class="book-title-small">{{ Str::limit($pb->judul, 28) }}</h3>
-                <p class="book-author-small">{{ $pb->penulis ?? 'Anonim' }}</p>
-            </div>
-            @endforeach
-        </div>
-    </div>
+<!-- Sticky Header -->
+<div class="sticky-header">
+  <div class="container">
+    <h1 class="header-title">
+      <i class="fas fa-book-open me-3"></i>Katalog Buku
+    </h1>
+    <p class="header-subtitle">Koleksi Buku Perpustakaan SDN Berat Wetan 1</p>
+  </div>
 </div>
-@endif
 
-<section id="koleksi">
-    <div class="book-grid" id="containerKoleksi">
-        @forelse($books as $b)
-        <div class="book-item">
+<div class="container">
+  
+  <!-- ==================== REKOMENDASI BUKU POPULER ==================== -->
+  @if(isset($popularBooks) && $popularBooks && $popularBooks->count() > 0)
+  <div class="recommendation-wrapper">
+    <div class="recommendation-container">
+      <div class="recommendation-header">
+        <div>
+          <div class="recommendation-title-section">
+            <div class="recommendation-icon">
+              <i class="fas fa-trophy"></i>
+            </div>
+            <div>
+              <h2 class="recommendation-title">Top 10 Paling Populer</h2>
+              <p class="recommendation-subtitle">Buku yang paling sering dipinjam murid (diurutkan dari tertinggi)</p>
+            </div>
+          </div>
+        </div>
+        <div class="recommendation-badge">
+          <i class="fas fa-chart-line"></i> Berdasarkan data peminjaman real
+        </div>
+      </div>
+
+      <div class="recommendation-scroll" style="position: relative;">
+        <div class="scroll-btn scroll-left" onclick="scrollRecommendations(-1)">
+          <i class="fas fa-chevron-left"></i>
+        </div>
+        <div class="recommendation-track" id="recommendationTrack">
+          @foreach($popularBooks as $index => $book)
+          <div class="rec-card" onclick="searchByCategory({{ $book->kategori_id ?? 'null' }})">
+            <div class="rank-badge @if($index == 0) rank-1 @elseif($index == 1) rank-2 @elseif($index == 2) rank-3 @endif">
+              #{{ $index + 1 }}
+            </div>
             @php
-                // 🔥 FIX: Gunakan 'cover' bukan 'gambar'
-                $imageUrl = $b->cover ? asset('storage/' . $b->cover) : asset('web-perpus/img/bukubaru.png');
+              $totalDipinjam = $book->total_dipinjam ?? 0;
             @endphp
-            
-            <div class="img-box">
-                <span class="category-pill">{{ $b->kategori->nama ?? 'Umum' }}</span>
-                <img src="{{ $imageUrl }}" alt="{{ $b->judul }}" onerror="this.src='{{ asset('') }}'">
-            </div>
-            
-            <div class="book-info-container">
-                <h3 class="b-title">{{ Str::limit($b->judul, 40) }}</h3>
-                <p class="b-author">{{ Str::limit($b->penulis ?? 'Anonim', 25) }}</p>
-                
-                <div class="b-meta">
-                    <div class="b-meta-row">
-                        <span class="b-year"><i class="fas fa-calendar-alt"></i> {{ $b->tahun_terbit ?? '-' }}</span>
-                        <span class="b-stock"><i class="fas fa-box"></i> {{ $b->stok ?? 0 }}</span>
-                    </div>
+            @if($totalDipinjam >= 20)
+            <div class="hot-badge"><i class="fas fa-fire"></i> HOT</div>
+            @elseif($totalDipinjam >= 10)
+            <div class="popular-badge"><i class="fas fa-chart-line"></i> POPULER</div>
+            @endif
+            <div class="rec-cover">
+              @if($book->gambar)
+                <img src="{{ asset('storage/' . $book->gambar) }}" class="rec-cover-img" alt="{{ $book->judul }}">
+              @else
+                <div class="rec-cover-img" style="display: flex; align-items: center; justify-content: center;">
+                  <i class="fas fa-book fa-3x" style="color: var(--text-secondary); opacity: 0.3;"></i>
                 </div>
+              @endif
             </div>
+            <div class="rec-info">
+              <div class="rec-title">{{ Str::limit($book->judul, 40) }}</div>
+              <div class="rec-author">{{ Str::limit($book->penulis, 25) }}</div>
+              <div class="rec-stats">
+                <span class="borrow-count">
+                  <i class="fas fa-users"></i> {{ number_format($totalDipinjam) }} x dipinjam
+                </span>
+                <span style="font-size: 0.65rem; color: var(--text-secondary);">
+                  <i class="fas fa-tag"></i> {{ $book->kategori->nama ?? 'Umum' }}
+                </span>
+              </div>
+            </div>
+          </div>
+          @endforeach
         </div>
-        @empty
-        <div style="grid-column: 1/-1; text-align: center; padding: 80px 20px;">
-            <i class="fas fa-book-open" style="font-size: 4rem; color: var(--text-muted); margin-bottom: 20px; display: block;"></i>
-            <h3 style="color: var(--text-muted);">Belum ada buku tersedia</h3>
-            <p style="color: var(--text-muted);">Silakan cek kembali nanti</p>
+        <div class="scroll-btn scroll-right" onclick="scrollRecommendations(1)">
+          <i class="fas fa-chevron-right"></i>
         </div>
-        @endforelse
+      </div>
     </div>
+  </div>
+  @endif
 
-    @if($books->hasPages())
-    <div class="d-flex justify-content-center" style="margin-top: 60px;">
-        {{ $books->links('pagination::bootstrap-4') }}
+  <!-- Section Divider -->
+  <div class="section-divider">
+    <div class="divider-line"></div>
+    <div class="divider-icon">
+      <i class="fas fa-book"></i>
     </div>
+    <div class="divider-line"></div>
+  </div>
+
+  <!-- Sticky Filter Section (KATALOG BUKU) -->
+  <div class="sticky-filter">
+    <div class="filter-card">
+      <form method="GET" action="{{ route('katalog') }}" id="filterForm">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <input type="text" class="filter-input" name="search" 
+                   placeholder="Cari judul atau penulis..." 
+                   value="{{ request('search') }}">
+          </div>
+          <div class="col-md-4">
+            <select class="filter-select" name="kategori" id="categorySelect">
+              <option value="">Semua Kategori</option>
+              @foreach ($kategoris as $kategori)
+                <option value="{{ $kategori->id }}" {{ request('kategori') == $kategori->id ? 'selected' : '' }}>
+                  {{ $kategori->nama }}
+                </option>
+              @endforeach
+            </select>
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn-search">
+              <i class="fas fa-search me-2"></i>Cari
+            </button>
+          </div>
+        </div>
+      </form>
+
+      @if(request('search') || request('kategori'))
+      <div class="active-filters mt-3" style="display: flex; gap: 10px; flex-wrap: wrap;">
+        @if(request('search'))
+        <span class="filter-tag" style="background: rgba(139,92,246,0.2); border-radius: 50px; padding: 5px 15px;">
+          <i class="fas fa-search me-1"></i> "{{ request('search') }}"
+          <a href="{{ route('katalog', array_merge(request()->except('search'), ['kategori' => request('kategori')])) }}" class="text-decoration-none ms-2">✕</a>
+        </span>
+        @endif
+        @if(request('kategori'))
+        <span class="filter-tag" style="background: rgba(139,92,246,0.2); border-radius: 50px; padding: 5px 15px;">
+          <i class="fas fa-tag me-1"></i> {{ $kategoris->firstWhere('id', request('kategori'))->nama ?? 'Kategori' }}
+          <a href="{{ route('katalog', array_merge(request()->except('kategori'), ['search' => request('search')])) }}" class="text-decoration-none ms-2">✕</a>
+        </span>
+        @endif
+        <a href="{{ route('katalog') }}" class="btn-reset">Reset Semua</a>
+      </div>
+      @endif
+
+      <div class="results-info mt-3">
+        <i class="fas fa-book me-1"></i> Total {{ $books->total() }} buku
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-spinner" id="loadingSpinner" style="display: none; text-align: center; padding: 40px;">
+    <div class="spinner" style="width: 50px; height: 50px; border: 3px solid rgba(139,92,246,0.2); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+    <p class="mt-2">Memuat buku...</p>
+  </div>
+
+  <!-- Book Grid (KATALOG) -->
+  <div class="row g-4 book-grid" id="bookGrid">
+    @if($books->count() > 0)
+      @foreach ($books as $book)
+        <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+          <div class="book-card">
+            <div class="cover-container">
+              @if($book->gambar)
+                <img src="{{ asset('storage/' . $book->gambar) }}" class="cover-img" alt="{{ $book->judul }}">
+              @else
+                <div class="cover-img" style="display: flex; align-items: center; justify-content: center;">
+                  <i class="fas fa-book fa-3x" style="color: var(--text-secondary); opacity: 0.3;"></i>
+                </div>
+              @endif
+            </div>
+            <div class="book-info">
+              <div class="book-title">{{ Str::limit($book->judul, 50) }}</div>
+              <div class="book-author">{{ Str::limit($book->penulis, 30) }}</div>
+              <div class="book-meta">
+                <span class="book-category">{{ $book->kategori->nama ?? 'Umum' }}</span>
+                @if($book->stok > 5)
+                  <span class="stock-badge stock-available" style="padding: 4px 8px; border-radius: 50px; font-size: 0.7rem;">{{ $book->stok }} Tersedia</span>
+                @elseif($book->stok > 0)
+                  <span class="stock-badge stock-low" style="padding: 4px 8px; border-radius: 50px; font-size: 0.7rem;">Sisa {{ $book->stok }}</span>
+                @else
+                  <span class="stock-badge stock-empty" style="padding: 4px 8px; border-radius: 50px; font-size: 0.7rem;">Stok Habis</span>
+                @endif
+              </div>
+            </div>
+          </div>
+        </div>
+      @endforeach
+    @else
+      <div class="col-12">
+        <div class="empty-state text-center p-5" style="background: var(--card-bg); border-radius: 30px;">
+          <i class="fas fa-book-open fa-3x mb-3" style="color: var(--text-secondary);"></i>
+          <h4>Tidak Ada Buku Ditemukan</h4>
+          <p>Silakan coba kata kunci atau kategori lain</p>
+        </div>
+      </div>
     @endif
-</section>
+  </div>
 
-<a href="{{ url('/') }}" class="btn-kembali">
-    <i class="fas fa-arrow-left"></i> KEMBALI
+  <!-- Pagination -->
+  @if(method_exists($books, 'links') && $books->hasPages())
+    <div class="row mt-5">
+      <div class="col-12">
+        {{ $books->withQueryString()->links('pagination::bootstrap-5') }}
+      </div>
+    </div>
+  @endif
+</div>
+
+<!-- Floating Back Button -->
+<a href="{{ url('/') }}" class="btn-back" id="backButton">
+  <i class="fas fa-arrow-left"></i>
+  <span>Kembali ke Beranda</span>
 </a>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    function moveSlide(offset) {
-        const slider = document.getElementById('mainSlider');
-        if(slider) {
-            slider.scrollBy({ left: offset, behavior: 'smooth' });
+  // Scroll horizontal untuk rekomendasi
+  function scrollRecommendations(direction) {
+    const track = document.getElementById('recommendationTrack');
+    if (track) {
+      const scrollAmount = 280;
+      track.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+    }
+  }
+
+  // Pencarian berdasarkan kategori (ketika card rekomendasi diklik)
+  window.searchByCategory = function(categoryId) {
+    if (categoryId) {
+      const categorySelect = document.getElementById('categorySelect');
+      if (categorySelect) {
+        categorySelect.value = categoryId;
+        const filterForm = document.getElementById('filterForm');
+        if (filterForm) {
+          filterForm.submit();
         }
+      }
+    }
+  }
+
+  // Animasi scroll untuk book cards
+  function initCardAnimations() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.book-card').forEach(card => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(20px)';
+      card.style.transition = 'all 0.5s ease';
+      observer.observe(card);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    initCardAnimations();
+
+    // Filter form handling
+    const filterForm = document.getElementById('filterForm');
+    const categorySelect = document.getElementById('categorySelect');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const bookGrid = document.getElementById('bookGrid');
+
+    function submitForm() {
+      if (loadingSpinner) loadingSpinner.style.display = 'block';
+      if (bookGrid) bookGrid.style.opacity = '0.5';
+      setTimeout(() => { if (filterForm) filterForm.submit(); }, 300);
     }
 
-    function filterBuku() {
-        let keyword = document.getElementById('keyword').value;
-        let kategori = document.getElementById('kat_id').value;
-        let container = document.getElementById('containerKoleksi');
-
-        if(!container) return;
-        
-        container.style.opacity = '0.3';
-
-        fetch(`{{ route('katalog.filter') }}?search=${encodeURIComponent(keyword)}&kategori=${encodeURIComponent(kategori)}`)
-            .then(res => res.json())
-            .then(data => {
-                let html = '';
-                
-                if(data.success && data.books && data.books.length > 0) {
-                    data.books.forEach(b => {
-                        // 🔥 FIX: Gunakan 'cover' bukan 'gambar'
-                        let img = b.cover ? `/storage/${b.cover}` : '{{ asset("web-perpus/img/bukubaru.png") }}';
-                        
-                        let kname = b.kategori ? b.kategori.nama : 'Umum';
-                        let tahun = b.tahun_terbit ? b.tahun_terbit : '-';
-                        let stok = b.stok !== null ? b.stok : '0';
-                        let penulis = b.penulis ? (b.penulis.length > 25 ? b.penulis.substring(0,25) + '...' : b.penulis) : 'Anonim';
-                        let judul = b.judul.length > 40 ? b.judul.substring(0,40) + '...' : b.judul;
-
-                        html += `
-                        <div class="book-item">
-                            <div class="img-box">
-                                <span class="category-pill">${escapeHtml(kname)}</span>
-                                <img src="${img}" onerror="this.src='{{ asset("web-perpus/img/bukubaru.png") }}'" alt="${escapeHtml(judul)}">
-                            </div>
-                            <div class="book-info-container">
-                                <h3 class="b-title">${escapeHtml(judul)}</h3>
-                                <p class="b-author">${escapeHtml(penulis)}</p>
-                                <div class="b-meta">
-                                    <div class="b-meta-row">
-                                        <span class="b-year"><i class="fas fa-calendar-alt"></i> ${escapeHtml(tahun)}</span>
-                                        <span class="b-stock"><i class="fas fa-box"></i> ${escapeHtml(stok)}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>`;
-                    });
-                } else {
-                    html = '<div style="grid-column: 1/-1; text-align: center; padding: 80px 20px;"><i class="fas fa-search" style="font-size: 4rem; color: var(--text-muted); margin-bottom: 20px; display: block;"></i><h3 style="color: var(--text-muted);">Buku tidak ditemukan</h3><p style="color: var(--text-muted);">Coba dengan kata kunci lain</p></div>';
-                }
-
-                container.innerHTML = html;
-                container.style.opacity = '1';
-                
-                // Update URL tanpa reload
-                const url = new URL(window.location);
-                if(keyword) url.searchParams.set('search', keyword); else url.searchParams.delete('search');
-                if(kategori) url.searchParams.set('kategori', kategori); else url.searchParams.delete('kategori');
-                window.history.pushState({}, '', url);
-            })
-            .catch(err => {
-                console.error('Error:', err);
-                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 80px 20px;"><i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: var(--soft-pink); margin-bottom: 20px; display: block;"></i><h3 style="color: var(--text-muted);">Terjadi kesalahan</h3><p style="color: var(--text-muted);">Silakan coba lagi</p></div>';
-                container.style.opacity = '1';
-            });
+    if (categorySelect) {
+      categorySelect.addEventListener('change', submitForm);
     }
 
-    // Escape HTML untuk keamanan
-    function escapeHtml(str) {
-        if(!str) return '';
-        return String(str).replace(/[&<>]/g, function(m) {
-            if(m === '&') return '&amp;';
-            if(m === '<') return '&lt;';
-            if(m === '>') return '&gt;';
-            return m;
-        });
+    // Back button transition
+    const backButton = document.getElementById('backButton');
+    if (backButton) {
+      backButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.body.style.opacity = '0';
+        document.body.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => { window.location.href = this.href; }, 300);
+      });
     }
-
-    // Event listener untuk enter key
-    const keywordInput = document.getElementById('keyword');
-    if(keywordInput) {
-        keywordInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                filterBuku();
-            }
-        });
-    }
+  });
 </script>
-@endsection
+
+<style>
+  .stock-badge {
+    padding: 4px 8px;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+  .active-filters .filter-tag {
+    background: rgba(139, 92, 246, 0.2);
+    border-radius: 50px;
+    padding: 5px 15px;
+    font-size: 0.85rem;
+  }
+  .btn-reset {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 8px 20px;
+    color: var(--text);
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-reset:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--text);
+  }
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+  }
+</style>
+
+</body>
+</html>
