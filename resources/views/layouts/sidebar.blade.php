@@ -16,15 +16,18 @@
     .main-sidebar::-webkit-scrollbar-thumb:hover {
       background: linear-gradient(180deg, #f472b6, #a78bfa);
     }
+
     .brand-link {
       background: rgba(255, 255, 255, 0.05) !important;
       backdrop-filter: blur(10px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
+
     .nav-link {
       position: relative;
       overflow: hidden;
     }
+
     .nav-link::before {
       content: '';
       position: absolute;
@@ -36,23 +39,109 @@
       transition: left 0.5s ease;
       z-index: 0;
     }
+
     .nav-link:hover::before {
       left: 100%;
     }
+
     .nav-link.active {
       background: linear-gradient(90deg, rgba(236, 72, 153, 0.3), rgba(139, 92, 246, 0.3)) !important;
       border-left: 4px solid #ec4899 !important;
       box-shadow: 0 0 20px rgba(236, 72, 153, 0.3);
     }
+
     .nav-treeview .nav-link {
       margin-left: 15px;
       font-size: 14px;
     }
+
     .user-panel {
       border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
+
     .glow-text {
       text-shadow: 0 0 10px rgba(236, 72, 153, 0.5);
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+      body {
+        margin-left: 0;
+      }
+
+      .main-sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        padding-top: 20px;
+      }
+
+      /* Adjust brand image and text */
+      .brand-link {
+        display: flex;
+        justify-content: center;
+        padding: 10px 0;
+      }
+
+      .brand-image {
+        width: 35px;
+        margin-right: 10px;
+      }
+
+      .brand-text {
+        font-size: 1.2rem;
+        text-align: center;
+      }
+
+      /* Collapsing Sidebar Links */
+      .sidebar .nav-link {
+        font-size: 14px;
+        padding: 10px;
+        margin: 5px 0;
+        text-align: center;
+      }
+
+      .sidebar .nav-link:hover {
+        background: linear-gradient(90deg, #ffd1f7, #d0f0ff);
+      }
+
+      /* Adjust User Panel */
+      .user-panel {
+        padding: 10px;
+        text-align: center;
+      }
+
+      /* Nav Treeview (nested menu) */
+      .nav-treeview {
+        padding-left: 0;
+        display: none;
+      }
+
+      /* Show menu when clicked */
+      .menu-open > .nav-treeview {
+        display: block;
+      }
+
+      .nav-item.menu-open > .nav-link {
+        border-radius: 5px;
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+    }
+
+    /* For very small devices (mobile phone) */
+    @media (max-width: 576px) {
+      .nav-link {
+        font-size: 12px;
+      }
+
+      .sidebar .nav-link {
+        font-size: 13px;
+      }
+
+      /* Menu Treeview Adjustment */
+      .nav-treeview .nav-link {
+        font-size: 12px;
+      }
     }
   </style>
 

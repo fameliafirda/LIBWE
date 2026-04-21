@@ -10,11 +10,11 @@
             <div class="card border-0 shadow-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px;">
                 <div class="card-body p-4">
                     <div class="row align-items-center">
-                        <div class="col-md-8">
+                        <div class="col-12 col-md-8">
                             <h3 class="text-white mb-2" style="font-weight: 600;">📦 Data Pengembalian Buku</h3>
                             <p class="text-white opacity-75 mb-0">Kelola data pengembalian buku perpustakaan</p>
                         </div>
-                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                        <div class="col-12 col-md-4 text-md-end mt-3 mt-md-0">
                             <a href="{{ route('pengembalians.create') }}" class="btn btn-light btn-lg" style="border-radius: 50px; padding: 12px 30px; font-weight: 600; color: #667eea; box-shadow: 0 10px 20px rgba(0,0,0,0.2);">
                                 <i class="fas fa-plus-circle me-2"></i> Tambah Pengembalian
                             </a>
@@ -42,7 +42,7 @@
 
     <!-- Statistik Cards -->
     <div class="row mb-4">
-        <div class="col-md-4 mb-3">
+        <div class="col-12 col-md-4 mb-3">
             <div class="card border-0 shadow-sm h-100" style="border-radius: 20px; background: linear-gradient(135deg, #f7c0ec 0%, #a7bdea 100%);">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
@@ -58,7 +58,7 @@
             </div>
         </div>
         
-        <div class="col-md-4 mb-3">
+        <div class="col-12 col-md-4 mb-3">
             <div class="card border-0 shadow-sm h-100" style="border-radius: 20px; background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
@@ -74,7 +74,7 @@
             </div>
         </div>
         
-        <div class="col-md-4 mb-3">
+        <div class="col-12 col-md-4 mb-3">
             <div class="card border-0 shadow-sm h-100" style="border-radius: 20px; background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
@@ -98,7 +98,7 @@
                 <h5 class="mb-0" style="color: #2d3436; font-weight: 600;">
                     <i class="fas fa-list me-2" style="color: #8b5cf6;"></i> Daftar Pengembalian
                 </h5>
-                <div class="input-group" style="width: 300px;">
+                <div class="input-group" style="width: 100%; max-width: 300px;">
                     <input type="text" class="form-control" placeholder="Cari..." id="searchInput" style="border-radius: 50px 0 0 50px; border: 1px solid #e0e0e0;">
                     <button class="btn" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); border-radius: 0 50px 50px 0; color: #000;" type="button">
                         <i class="fas fa-search"></i>

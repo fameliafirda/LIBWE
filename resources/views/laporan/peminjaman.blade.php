@@ -84,7 +84,7 @@
         $sudahDikembalikan = $pinjamans->where('status', 'sudah dikembalikan')->count();
     @endphp
     <div class="row g-3 mb-4">
-        <div class="col-md-3">
+        <div class="col-md-3 col-sm-6">
             <div class="card border-0 shadow-sm" style="border-radius: 20px; background: linear-gradient(135deg, #f7c0ec 0%, #a7bdea 100%);">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
@@ -99,7 +99,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 col-sm-6">
             <div class="card border-0 shadow-sm" style="border-radius: 20px; background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
@@ -114,7 +114,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 col-sm-6">
             <div class="card border-0 shadow-sm" style="border-radius: 20px; background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
@@ -129,7 +129,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 col-sm-6">
             <div class="card border-0 shadow-sm" style="border-radius: 20px; background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">

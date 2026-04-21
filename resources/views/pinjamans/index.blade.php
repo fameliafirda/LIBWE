@@ -10,13 +10,13 @@
             <div class="card border-0 shadow-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 0 20px 20px 0;">
                 <div class="card-body p-4">
                     <div class="row align-items-center">
-                        <div class="col-md-8">
+                        <div class="col-12 col-md-8">
                             <h3 class="text-white mb-2" style="font-weight: 600;">
                                 <i class="fas fa-hand-holding-heart me-2"></i> Daftar Peminjaman Buku
                             </h3>
                             <p class="text-white opacity-75 mb-0">Kelola data peminjaman buku perpustakaan SDN Berat Wetan 1</p>
                         </div>
-                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                        <div class="col-12 col-md-4 text-md-end mt-3 mt-md-0">
                             <a href="{{ route('pinjamans.create') }}" class="btn btn-light" style="border-radius: 50px; padding: 10px 25px; font-weight: 500; color: #667eea; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
                                 <i class="fas fa-plus-circle me-2"></i> Tambah Peminjaman
                             </a>
@@ -66,7 +66,7 @@
                         <strong class="d-block mb-2" style="color: #856404;">⚠️ Perhatian! Stok Buku Habis</strong>
                         <div class="row">
                             @foreach($bukuHabis as $buku)
-                            <div class="col-md-4 mb-2">
+                            <div class="col-12 col-md-4 mb-2">
                                 <div class="d-flex align-items-center">
                                     <i class="fas fa-book me-2" style="color: #8b5cf6; font-size: 12px;"></i>
                                     <span class="fw-semibold small">{{ $buku->judul }}</span>
@@ -85,7 +85,7 @@
 
     <!-- Statistik Peminjaman -->
     <div class="row g-3 mb-4">
-        <div class="col-md-3">
+        <div class="col-12 col-md-3">
             <div class="card border-0 shadow-sm h-100" style="border-radius: 20px; background: linear-gradient(135deg, #f7c0ec 0%, #a7bdea 100%);">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
@@ -101,7 +101,7 @@
             </div>
         </div>
         
-        <div class="col-md-3">
+        <div class="col-12 col-md-3">
             <div class="card border-0 shadow-sm h-100" style="border-radius: 20px; background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
@@ -117,7 +117,7 @@
             </div>
         </div>
         
-        <div class="col-md-3">
+        <div class="col-12 col-md-3">
             <div class="card border-0 shadow-sm h-100" style="border-radius: 20px; background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
@@ -133,7 +133,7 @@
             </div>
         </div>
         
-        <div class="col-md-3">
+        <div class="col-12 col-md-3">
             <div class="card border-0 shadow-sm h-100" style="border-radius: 20px; background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
@@ -190,7 +190,7 @@
                         <h5 class="mb-0" style="color: #2d3436; font-weight: 600;">
                             <i class="fas fa-list me-2" style="color: #8b5cf6;"></i> Daftar Transaksi Peminjaman
                         </h5>
-                        <div class="input-group" style="width: 250px;">
+                        <div class="input-group" style="width: 100%; max-width: 250px;">
                             <input type="text" class="form-control form-control-sm" placeholder="Cari peminjam/buku..." id="searchInput" style="border-radius: 50px 0 0 50px; border: 1px solid #e0e0e0;">
                             <button class="btn btn-sm" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); border-radius: 0 50px 50px 0; color: #000;" type="button">
                                 <i class="fas fa-search"></i>
@@ -201,7 +201,7 @@
 
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover mb-0" id="pinjamanTable" style="min-width: 1200px;">
+                        <table class="table table-hover mb-0" id="pinjamanTable">
                             <thead style="background: linear-gradient(45deg, #f7c0ec, #a7bdea);">
                                 <tr>
                                     <th class="text-center" style="width: 50px;">No</th>
@@ -244,12 +244,6 @@
                                                 <i class="fas fa-book me-2" style="color: #8b5cf6;"></i>
                                                 {{ $pinjaman->judul_buku ?? '-' }}
                                             </div>
-                                            @php
-                                                $buku = App\Models\Book::where('judul', $pinjaman->judul_buku)->first();
-                                            @endphp
-                                            @if($buku && $buku->stok == 0 && $pinjaman->status == 'belum dikembalikan')
-                                                <span class="badge bg-danger mt-1">Stok buku ini habis!</span>
-                                            @endif
                                         </td>
                                         <td class="text-center">
                                             <span class="badge bg-info text-dark px-3 py-2">
@@ -287,27 +281,7 @@
                                                    data-bs-toggle="tooltip" title="Edit peminjaman">
                                                    <i class="fas fa-edit"></i>
                                                 </a>
-
-                                                @if ($pinjaman->status === 'belum dikembalikan')
-                                                    <form action="{{ route('pinjamans.update', $pinjaman->id) }}" method="POST" class="d-inline">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <input type="hidden" name="status" value="sudah dikembalikan">
-                                                        <input type="hidden" name="nama" value="{{ $pinjaman->nama }}">
-                                                        <input type="hidden" name="kelas" value="{{ $pinjaman->kelas }}">
-                                                        <input type="hidden" name="jenis_kelamin" value="{{ $pinjaman->jenis_kelamin }}">
-                                                        <input type="hidden" name="judul_buku" value="{{ $pinjaman->judul_buku }}">
-                                                        <input type="hidden" name="tanggal_pinjam" value="{{ $pinjaman->tanggal_pinjam }}">
-                                                        <input type="hidden" name="tanggal_kembali" value="{{ $pinjaman->tanggal_kembali }}">
-                                                        <button type="submit" class="btn btn-sm"
-                                                                style="background-color: #8fd19e; color: #000; border: none; border-radius: 8px; padding: 6px 10px;"
-                                                                onclick="return confirm('Apakah buku sudah dikembalikan?')"
-                                                                data-bs-toggle="tooltip" title="Tandai sudah dikembalikan">
-                                                            <i class="fas fa-check"></i>
-                                                        </button>
-                                                    </form>
-                                                @endif
-
+                                                
                                                 <form action="{{ route('pinjamans.destroy', $pinjaman->id) }}" method="POST" class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
@@ -373,8 +347,6 @@
         let tableRows = document.querySelectorAll('#pinjamanTable tbody tr');
         
         tableRows.forEach(function(row) {
-            if (row.querySelector('td[colspan="8"]')) return; // Skip empty state row
-            
             let text = row.textContent.toLowerCase();
             if (text.indexOf(searchValue) > -1) {
                 row.style.display = '';

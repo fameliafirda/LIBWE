@@ -355,7 +355,6 @@
         
         tableRows.forEach(function(row) {
             if (row.querySelector('td[colspan="7"]')) return; // Skip empty state row
-            
             let text = row.textContent.toLowerCase();
             if (text.indexOf(searchValue) > -1) {
                 row.style.display = '';

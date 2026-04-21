@@ -39,52 +39,85 @@
     </div>
     @endif
 
-    <!-- Statistik Kategori -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100" style="border-radius: 20px; background: linear-gradient(135deg, #f7c0ec 0%, #a7bdea 100%);">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="text-dark mb-1" style="opacity: 0.8;">Total Kategori</p>
-                            <h2 class="text-dark mb-0 fw-bold">{{ $categories->count() }}</h2>
-                        </div>
-                        <div class="bg-white bg-opacity-25 rounded-circle p-3">
-                            <i class="fas fa-tags fa-2x text-dark"></i>
-                        </div>
+    <!-- Notifikasi Stok Habis -->
+    @php
+        $bukuHabis = App\Models\Book::where('stok', '<=', 0)->get();
+    @endphp
+    @if($bukuHabis->count() > 0)
+    <div class="row g-0 mb-4">
+        <div class="col-12">
+            <div class="alert alert-warning alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 15px; border-left: 5px solid #f39c12;">
+                <div class="d-flex align-items-start">
+                    <div class="me-3">
+                        <i class="fas fa-exclamation-triangle fa-2x" style="color: #f39c12;"></i>
+                    </div>
+                    <div>
+                        <strong class="d-block mb-2">⚠️ Perhatian! Stok Buku Habis</strong>
+                        <ul class="mb-0 ps-3">
+                            @foreach($bukuHabis as $buku)
+                                <li class="mb-1">
+                                    <span class="fw-semibold">{{ $buku->judul }}</span> 
+                                    <span class="badge bg-secondary ms-2">{{ $buku->kategori->nama ?? 'Tanpa Kategori' }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
                     </div>
                 </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         </div>
-        
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100" style="border-radius: 20px; background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="text-dark mb-1" style="opacity: 0.8;">Total Buku</p>
-                            <h2 class="text-dark mb-0 fw-bold">{{ $categories->sum('books_count') }}</h2>
-                        </div>
-                        <div class="bg-white bg-opacity-25 rounded-circle p-3">
-                            <i class="fas fa-book fa-2x text-dark"></i>
-                        </div>
-                    </div>
+    </div>
+    @endif
+
+    <!-- Filter Kategori -->
+    @if(isset($filterKategori))
+    <div class="row g-0 mb-4">
+        <div class="col-12">
+            <div class="alert alert-info d-flex justify-content-between align-items-center" style="border-radius: 15px; background: rgba(139, 92, 246, 0.1); border-left: 5px solid #8b5cf6;">
+                <div>
+                    <i class="fas fa-filter me-2" style="color: #8b5cf6;"></i>
+                    Menampilkan buku kategori: <strong class="ms-1">{{ $filterKategori }}</strong>
                 </div>
+                <a href="{{ route('books.index') }}" class="btn btn-sm" style="background-color: #ff6b6b; color: white; border-radius: 50px; padding: 5px 15px;">
+                    <i class="fas fa-times me-1"></i> Reset
+                </a>
             </div>
         </div>
-        
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100" style="border-radius: 20px; background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="text-dark mb-1" style="opacity: 0.8;">Rata-rata Buku/Kategori</p>
-                            <h2 class="text-dark mb-0 fw-bold">{{ $categories->count() > 0 ? round($categories->sum('books_count') / $categories->count(), 1) : 0 }}</h2>
+    </div>
+    @endif
+
+    <!-- Search & Filter Bar -->
+    <div class="row g-0 mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm" style="border-radius: 20px;">
+                <div class="card-body p-3">
+                    <form method="GET" action="{{ route('books.index') }}" class="d-flex flex-wrap align-items-center gap-3">
+                        <div class="d-flex align-items-center flex-grow-1">
+                            <label class="fw-semibold text-muted mb-0 me-3" style="min-width: 70px;">
+                                <i class="fas fa-search me-2" style="color: #8b5cf6;"></i>Cari:
+                            </label>
+                            <input type="text" name="search" class="form-control" placeholder="Cari judul atau penulis..." value="{{ request('search') }}" style="border-radius: 50px; border: 1px solid #e0e0e0; max-width: 300px;">
                         </div>
-                        <div class="bg-white bg-opacity-25 rounded-circle p-3">
-                            <i class="fas fa-chart-line fa-2x text-dark"></i>
+                        <div class="d-flex align-items-center">
+                            <label class="fw-semibold text-muted mb-0 me-3">
+                                <i class="fas fa-tags me-2" style="color: #8b5cf6;"></i>Kategori:
+                            </label>
+                            <select name="kategori" class="form-control" style="border-radius: 50px; border: 1px solid #e0e0e0; min-width: 200px;">
+                                <option value="">Semua Kategori</option>
+                                @foreach($categories as $kategori)
+                                    <option value="{{ $kategori->id }}" {{ request('kategori') == $kategori->id ? 'selected' : '' }}>{{ $kategori->nama }}</option>
+                                @endforeach
+                            </select>
                         </div>
-                    </div>
+                        <button type="submit" class="btn" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000; border-radius: 50px; padding: 8px 25px;">
+                            <i class="fas fa-filter me-2"></i> Filter
+                        </button>
+                        @if(request('search') || request('kategori'))
+                            <a href="{{ route('books.index') }}" class="btn btn-sm" style="background-color: #ff6b6b; color: white; border-radius: 50px; padding: 8px 20px;">
+                                <i class="fas fa-times me-1"></i> Reset
+                            </a>
+                        @endif
+                    </form>
                 </div>
             </div>
         </div>

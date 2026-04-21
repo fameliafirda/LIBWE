@@ -105,9 +105,7 @@
                             <select name="kategori" class="form-control" style="border-radius: 50px; border: 1px solid #e0e0e0; min-width: 200px;">
                                 <option value="">Semua Kategori</option>
                                 @foreach($categories as $kategori)
-                                    <option value="{{ $kategori->id }}" {{ request('kategori') == $kategori->id ? 'selected' : '' }}>
-                                        {{ $kategori->nama }}
-                                    </option>
+                                    <option value="{{ $kategori->id }}" {{ request('kategori') == $kategori->id ? 'selected' : '' }}>{{ $kategori->nama }}</option>
                                 @endforeach
                             </select>
                         </div>
