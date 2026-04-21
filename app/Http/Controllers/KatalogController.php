@@ -11,17 +11,17 @@ use Illuminate\Support\Facades\DB;
 class KatalogController extends Controller
 {
     /**
-     * Menampilkan halaman katalog dengan rekomendasi dan grid buku.
+     * Menampilkan halaman katalog utama.
      */
     public function index(Request $request)
     {
-        // 1. Ambil semua kategori untuk dropdown
+        // 1. Ambil semua kategori untuk dropdown filter
         $kategoris = Category::all();
 
-        // 2. Ambil 10 buku paling sering dipinjam (Rekomendasi)
+        // 2. Ambil Rekomendasi (Hanya yang pernah dipinjam > 0)
         $popularBooks = $this->getPopularBooks(10);
 
-        // 3. Query Utama untuk Katalog Buku (Grid)
+        // 3. Query Utama untuk Katalog Grid
         $query = Book::with('kategori');
 
         // Fitur Pencarian
@@ -39,7 +39,7 @@ class KatalogController extends Controller
             $query->where('kategori_id', $request->kategori);
         }
 
-        // Pagination 24 buku per halaman
+        // Paginate 24 buku (sesuai permintaan fitur tidak dikurangi)
         $books = $query->latest()->paginate(24)->withQueryString();
 
         return view('katalog.index', [
@@ -50,74 +50,37 @@ class KatalogController extends Controller
     }
 
     /**
-     * Logika mengambil buku populer berdasarkan history peminjaman.
+     * Logika mengambil buku populer: Minimal 1x dipinjam.
      */
     private function getPopularBooks($limit = 10)
     {
-        $cacheKey = 'popular_books_limit_' . $limit;
+        // Gunakan cache agar performa cepat, tapi durasi pendek agar data tetap update
+        $cacheKey = 'popular_books_katalog_realtime_' . $limit;
         
-        return Cache::remember($cacheKey, now()->addMinutes(30), function() use ($limit) {
-            if (!$this->hasPinjamanTable()) {
+        return Cache::remember($cacheKey, now()->addMinutes(5), function() use ($limit) {
+            if (!DB::connection()->getSchemaBuilder()->hasTable('pinjamans')) {
                 return collect();
             }
 
-            $popularBooks = Book::with('kategori')
-                ->leftJoin('pinjamans', function($join) {
-                    $join->on('books.id', '=', 'pinjamans.buku_id')
-                         ->where('pinjamans.status', '=', 'sudah dikembalikan');
-                })
+            return Book::with('kategori')
+                ->join('pinjamans', 'books.id', '=', 'pinjamans.buku_id')
                 ->select(
-                    'books.id',
-                    'books.judul',
-                    'books.penulis',
-                    'books.penerbit',
-                    'books.tahun_terbit',
-                    'books.gambar',
-                    'books.stok',
-                    'books.kategori_id',
+                    'books.id', 'books.judul', 'books.penulis', 'books.penerbit',
+                    'books.tahun_terbit', 'books.gambar', 'books.stok', 'books.kategori_id',
                     DB::raw('COUNT(pinjamans.id) as total_dipinjam')
                 )
-                ->groupBy(
-                    'books.id',
-                    'books.judul',
-                    'books.penulis',
-                    'books.penerbit',
-                    'books.tahun_terbit',
-                    'books.gambar',
-                    'books.stok',
-                    'books.kategori_id'
-                )
+                // Filter hanya yang sudah dikembalikan agar data valid
+                ->where('pinjamans.status', '=', 'sudah dikembalikan')
+                ->groupBy('books.id', 'books.judul', 'books.penulis', 'books.penerbit', 'books.tahun_terbit', 'books.gambar', 'books.stok', 'books.kategori_id')
+                ->having('total_dipinjam', '>', 0) // 🔥 SYARAT: Tidak muncul jika 0
                 ->orderBy('total_dipinjam', 'DESC')
                 ->limit($limit)
                 ->get();
-
-            // Jika belum ada data pinjam, ambil berdasarkan stok terbanyak (Fallback)
-            if ($popularBooks->isEmpty() || $popularBooks->sum('total_dipinjam') == 0) {
-                return Book::with('kategori')
-                    ->orderBy('stok', 'DESC')
-                    ->limit($limit)
-                    ->get()
-                    ->map(function($book) {
-                        $book->total_dipinjam = 0;
-                        return $book;
-                    });
-            }
-
-            return $popularBooks;
         });
     }
 
-    private function hasPinjamanTable()
-    {
-        try {
-            return DB::connection()->getSchemaBuilder()->hasTable('pinjamans');
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
     /**
-     * Fungsi AJAX Filter (Tanpa Refresh Halaman)
+     * Fitur AJAX Filter (Pencarian Live)
      */
     public function filter(Request $request)
     {
@@ -128,8 +91,7 @@ class KatalogController extends Controller
                 $search = $request->search;
                 $query->where(function($q) use ($search) {
                     $q->where('judul', 'LIKE', "%{$search}%")
-                      ->orWhere('penulis', 'LIKE', "%{$search}%")
-                      ->orWhere('penerbit', 'LIKE', "%{$search}%");
+                      ->orWhere('penulis', 'LIKE', "%{$search}%");
                 });
             }
 
