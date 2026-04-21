@@ -383,7 +383,7 @@
                 if(data.success && data.books && data.books.length > 0) {
                     data.books.forEach(b => {
                         // 🔥 FIX: Gunakan 'cover' bukan 'gambar'
-                        let img = b.cover ? `/storage/${b.cover}` : '{{ asset("web-perpus/img/bukubaru.png") }}';
+                        let img = b.cover ? `/storage/${b.cover}` : '{{ asset(" ") }}';
                         
                         let kname = b.kategori ? b.kategori.nama : 'Umum';
                         let tahun = b.tahun_terbit ? b.tahun_terbit : '-';
