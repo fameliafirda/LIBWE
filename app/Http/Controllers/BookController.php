@@ -6,6 +6,7 @@ use App\Models\Book;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class BookController extends Controller
 {
@@ -65,6 +66,7 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
+        // Validasi input
         $validated = $request->validate([
             'judul'         => 'required|string|max:255',
             'penulis'       => 'required|string|max:255',
@@ -75,12 +77,26 @@ class BookController extends Controller
             'gambar'        => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // Upload gambar ke storage dan simpan path ke kolom 'cover'
+        // 🔥 PROSES UPLOAD GAMBAR
         if ($request->hasFile('gambar')) {
-            $path = $request->file('gambar')->store('gambar_buku', 'public');
-            $validated['cover'] = $path;  // 🔥 SIMPAN KE KOLOM 'cover'
+            $file = $request->file('gambar');
+            
+            // Buat nama file unik: timestamp_nama_original.jpg
+            $filename = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            
+            // Simpan ke folder storage/app/public/gambar_buku/
+            $path = $file->storeAs('gambar_buku', $filename, 'public');
+            
+            // Simpan path ke database (kolom 'cover')
+            $validated['cover'] = $path;
+            
+            // Debug: catat log jika berhasil
+            Log::info('Gambar berhasil diupload: ' . $path);
+        } else {
+            Log::info('Tidak ada file gambar yang diupload');
         }
 
+        // Simpan ke database
         Book::create($validated);
 
         return redirect()->route('books.index')->with('success', 'Buku berhasil ditambahkan.');
@@ -100,6 +116,7 @@ class BookController extends Controller
      */
     public function update(Request $request, Book $book)
     {
+        // Validasi input
         $validated = $request->validate([
             'judul'         => 'required|string|max:255',
             'penulis'       => 'required|string|max:255',
@@ -110,18 +127,29 @@ class BookController extends Controller
             'gambar'        => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // Proses upload gambar baru
+        // 🔥 PROSES UPLOAD GAMBAR BARU
         if ($request->hasFile('gambar')) {
             // Hapus gambar lama jika ada
             if ($book->cover && Storage::disk('public')->exists($book->cover)) {
                 Storage::disk('public')->delete($book->cover);
+                Log::info('Gambar lama dihapus: ' . $book->cover);
             }
 
-            // Simpan gambar baru
-            $path = $request->file('gambar')->store('gambar_buku', 'public');
-            $validated['cover'] = $path;  // 🔥 SIMPAN KE KOLOM 'cover'
+            $file = $request->file('gambar');
+            
+            // Buat nama file unik
+            $filename = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            
+            // Simpan ke folder storage/app/public/gambar_buku/
+            $path = $file->storeAs('gambar_buku', $filename, 'public');
+            
+            // Simpan path ke database (kolom 'cover')
+            $validated['cover'] = $path;
+            
+            Log::info('Gambar baru diupload: ' . $path);
         }
 
+        // Update database
         $book->update($validated);
 
         return redirect()->route('books.index')->with('success', 'Buku berhasil diperbarui.');
@@ -135,6 +163,7 @@ class BookController extends Controller
         // Hapus file gambar jika ada
         if ($book->cover && Storage::disk('public')->exists($book->cover)) {
             Storage::disk('public')->delete($book->cover);
+            Log::info('Gambar dihapus: ' . $book->cover);
         }
 
         $book->delete();
