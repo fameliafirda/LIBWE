@@ -104,7 +104,10 @@ class KatalogController extends Controller
                 return $this->getFallbackPopularBooks($limit);
             }
 
-            return $popularBooks;
+            // Filter buku yang tidak dipinjam sama sekali
+            return $popularBooks->filter(function($book) {
+                return $book->total_dipinjam > 0; // Buku harus dipinjam minimal sekali
+            });
         });
     }
 
