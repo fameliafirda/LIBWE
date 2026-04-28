@@ -52,7 +52,6 @@ class KatalogController extends Controller
 
     /**
      * Get popular books based on borrowing history from pinjamans table.
-     * Diurutkan dari yang paling banyak dipinjam ke yang paling sedikit
      */
     private function getPopularBooks($limit = 10)
     {
@@ -61,7 +60,6 @@ class KatalogController extends Controller
         return Cache::remember($cacheKey, now()->addMinutes(30), function() use ($limit) {
             // Cek apakah tabel pinjamans ada
             if (!$this->hasPinjamanTable()) {
-                Log::info('Tabel pinjamans tidak ditemukan, menggunakan fallback stok terbanyak');
                 return $this->getFallbackPopularBooks($limit);
             }
 
@@ -71,11 +69,11 @@ class KatalogController extends Controller
                 ->count();
 
             if ($totalPinjaman == 0) {
-                Log::info('Tidak ada data peminjaman dengan status "sudah dikembalikan", menggunakan fallback stok terbanyak');
                 return $this->getFallbackPopularBooks($limit);
             }
 
             // Query untuk mendapatkan buku paling sering dipinjam
+            // 🔥 FIX: Memastikan mengambil kolom 'gambar'
             $popularBooks = Book::with('kategori')
                 ->leftJoin('pinjamans', function($join) {
                     $join->on('books.id', '=', 'pinjamans.buku_id')
@@ -87,7 +85,7 @@ class KatalogController extends Controller
                     'books.penulis',
                     'books.penerbit',
                     'books.tahun_terbit',
-                    'books.gambar',          // 🔥 FIX: Pakai gambar
+                    'books.gambar',
                     'books.stok',
                     'books.kategori_id',
                     DB::raw('COALESCE(COUNT(pinjamans.id), 0) as total_dipinjam')
@@ -98,7 +96,7 @@ class KatalogController extends Controller
                     'books.penulis',
                     'books.penerbit',
                     'books.tahun_terbit',
-                    'books.gambar',          // 🔥 FIX: Pakai gambar
+                    'books.gambar',
                     'books.stok',
                     'books.kategori_id'
                 )
@@ -106,7 +104,6 @@ class KatalogController extends Controller
                 ->limit($limit)
                 ->get();
 
-            // Jika hasil query kosong atau semua total_dipinjam 0, fallback
             if ($popularBooks->isEmpty() || $popularBooks->sum('total_dipinjam') == 0) {
                 return $this->getFallbackPopularBooks($limit);
             }

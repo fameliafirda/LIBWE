@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\Category;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 
 class BookController extends Controller
@@ -77,22 +77,18 @@ class BookController extends Controller
             'gambar'        => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // 🔥 PROSES UPLOAD GAMBAR
+        // 🔥 FIX: Simpan langsung ke folder public/gambar_buku
         if ($request->hasFile('gambar')) {
             $file = $request->file('gambar');
-            
-            // Buat nama file unik: timestamp_nama_original.jpg
             $filename = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
             
-            // Simpan ke folder storage/app/public/gambar_buku/
-            $path = $file->storeAs('gambar_buku', $filename, 'public');
+            // Pindahkan file ke public/gambar_buku
+            $file->move(public_path('gambar_buku'), $filename);
             
-            // Simpan path ke database (kolom 'gambar')
-            $validated['gambar'] = $path;
+            // Simpan path relatif ke database
+            $validated['gambar'] = 'gambar_buku/' . $filename;
             
-            Log::info('Gambar berhasil diupload: ' . $path);
-        } else {
-            Log::info('Tidak ada file gambar yang diupload');
+            Log::info('Gambar berhasil diupload ke public: ' . $validated['gambar']);
         }
 
         // Simpan ke database
@@ -126,26 +122,20 @@ class BookController extends Controller
             'gambar'        => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // 🔥 PROSES UPLOAD GAMBAR BARU
+        // 🔥 FIX: Update langsung ke folder public/gambar_buku
         if ($request->hasFile('gambar')) {
-            // Hapus gambar lama jika ada
-            if ($book->gambar && Storage::disk('public')->exists($book->gambar)) {
-                Storage::disk('public')->delete($book->gambar);
-                Log::info('Gambar lama dihapus: ' . $book->gambar);
+            // Hapus gambar lama jika ada di folder public
+            if ($book->gambar && file_exists(public_path($book->gambar))) {
+                @unlink(public_path($book->gambar));
             }
 
             $file = $request->file('gambar');
-            
-            // Buat nama file unik
             $filename = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
             
-            // Simpan ke folder storage/app/public/gambar_buku/
-            $path = $file->storeAs('gambar_buku', $filename, 'public');
+            // Pindahkan ke public/gambar_buku
+            $file->move(public_path('gambar_buku'), $filename);
             
-            // Simpan path ke database (kolom 'gambar')
-            $validated['gambar'] = $path;
-            
-            Log::info('Gambar baru diupload: ' . $path);
+            $validated['gambar'] = 'gambar_buku/' . $filename;
         }
 
         // Update database
@@ -159,10 +149,9 @@ class BookController extends Controller
      */
     public function destroy(Book $book)
     {
-        // Hapus file gambar jika ada
-        if ($book->gambar && Storage::disk('public')->exists($book->gambar)) {
-            Storage::disk('public')->delete($book->gambar);
-            Log::info('Gambar dihapus: ' . $book->gambar);
+        // Hapus file gambar dari folder public jika ada
+        if ($book->gambar && file_exists(public_path($book->gambar))) {
+            @unlink(public_path($book->gambar));
         }
 
         $book->delete();
