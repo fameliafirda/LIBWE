@@ -15,37 +15,36 @@ use Illuminate\Support\Facades\File;
 
 /*
 |--------------------------------------------------------------------------
-| UTILITY ROUTE (PERBAIKAN STORAGE & PERMISSION)
-| Akses ini satu kali di browser: perpustakaansdnberatwetan1.online/fix-storage
+| UTILITY ROUTE (PERBAIKAN STORAGE TANPA EXEC)
+| Akses ini satu kali: perpustakaansdnberatwetan1.online/fix-storage
 |--------------------------------------------------------------------------
 */
 Route::get('/fix-storage', function () {
-    // 1. Ambil path target dan shortcut
     $target = storage_path('app/public');
     $shortcut = public_path('storage');
 
-    // 2. Hapus shortcut lama jika ada (antisipasi link mati)
+    // 1. Hapus shortcut lama jika ada (file, folder, atau link mati)
     if (file_exists($shortcut)) {
-        File::delete($shortcut);
+        if (is_link($shortcut)) {
+            @unlink($shortcut);
+        } else {
+            File::deleteDirectory($shortcut);
+        }
     }
 
-    // 3. Buat folder gambar_buku jika belum ada
+    // 2. Pastikan folder tujuan fisik ada
     if (!File::exists($target . '/gambar_buku')) {
         File::makeDirectory($target . '/gambar_buku', 0755, true);
     }
 
-    // 4. Buat ulang Symlink
-    app('files')->link($target, $shortcut);
-
-    return "
-        <h1>Proses Perbaikan Selesai!</h1>
-        <ul>
-            <li>Folder 'gambar_buku' dipastikan ada.</li>
-            <li>Symlink Storage telah diperbarui.</li>
-        </ul>
-        <p>Silakan coba upload buku baru sekarang.</p>
-        <a href='/'>Kembali ke Beranda</a>
-    ";
+    // 3. Gunakan PHP Native symlink (Menghindari error exec() di hosting)
+    try {
+        if (symlink($target, $shortcut)) {
+            return "<h1>Link Storage Berhasil!</h1><p>Jembatan folder sudah dibuat. Silakan upload buku baru.</p>";
+        }
+    } catch (\Throwable $e) {
+        return "<h1>Gagal!</h1><p>Error: " . $e->getMessage() . "</p><p>Kemungkinan fungsi 'symlink' dimatikan oleh hosting. Solusinya: Hubungi provider hosting untuk mengaktifkan fungsi symlink.</p>";
+    }
 });
 
 /*
