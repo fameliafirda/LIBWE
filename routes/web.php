@@ -15,35 +15,24 @@ use Illuminate\Support\Facades\File;
 
 /*
 |--------------------------------------------------------------------------
-| UTILITY ROUTE (PERBAIKAN STORAGE TANPA EXEC)
+| UTILITY ROUTE (PERBAIKAN STORAGE UNTUK HOSTING)
 | Akses ini satu kali: perpustakaansdnberatwetan1.online/fix-storage
 |--------------------------------------------------------------------------
 */
 Route::get('/fix-storage', function () {
-    $target = storage_path('app/public');
-    $shortcut = public_path('storage');
+    // Karena hosting mematikan symlink, kita buat folder langsung di Document Root (public_html)
+    $documentRoot = rtrim($_SERVER['DOCUMENT_ROOT'], '/');
+    $target = $documentRoot . '/gambar_buku';
 
-    // 1. Hapus shortcut lama jika ada (file, folder, atau link mati)
-    if (file_exists($shortcut)) {
-        if (is_link($shortcut)) {
-            @unlink($shortcut);
-        } else {
-            File::deleteDirectory($shortcut);
-        }
-    }
-
-    // 2. Pastikan folder tujuan fisik ada
-    if (!File::exists($target . '/gambar_buku')) {
-        File::makeDirectory($target . '/gambar_buku', 0755, true);
-    }
-
-    // 3. Gunakan PHP Native symlink (Menghindari error exec() di hosting)
     try {
-        if (symlink($target, $shortcut)) {
-            return "<h1>Link Storage Berhasil!</h1><p>Jembatan folder sudah dibuat. Silakan upload buku baru.</p>";
+        if (!File::exists($target)) {
+            File::makeDirectory($target, 0755, true);
+            return "<h1>Berhasil!</h1><p>Folder 'gambar_buku' telah dibuat langsung di server publik. Silakan upload buku baru.</p>";
+        } else {
+            return "<h1>Sudah Siap!</h1><p>Folder 'gambar_buku' sudah ada di server publik. Sistem siap digunakan untuk upload gambar.</p>";
         }
     } catch (\Throwable $e) {
-        return "<h1>Gagal!</h1><p>Error: " . $e->getMessage() . "</p><p>Kemungkinan fungsi 'symlink' dimatikan oleh hosting. Solusinya: Hubungi provider hosting untuk mengaktifkan fungsi symlink.</p>";
+        return "<h1>Gagal!</h1><p>Error: " . $e->getMessage() . "</p>";
     }
 });
 
@@ -128,5 +117,6 @@ Route::middleware([PustakawanMiddleware::class])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::fallback(function () {
-    return response()->view('errors.404', [], 404);
+    // 🔥 FIX: Menggunakan pesan teks biasa karena file view 'errors.404' tidak ditemukan
+    return response('Halaman atau file gambar tidak ditemukan (404 Not Found).', 404);
 });

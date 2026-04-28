@@ -77,18 +77,26 @@ class BookController extends Controller
             'gambar'        => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // Simpan langsung ke folder public/gambar_buku
         if ($request->hasFile('gambar')) {
             $file = $request->file('gambar');
             $filename = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
             
-            // Pindahkan file ke public/gambar_buku
-            $file->move(public_path('gambar_buku'), $filename);
+            // 🔥 FIX HOSTING: Arahkan langsung ke Document Root domain (public_html)
+            $documentRoot = rtrim($_SERVER['DOCUMENT_ROOT'], '/');
+            $destinationPath = $documentRoot . '/gambar_buku';
             
-            // Simpan path relatif ke database
+            // Buat folder jika belum ada di server
+            if (!File::exists($destinationPath)) {
+                File::makeDirectory($destinationPath, 0755, true);
+            }
+
+            // Pindahkan file ke folder asli server
+            $file->move($destinationPath, $filename);
+            
+            // Simpan path relatif ke DB
             $validated['gambar'] = 'gambar_buku/' . $filename;
             
-            Log::info('Gambar berhasil diupload ke public: ' . $validated['gambar']);
+            Log::info('Gambar berhasil diupload ke: ' . $destinationPath . '/' . $filename);
         }
 
         // Simpan ke database
@@ -122,18 +130,26 @@ class BookController extends Controller
             'gambar'        => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // Update langsung ke folder public/gambar_buku
         if ($request->hasFile('gambar')) {
-            // Hapus gambar lama jika ada di folder public
-            if ($book->gambar && file_exists(public_path($book->gambar))) {
-                @unlink(public_path($book->gambar));
+            $documentRoot = rtrim($_SERVER['DOCUMENT_ROOT'], '/');
+            
+            // Hapus gambar lama dari server jika ada
+            if ($book->gambar && file_exists($documentRoot . '/' . $book->gambar)) {
+                @unlink($documentRoot . '/' . $book->gambar);
             }
 
             $file = $request->file('gambar');
             $filename = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
             
-            // Pindahkan ke public/gambar_buku
-            $file->move(public_path('gambar_buku'), $filename);
+            $destinationPath = $documentRoot . '/gambar_buku';
+            
+            // Buat folder jika belum ada di server
+            if (!File::exists($destinationPath)) {
+                File::makeDirectory($destinationPath, 0755, true);
+            }
+
+            // Pindahkan file baru
+            $file->move($destinationPath, $filename);
             
             $validated['gambar'] = 'gambar_buku/' . $filename;
         }
@@ -149,9 +165,11 @@ class BookController extends Controller
      */
     public function destroy(Book $book)
     {
-        // Hapus file gambar dari folder public jika ada
-        if ($book->gambar && file_exists(public_path($book->gambar))) {
-            @unlink(public_path($book->gambar));
+        $documentRoot = rtrim($_SERVER['DOCUMENT_ROOT'], '/');
+        
+        // Hapus file gambar dari server jika ada
+        if ($book->gambar && file_exists($documentRoot . '/' . $book->gambar)) {
+            @unlink($documentRoot . '/' . $book->gambar);
         }
 
         $book->delete();
