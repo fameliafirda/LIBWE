@@ -83,7 +83,7 @@ class BookController extends Controller
             $filename = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
             
             // Pindahkan file ke public/gambar_buku
-            $file->move(public_path('gambar_buku'), $filename);
+            $file->move(public_path('gambar_buku/'), $filename);
             
             // Simpan path relatif ke database
             $validated['gambar'] = 'gambar_buku/' . $filename;
