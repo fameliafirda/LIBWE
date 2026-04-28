@@ -87,8 +87,8 @@ class BookController extends Controller
             // Simpan ke folder storage/app/public/gambar_buku/
             $path = $file->storeAs('gambar_buku', $filename, 'public');
             
-            // Simpan path ke database (kolom 'cover')
-            $validated['cover'] = $path;
+            // Simpan path ke database (kolom 'gambar')
+            $validated['gambar'] = $path;
             
             // Debug: catat log jika berhasil
             Log::info('Gambar berhasil diupload: ' . $path);
@@ -130,9 +130,9 @@ class BookController extends Controller
         // 🔥 PROSES UPLOAD GAMBAR BARU
         if ($request->hasFile('gambar')) {
             // Hapus gambar lama jika ada
-            if ($book->cover && Storage::disk('public')->exists($book->cover)) {
-                Storage::disk('public')->delete($book->cover);
-                Log::info('Gambar lama dihapus: ' . $book->cover);
+            if ($book->gambar && Storage::disk('public')->exists($book->gambar)) {
+                Storage::disk('public')->delete($book->gambar);
+                Log::info('Gambar lama dihapus: ' . $book->gambar);
             }
 
             $file = $request->file('gambar');
@@ -143,8 +143,8 @@ class BookController extends Controller
             // Simpan ke folder storage/app/public/gambar_buku/
             $path = $file->storeAs('gambar_buku', $filename, 'public');
             
-            // Simpan path ke database (kolom 'cover')
-            $validated['cover'] = $path;
+            // Simpan path ke database (kolom 'gambar')
+            $validated['gambar'] = $path;
             
             Log::info('Gambar baru diupload: ' . $path);
         }
@@ -161,9 +161,9 @@ class BookController extends Controller
     public function destroy(Book $book)
     {
         // Hapus file gambar jika ada
-        if ($book->cover && Storage::disk('public')->exists($book->cover)) {
-            Storage::disk('public')->delete($book->cover);
-            Log::info('Gambar dihapus: ' . $book->cover);
+        if ($book->gambar && Storage::disk('public')->exists($book->gambar)) {
+            Storage::disk('public')->delete($book->gambar);
+            Log::info('Gambar dihapus: ' . $book->gambar);
         }
 
         $book->delete();

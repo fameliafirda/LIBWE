@@ -53,9 +53,6 @@ class KatalogController extends Controller
     /**
      * Get popular books based on borrowing history from pinjamans table.
      * Diurutkan dari yang paling banyak dipinjam ke yang paling sedikit
-     * 
-     * @param int $limit Jumlah buku yang ditampilkan (default 10)
-     * @return \Illuminate\Database\Eloquent\Collection
      */
     private function getPopularBooks($limit = 10)
     {
@@ -79,7 +76,6 @@ class KatalogController extends Controller
             }
 
             // Query untuk mendapatkan buku paling sering dipinjam
-            // 🔥 PERBAIKAN: Gunakan 'cover' BUKAN 'gambar'
             $popularBooks = Book::with('kategori')
                 ->leftJoin('pinjamans', function($join) {
                     $join->on('books.id', '=', 'pinjamans.buku_id')
@@ -91,7 +87,7 @@ class KatalogController extends Controller
                     'books.penulis',
                     'books.penerbit',
                     'books.tahun_terbit',
-                    'books.cover',           // 🔥 FIX: cover BUKAN gambar
+                    'books.gambar',          // 🔥 Sudah diubah ke gambar
                     'books.stok',
                     'books.kategori_id',
                     DB::raw('COALESCE(COUNT(pinjamans.id), 0) as total_dipinjam')
@@ -102,7 +98,7 @@ class KatalogController extends Controller
                     'books.penulis',
                     'books.penerbit',
                     'books.tahun_terbit',
-                    'books.cover',           // 🔥 FIX: cover BUKAN gambar
+                    'books.gambar',          // 🔥 Sudah diubah ke gambar
                     'books.stok',
                     'books.kategori_id'
                 )
@@ -124,7 +120,6 @@ class KatalogController extends Controller
      */
     private function getFallbackPopularBooks($limit = 10)
     {
-        // 🔥 PERBAIKAN: Gunakan 'cover' BUKAN 'gambar'
         return Book::with('kategori')
             ->orderBy('stok', 'DESC')
             ->limit($limit)

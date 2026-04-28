@@ -13,8 +13,7 @@ return new class extends Migration {
             $table->string('penulis');
             $table->string('penerbit')->nullable();
             $table->year('tahun_terbit');
-            $table->string('gambar')->nullable();
-            $table->string('cover')->nullable();
+            $table->string('gambar')->nullable(); // 🔥 Hanya gunakan kolom gambar
             $table->integer('stok')->default(0);
             $table->unsignedBigInteger('kategori_id');
             $table->timestamps();

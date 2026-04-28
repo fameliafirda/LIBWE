@@ -4,7 +4,6 @@
 
 @section('content')
 <div class="container-fluid px-4 py-3">
-    <!-- Header Gradient -->
     <div class="row g-0 mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 0 20px 20px 0;">
@@ -27,7 +26,6 @@
         </div>
     </div>
 
-    <!-- Alert Success -->
     @if(session('success'))
     <div class="row g-0 mb-4">
         <div class="col-12">
@@ -39,7 +37,6 @@
     </div>
     @endif
 
-    <!-- Notifikasi Stok Habis -->
     @php
         $bukuHabis = App\Models\Book::where('stok', '<=', 0)->get();
     @endphp
@@ -69,7 +66,6 @@
     </div>
     @endif
 
-    <!-- Filter Kategori -->
     @if(isset($filterKategori))
     <div class="row g-0 mb-4">
         <div class="col-12">
@@ -86,7 +82,6 @@
     </div>
     @endif
 
-    <!-- Search & Filter Bar -->
     <div class="row g-0 mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-sm" style="border-radius: 20px;">
@@ -123,7 +118,6 @@
         </div>
     </div>
 
-    <!-- Tabel Buku -->
     <div class="row g-0">
         <div class="col-12">
             <div class="card border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
@@ -258,7 +252,6 @@
                     </div>
                 </div>
 
-                <!-- Pagination -->
                 @if(method_exists($books, 'links') && $books->hasPages())
                 <div class="card-footer bg-white border-0 py-3">
                     <div class="d-flex justify-content-between align-items-center">

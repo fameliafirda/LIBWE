@@ -17,7 +17,7 @@ class Book extends Model
         'penulis',
         'penerbit',
         'tahun_terbit',
-        'cover', // 🔥 pakai ini aja
+        'gambar', // 🔥 Sudah diganti menggunakan 'gambar'
         'stok',
         'kategori_id',
         'rak_id',
@@ -105,10 +105,10 @@ class Book extends Model
     }
 
     // 🔥 INI TAMBAHAN PENTING BUAT GAMBAR
-    public function getCoverUrlAttribute()
+    public function getGambarUrlAttribute()
     {
-        if ($this->cover) {
-            return asset('storage/' . $this->cover);
+        if ($this->gambar) {
+            return asset('storage/' . $this->gambar);
         }
 
         // fallback kalau tidak ada gambar
@@ -226,6 +226,6 @@ class Book extends Model
 
     public static function clearPopularBooksCache()
     {
-        Cache::flush(); // 🔥 lebih simpel & bersih
+        Cache::flush();
     }
 }

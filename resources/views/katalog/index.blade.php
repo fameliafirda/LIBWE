@@ -269,8 +269,8 @@
                 <div class="rank-badge">#{{ $index + 1 }}</div>
                 <div class="borrow-stats"><i class="fas fa-book-reader"></i> {{ $pb->total_dipinjam ?? 0 }}x</div>
                 <div class="img-box" style="height: 240px;">
-                    @if($pb->cover)
-                        <img src="{{ asset('storage/' . $pb->cover) }}" alt="{{ $pb->judul }}">
+                    @if($pb->gambar)
+                        <img src="{{ asset('storage/' . $pb->gambar) }}" alt="{{ $pb->judul }}">
                     @else
                         <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#1a1a2e;">
                             <i class="fas fa-book" style="font-size: 3rem; color: var(--text-muted); opacity: 0.3;"></i>
@@ -292,8 +292,8 @@
         <div class="book-item">
             <div class="img-box">
                 <span class="category-pill">{{ $b->kategori->nama ?? 'Umum' }}</span>
-                @if($b->cover)
-                    <img src="{{ asset('storage/' . $b->cover) }}" alt="{{ $b->judul }}">
+                @if($b->gambar)
+                    <img src="{{ asset('storage/' . $b->gambar) }}" alt="{{ $b->judul }}">
                 @else
                     <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#1a1a2e;">
                         <i class="fas fa-book" style="font-size: 2.5rem; color: var(--text-muted); opacity: 0.3;"></i>
@@ -349,8 +349,9 @@
                 let html = '';
                 if(data.success && data.books && data.books.length > 0) {
                     data.books.forEach(b => {
-                        let hasCover = b.cover ? true : false;
-                        let imgHtml = hasCover ? `<img src="/storage/${b.cover}" alt="${escapeHtml(b.judul)}">` : 
+                        // 🔥 Diperbaiki menjadi b.gambar
+                        let hasCover = b.gambar ? true : false;
+                        let imgHtml = hasCover ? `<img src="/storage/${b.gambar}" alt="${escapeHtml(b.judul)}">` : 
                             `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#1a1a2e;"><i class="fas fa-book" style="font-size: 2.5rem; color: #94a3b8; opacity: 0.3;"></i></div>`;
                         
                         html += `
