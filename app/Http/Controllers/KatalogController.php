@@ -51,7 +51,7 @@ class KatalogController extends Controller
     }
 
     /**
-     * Get popular books based on borrowing history from pinjamans table.
+     * Get popular books based on borrowing history.
      */
     private function getPopularBooks($limit = 10)
     {
@@ -63,17 +63,7 @@ class KatalogController extends Controller
                 return $this->getFallbackPopularBooks($limit);
             }
 
-            // Cek apakah ada data peminjaman yang sudah dikembalikan
-            $totalPinjaman = DB::table('pinjamans')
-                ->where('status', 'sudah dikembalikan')
-                ->count();
-
-            if ($totalPinjaman == 0) {
-                return $this->getFallbackPopularBooks($limit);
-            }
-
             // Query untuk mendapatkan buku paling sering dipinjam
-            // 🔥 FIX: Memastikan mengambil kolom 'gambar'
             $popularBooks = Book::with('kategori')
                 ->leftJoin('pinjamans', function($join) {
                     $join->on('books.id', '=', 'pinjamans.buku_id')
@@ -120,11 +110,7 @@ class KatalogController extends Controller
         return Book::with('kategori')
             ->orderBy('stok', 'DESC')
             ->limit($limit)
-            ->get()
-            ->map(function($book) {
-                $book->total_dipinjam = 0;
-                return $book;
-            });
+            ->get();
     }
 
     /**
@@ -135,7 +121,6 @@ class KatalogController extends Controller
         try {
             return DB::connection()->getSchemaBuilder()->hasTable('pinjamans');
         } catch (\Exception $e) {
-            Log::error('Error checking pinjamans table: ' . $e->getMessage());
             return false;
         }
     }
@@ -152,8 +137,7 @@ class KatalogController extends Controller
                 $search = $request->search;
                 $query->where(function($q) use ($search) {
                     $q->where('judul', 'LIKE', "%{$search}%")
-                      ->orWhere('penulis', 'LIKE', "%{$search}%")
-                      ->orWhere('penerbit', 'LIKE', "%{$search}%");
+                      ->orWhere('penulis', 'LIKE', "%{$search}%");
                 });
             }
 
@@ -168,11 +152,7 @@ class KatalogController extends Controller
                 'books'   => $books
             ]);
         } catch (\Exception $e) {
-            Log::error('Filter error: ' . $e->getMessage());
-            return response()->json([
-                'success' => false, 
-                'message' => $e->getMessage()
-            ], 500);
+            return response()->json(['success' => false], 500);
         }
     }
 
@@ -182,12 +162,6 @@ class KatalogController extends Controller
     public function clearRecommendationCache()
     {
         Cache::forget('popular_books_limit_10');
-        Cache::forget('popular_books_limit_5');
-        
-        if (request()->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Cache rekomendasi berhasil dihapus']);
-        }
-        
         return back()->with('success', 'Cache rekomendasi berhasil dihapus');
     }
 }

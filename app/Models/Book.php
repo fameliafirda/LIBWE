@@ -17,7 +17,7 @@ class Book extends Model
         'penulis',
         'penerbit',
         'tahun_terbit',
-        'gambar', // 🔥 Menggunakan kolom gambar
+        'gambar', 
         'stok',
         'kategori_id',
         'rak_id',
@@ -104,13 +104,12 @@ class Book extends Model
         return 'normal';
     }
 
-    // 🔥 FIX: Mengarah langsung ke folder public tanpa storage link
+    // 🔥 FIX: Mengarah langsung ke folder public (tanpa lewat storage/symlink)
     public function getGambarUrlAttribute()
     {
-        if ($this->gambar && file_exists(public_path($this->gambar))) {
+        if ($this->gambar) {
             return asset($this->gambar);
         }
-
         return asset('images/no-image.png');
     }
 

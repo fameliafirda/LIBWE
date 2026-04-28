@@ -77,13 +77,13 @@ class BookController extends Controller
             'gambar'        => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // 🔥 FIX: Simpan langsung ke folder public/gambar_buku
+        // Simpan langsung ke folder public/gambar_buku
         if ($request->hasFile('gambar')) {
             $file = $request->file('gambar');
             $filename = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
             
             // Pindahkan file ke public/gambar_buku
-            $file->move(public_path('gambar_buku/'), $filename);
+            $file->move(public_path('gambar_buku'), $filename);
             
             // Simpan path relatif ke database
             $validated['gambar'] = 'gambar_buku/' . $filename;
@@ -122,7 +122,7 @@ class BookController extends Controller
             'gambar'        => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // 🔥 FIX: Update langsung ke folder public/gambar_buku
+        // Update langsung ke folder public/gambar_buku
         if ($request->hasFile('gambar')) {
             // Hapus gambar lama jika ada di folder public
             if ($book->gambar && file_exists(public_path($book->gambar))) {
