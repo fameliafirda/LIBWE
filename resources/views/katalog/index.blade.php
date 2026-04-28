@@ -147,7 +147,7 @@
 
     .borrow-stats {
         position: absolute; top: 10px; right: 10px; background: rgba(5, 5, 8, 0.8); color: var(--baby-blue);
-        backdrop-filter: blur(5px); padding: 5px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: 700;
+        backdrop-filter: blur(5px); padding: 5px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; border: 1px solid rgba(155, 246, 255, 0.3);
     }
 
     .book-title-small { font-family: 'Unbounded'; font-size: 0.85rem; margin-bottom: 5px; color: #fff; }
@@ -267,10 +267,10 @@
             @foreach($popularBooks as $index => $pb)
             <div class="slider-card">
                 <div class="rank-badge">#{{ $index + 1 }}</div>
-                <div class="borrow-stats"><i class="fas fa-book-reader"></i> {{ $pb->total_dipinjam ?? 0 }}x</div>
+                <div class="borrow-stats"><i class="fas fa-book-reader"></i> Dipinjam: {{ $pb->total_dipinjam ?? 0 }}x</div>
                 <div class="img-box" style="height: 240px;">
                     @if($pb->gambar)
-                        <img src="{{ asset($pb->gambar) }}" alt="{{ $pb->judul }}">
+                        <img src="{{ asset('public/' . $pb->gambar) }}" alt="{{ $pb->judul }}">
                     @else
                         <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#1a1a2e;">
                             <i class="fas fa-book" style="font-size: 3rem; color: var(--text-muted); opacity: 0.3;"></i>
@@ -293,7 +293,7 @@
             <div class="img-box">
                 <span class="category-pill">{{ $b->kategori->nama ?? 'Umum' }}</span>
                 @if($b->gambar)
-                    <img src="{{ asset($b->gambar) }}" alt="{{ $b->judul }}">
+                    <img src="{{ asset('public/' . $b->gambar) }}" alt="{{ $b->judul }}">
                 @else
                     <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#1a1a2e;">
                         <i class="fas fa-book" style="font-size: 2.5rem; color: var(--text-muted); opacity: 0.3;"></i>
@@ -349,9 +349,10 @@
                 let html = '';
                 if(data.success && data.books && data.books.length > 0) {
                     data.books.forEach(b => {
-                        // 🔥 PERBAIKAN: Menghapus kata 'storage/' untuk AJAX JS
+                        // 🔥 PATH GAMBAR PUBLIC DI DALAM JAVASCRIPT AJAX
                         let hasCover = b.gambar ? true : false;
-                        let imgHtml = hasCover ? `<img src="/${b.gambar}" alt="${escapeHtml(b.judul)}">` : 
+                        let imgPath = hasCover ? `/public/${b.gambar}` : '/images/no-image.png';
+                        let imgHtml = hasCover ? `<img src="${imgPath}" alt="${escapeHtml(b.judul)}">` : 
                             `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#1a1a2e;"><i class="fas fa-book" style="font-size: 2.5rem; color: #94a3b8; opacity: 0.3;"></i></div>`;
                         
                         html += `
