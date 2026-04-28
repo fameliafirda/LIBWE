@@ -90,7 +90,6 @@ class BookController extends Controller
             // Simpan path ke database (kolom 'gambar')
             $validated['gambar'] = $path;
             
-            // Debug: catat log jika berhasil
             Log::info('Gambar berhasil diupload: ' . $path);
         } else {
             Log::info('Tidak ada file gambar yang diupload');

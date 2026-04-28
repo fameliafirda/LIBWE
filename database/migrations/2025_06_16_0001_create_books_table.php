@@ -13,9 +13,10 @@ return new class extends Migration {
             $table->string('penulis');
             $table->string('penerbit')->nullable();
             $table->year('tahun_terbit');
-            $table->string('gambar')->nullable(); // 🔥 Hanya gunakan kolom gambar
+            $table->string('gambar')->nullable(); // 🔥 Cuma pakai ini, cover dihapus
             $table->integer('stok')->default(0);
             $table->unsignedBigInteger('kategori_id');
+            $table->unsignedBigInteger('rak_id')->nullable(); 
             $table->timestamps();
 
             $table->foreign('kategori_id')->references('id')->on('categories')->onDelete('cascade');

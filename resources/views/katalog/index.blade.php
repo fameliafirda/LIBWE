@@ -349,7 +349,7 @@
                 let html = '';
                 if(data.success && data.books && data.books.length > 0) {
                     data.books.forEach(b => {
-                        // 🔥 Diperbaiki menjadi b.gambar
+                        // 🔥 Diperbaiki pakai b.gambar
                         let hasCover = b.gambar ? true : false;
                         let imgHtml = hasCover ? `<img src="/storage/${b.gambar}" alt="${escapeHtml(b.judul)}">` : 
                             `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#1a1a2e;"><i class="fas fa-book" style="font-size: 2.5rem; color: #94a3b8; opacity: 0.3;"></i></div>`;
