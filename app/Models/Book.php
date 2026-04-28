@@ -28,12 +28,6 @@ class Book extends Model
         'stok' => 'integer',
     ];
 
-    /*
-    |--------------------------------------------------------------------------
-    | RELATION
-    |--------------------------------------------------------------------------
-    */
-
     public function kategori()
     {
         return $this->belongsTo(Category::class, 'kategori_id');
@@ -68,7 +62,23 @@ class Book extends Model
 
     /*
     |--------------------------------------------------------------------------
-    | ACCESSOR
+    | ACCESSOR - 🔥 BAGIAN PALING PENTING
+    |--------------------------------------------------------------------------
+    */
+
+    public function getGambarUrlAttribute()
+    {
+        if ($this->gambar) {
+            // Kita langsung panggil folder public, tanpa kata 'storage/'
+            return asset($this->gambar);
+        }
+
+        return asset('images/no-image.png');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | SISANYA TETAP SAMA
     |--------------------------------------------------------------------------
     */
 
@@ -95,22 +105,11 @@ class Book extends Model
     public function getPopularityLevelAttribute()
     {
         $total = $this->total_dipinjam;
-
         if ($total >= 50) return 'very_hot';
         if ($total >= 25) return 'hot';
         if ($total >= 10) return 'popular';
         if ($total >= 5) return 'trending';
-
         return 'normal';
-    }
-
-    // 🔥 FIX: Mengarah langsung ke folder public (tanpa lewat storage/symlink)
-    public function getGambarUrlAttribute()
-    {
-        if ($this->gambar) {
-            return asset($this->gambar);
-        }
-        return asset('images/no-image.png');
     }
 
     public function getLokasiAttribute()
@@ -125,20 +124,10 @@ class Book extends Model
         } elseif ($this->rak) {
             return "{$this->rak->judul} (Rak {$this->rak->nomor})";
         }
-
         return 'Belum ditempatkan';
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | METHOD
-    |--------------------------------------------------------------------------
-    */
-
-    public function stokTersedia()
-    {
-        return $this->stok_tersedia > 0;
-    }
+    public function stokTersedia() { return $this->stok_tersedia > 0; }
 
     public function kurangiStok()
     {
@@ -156,74 +145,18 @@ class Book extends Model
         self::clearPopularBooksCache();
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | SCOPE
-    |--------------------------------------------------------------------------
-    */
-
     public function scopeMostPopular($query, $limit = 10)
     {
-        return $query->withCount(['pinjamanSelesai as total_dipinjam'])
-                     ->orderBy('total_dipinjam', 'desc')
-                     ->limit($limit);
-    }
-
-    public function scopeTrending($query, $limit = 10)
-    {
-        return $query->withCount(['pinjamanSelesai as total_dipinjam' => function($q) {
-                        $q->where('tanggal_kembali', '>=', now()->subDays(30));
-                    }])
-                     ->orderBy('total_dipinjam', 'desc')
-                     ->limit($limit);
-    }
-
-    public function scopeTersedia($query)
-    {
-        return $query->where('stok', '>', 0);
-    }
-
-    public function scopeByRak($query, $rakId)
-    {
-        return $rakId ? $query->where('rak_id', $rakId) : $query;
+        return $query->withCount(['pinjamanSelesai as total_dipinjam'])->orderBy('total_dipinjam', 'desc')->limit($limit);
     }
 
     public function scopeSearch($query, $search)
     {
         if ($search) {
-            return $query->where('judul', 'like', '%' . $search . '%')
-                         ->orWhere('penulis', 'like', '%' . $search . '%')
-                         ->orWhere('penerbit', 'like', '%' . $search . '%');
+            return $query->where('judul', 'like', '%' . $search . '%')->orWhere('penulis', 'like', '%' . $search . '%');
         }
         return $query;
     }
 
-    public function scopeByCategory($query, $categoryId)
-    {
-        return $categoryId ? $query->where('kategori_id', $categoryId) : $query;
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | CACHE
-    |--------------------------------------------------------------------------
-    */
-
-    public static function getPopularBooks($limit = 10, $cacheMinutes = 30)
-    {
-        $cacheKey = 'popular_books_' . $limit;
-
-        return Cache::remember($cacheKey, now()->addMinutes($cacheMinutes), function() use ($limit) {
-            return self::with(['kategori', 'rak'])
-                ->withCount(['pinjamanSelesai as total_dipinjam'])
-                ->orderBy('total_dipinjam', 'desc')
-                ->limit($limit)
-                ->get();
-        });
-    }
-
-    public static function clearPopularBooksCache()
-    {
-        Cache::flush();
-    }
+    public static function clearPopularBooksCache() { Cache::flush(); }
 }

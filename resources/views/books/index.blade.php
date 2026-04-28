@@ -195,7 +195,7 @@
                                     <td class="text-center">
                                         @if($book->gambar)
                                             <div class="position-relative d-inline-block">
-                                                <img src="{{ asset('storage/' . $book->gambar) }}" 
+                                                <img src="{{ asset($book->gambar) }}" 
                                                      width="50" 
                                                      height="70" 
                                                      alt="Cover {{ $book->judul }}"
