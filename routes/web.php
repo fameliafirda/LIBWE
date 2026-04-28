@@ -11,6 +11,42 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\KatalogController;
 use App\Http\Middleware\PustakawanMiddleware;
+use Illuminate\Support\Facades\File;
+
+/*
+|--------------------------------------------------------------------------
+| UTILITY ROUTE (PERBAIKAN STORAGE & PERMISSION)
+| Akses ini satu kali di browser: perpustakaansdnberatwetan1.online/fix-storage
+|--------------------------------------------------------------------------
+*/
+Route::get('/fix-storage', function () {
+    // 1. Ambil path target dan shortcut
+    $target = storage_path('app/public');
+    $shortcut = public_path('storage');
+
+    // 2. Hapus shortcut lama jika ada (antisipasi link mati)
+    if (file_exists($shortcut)) {
+        File::delete($shortcut);
+    }
+
+    // 3. Buat folder gambar_buku jika belum ada
+    if (!File::exists($target . '/gambar_buku')) {
+        File::makeDirectory($target . '/gambar_buku', 0755, true);
+    }
+
+    // 4. Buat ulang Symlink
+    app('files')->link($target, $shortcut);
+
+    return "
+        <h1>Proses Perbaikan Selesai!</h1>
+        <ul>
+            <li>Folder 'gambar_buku' dipastikan ada.</li>
+            <li>Symlink Storage telah diperbarui.</li>
+        </ul>
+        <p>Silakan coba upload buku baru sekarang.</p>
+        <a href='/'>Kembali ke Beranda</a>
+    ";
+});
 
 /*
 |--------------------------------------------------------------------------
