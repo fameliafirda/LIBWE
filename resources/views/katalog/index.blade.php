@@ -359,7 +359,7 @@
                         
                         @if($b->stok > 0)
                             <div class="c-stock-wrapper stock-in">
-                                <i class="fas fa-check-circle me-2"></i> Stok Buku: {{ $b->stok }}
+                                <i class="fas fa-check-circle me-2"></i>      Stok Buku: {{ $b->stok }}
                             </div>
                         @else
                             <div class="c-stock-wrapper stock-out">
