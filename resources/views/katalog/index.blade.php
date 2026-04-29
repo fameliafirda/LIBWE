@@ -7,9 +7,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-    /* ============================================================
-       1. COLOR PALETTE (PREMIUM SOFT Y2K) & RESET
-       ============================================================ */
     :root {
         --bg-main: #050508; 
         --bg-section: #0f0f16;
@@ -49,9 +46,6 @@
         z-index: 0; pointer-events: none;
     }
 
-    /* ============================================================
-       2. NAVIGASI (SLEEK)
-       =========================================================== */
     .catalog-nav {
         position: fixed; top: 0; left: 0; width: 100%;
         padding: 20px 60px; display: flex; justify-content: space-between; align-items: center;
@@ -69,9 +63,6 @@
     }
     .nav-links a:hover, .nav-links a.active { color: var(--soft-pink); }
 
-    /* ============================================================
-       3. HERO PENCARIAN
-       =========================================================== */
     .hero-catalog {
         padding: 150px 20px 50px; text-align: center; position: relative;
         z-index: 10; display: flex; flex-direction: column; align-items: center;
@@ -105,9 +96,6 @@
     }
     .btn-cari:hover { background: #fff; transform: translateY(-2px); }
 
-    /* ============================================================
-       4. SECTION REKOMENDASI
-       =========================================================== */
     .recommendation-wrapper {
         margin: 40px 40px 80px 40px; padding: 60px 0;
         background: linear-gradient(145deg, var(--bg-section), #0a0a0f);
@@ -162,9 +150,6 @@
     .btn-prev { left: 20px; }
     .btn-next { right: 20px; }
 
-    /* ============================================================
-       5. KOLEKSI BUKU (GRID)
-       =========================================================== */
     #koleksi { padding: 20px 60px 100px; position: relative; z-index: 10; }
 
     .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 25px; }
@@ -270,7 +255,7 @@
                 <div class="borrow-stats"><i class="fas fa-book-reader"></i> Dipinjam: {{ $pb->total_dipinjam ?? 0 }}x</div>
                 <div class="img-box" style="height: 240px;">
                     @if($pb->gambar)
-                        <img src="{{ asset('public/' . $pb->gambar) }}" alt="{{ $pb->judul }}">
+                        <img src="{{ asset($pb->gambar) }}" alt="{{ $pb->judul }}">
                     @else
                         <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#1a1a2e;">
                             <i class="fas fa-book" style="font-size: 3rem; color: var(--text-muted); opacity: 0.3;"></i>
@@ -293,7 +278,7 @@
             <div class="img-box">
                 <span class="category-pill">{{ $b->kategori->nama ?? 'Umum' }}</span>
                 @if($b->gambar)
-                    <img src="{{ asset('public/' . $b->gambar) }}" alt="{{ $b->judul }}">
+                    <img src="{{ asset($b->gambar) }}" alt="{{ $b->judul }}">
                 @else
                     <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#1a1a2e;">
                         <i class="fas fa-book" style="font-size: 2.5rem; color: var(--text-muted); opacity: 0.3;"></i>
@@ -349,9 +334,9 @@
                 let html = '';
                 if(data.success && data.books && data.books.length > 0) {
                     data.books.forEach(b => {
-                        // 🔥 PATH GAMBAR PUBLIC DI DALAM JAVASCRIPT AJAX
+                        // 🔥 PATH GAMBAR AJAX SUDAH DIPERBAIKI
                         let hasCover = b.gambar ? true : false;
-                        let imgPath = hasCover ? `/public/${b.gambar}` : '/images/no-image.png';
+                        let imgPath = hasCover ? `/${b.gambar}` : '/images/no-image.png';
                         let imgHtml = hasCover ? `<img src="${imgPath}" alt="${escapeHtml(b.judul)}">` : 
                             `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#1a1a2e;"><i class="fas fa-book" style="font-size: 2.5rem; color: #94a3b8; opacity: 0.3;"></i></div>`;
                         
