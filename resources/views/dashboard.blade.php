@@ -66,7 +66,6 @@
     </div>
 
     <div class="row">
-        <!-- Grafik Aktivitas Perpustakaan (2 dataset) -->
         <div class="col-sm-12 col-md-8 mb-4">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-header bg-white border-0 py-3">
@@ -86,7 +85,6 @@
             </div>
         </div>
 
-        <!-- Grafik Kategori Buku -->
         <div class="col-sm-12 col-md-4 mb-4">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-header bg-white border-0 py-3">
@@ -102,7 +100,6 @@
     </div>
 
     <div class="row">
-        <!-- Tabel Buku Terbaru -->
         <div class="col-12 mb-4">
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
@@ -112,34 +109,36 @@
                     </a>
                 </div>
                 <div class="card-body">
-                    <table class="table table-hover">
-                        <thead style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000;">
-                            <tr>
-                                <th>Judul</th>
-                                <th>Penulis</th>
-                                <th>Kategori</th>
-                                <th>Stok</th>
-                                <th>Ditambahkan</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach(\App\Models\Book::with('kategori')->latest()->limit(5)->get() as $buku)
-                            <tr>
-                                <td>{{ $buku->judul }}</td>
-                                <td>{{ $buku->penulis }}</td>
-                                <td>{{ $buku->kategori->nama ?? '-' }}</td>
-                                <td>
-                                    @if($buku->stok > 0)
-                                        <span class="badge bg-success">{{ $buku->stok }}</span>
-                                    @else
-                                        <span class="badge bg-danger">Habis</span>
-                                    @endif
-                                </td>
-                                <td>{{ \Carbon\Carbon::parse($buku->created_at)->format('d/m/Y') }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-hover text-nowrap">
+                            <thead style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000;">
+                                <tr>
+                                    <th>Judul</th>
+                                    <th>Penulis</th>
+                                    <th>Kategori</th>
+                                    <th>Stok</th>
+                                    <th>Ditambahkan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(\App\Models\Book::with('kategori')->latest()->limit(5)->get() as $buku)
+                                <tr>
+                                    <td>{{ $buku->judul }}</td>
+                                    <td>{{ $buku->penulis }}</td>
+                                    <td>{{ $buku->kategori->nama ?? '-' }}</td>
+                                    <td>
+                                        @if($buku->stok > 0)
+                                            <span class="badge bg-success">{{ $buku->stok }}</span>
+                                        @else
+                                            <span class="badge bg-danger">Habis</span>
+                                        @endif
+                                    </td>
+                                    <td>{{ \Carbon\Carbon::parse($buku->created_at)->format('d/m/Y') }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
