@@ -4,7 +4,6 @@
 
 @section('content')
 <div class="container-fluid px-4 py-3">
-    <!-- Header Gradient -->
     <div class="row g-0 mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 0 20px 20px 0;">
@@ -27,7 +26,6 @@
         </div>
     </div>
 
-    <!-- Alert Messages -->
     @if(session('success'))
     <div class="row g-0 mb-4">
         <div class="col-12">
@@ -50,13 +48,11 @@
     </div>
     @endif
 
-    <!-- Filter Card -->
     <div class="row g-0 mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-sm" style="border-radius: 20px;">
                 <div class="card-body p-3">
                     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-                        <!-- Filter Kelas -->
                         <div class="d-flex align-items-center">
                             <label class="fw-semibold text-muted mb-0 me-3">
                                 <i class="fas fa-filter me-2" style="color: #8b5cf6;"></i>Filter Kelas:
@@ -76,7 +72,6 @@
                             @endif
                         </div>
 
-                        <!-- Tombol Hapus Semua (Tahun Ajaran Baru) - PAKAI CONFIRM JS -->
                         @if(count($anggotas) > 0)
                         <button type="button" 
                                 class="btn btn-danger" 
@@ -85,7 +80,6 @@
                             <i class="fas fa-user-slash me-2"></i> Hapus Semua Anggota ({{ count($anggotas) }})
                         </button>
                         
-                        <!-- Form untuk Hapus Semua (hidden) -->
                         <form id="deleteAllForm" action="{{ route('anggotas.delete-all') }}" method="POST" style="display: none;">
                             @csrf
                             @method('DELETE')
@@ -97,19 +91,17 @@
         </div>
     </div>
 
-    <!-- Tabel Anggota -->
     <div class="row g-0">
         <div class="col-12">
             <div class="card border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
                 <div class="card-header bg-white border-0 py-3 px-4">
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
                         <h5 class="mb-0" style="color: #2d3436; font-weight: 600;">
                             <i class="fas fa-list me-2" style="color: #8b5cf6;"></i> Daftar Anggota
                             <span class="badge ms-2" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000;">{{ count($anggotas) }} anggota</span>
                         </h5>
                         
-                        <!-- Search Box -->
-                        <div class="input-group" style="width: 250px;">
+                        <div class="input-group" style="width: 100%; max-width: 300px;">
                             <input type="text" class="form-control form-control-sm" placeholder="Cari anggota..." id="searchInput" style="border-radius: 50px 0 0 50px; border: 1px solid #e0e0e0;">
                             <button class="btn btn-sm" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); border-radius: 0 50px 50px 0; color: #000;" type="button" id="searchButton">
                                 <i class="fas fa-search"></i>
@@ -120,7 +112,7 @@
 
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover mb-0" style="min-width: 1200px;" id="anggotaTable">
+                        <table class="table table-hover mb-0 text-nowrap" style="min-width: 1200px;" id="anggotaTable">
                             <thead style="background: linear-gradient(45deg, #f7c0ec, #a7bdea);">
                                 <tr>
                                     <th class="text-center" style="width: 50px;">No</th>
@@ -207,7 +199,6 @@
                                     </td>
                                     <td class="text-center">
                                         <div class="d-flex flex-wrap gap-1 justify-content-center">
-                                            <!-- Tombol Edit -->
                                             <a href="{{ route('anggotas.edit', $item['anggota']->id) }}" 
                                                class="btn btn-sm" 
                                                style="background-color: #ffe066; color: #000; border: none; border-radius: 8px; padding: 6px 10px;"
@@ -215,7 +206,6 @@
                                                 <i class="fas fa-edit"></i>
                                             </a>
 
-                                            <!-- Tombol Lihat Peminjaman -->
                                             <a href="{{ route('anggotas.peminjaman', $item['anggota']->id) }}" 
                                                class="btn btn-sm" 
                                                style="background-color: #8fd19e; color: #000; border: none; border-radius: 8px; padding: 6px 10px;"
@@ -223,11 +213,10 @@
                                                 <i class="fas fa-eye"></i>
                                             </a>
 
-                                            <!-- Tombol Hapus Individu - PAKAI CONFIRM JS -->
                                             <button type="button" 
                                                     class="btn btn-sm" 
                                                     style="background-color: #ff6b6b; color: white; border: none; border-radius: 8px; padding: 6px 10px;"
-                                                    onclick="confirmDelete({{ $item['anggota']->id }}, '{{ $item['anggota']->nama }}', {{ $item['pinjamans']->where('status', 'belum dikembalikan')->count() }})"
+                                                    onclick="confirmDelete({{ $item['anggota']->id }}, '{{ addslashes($item['anggota']->nama) }}', {{ $item['pinjamans']->where('status', 'belum dikembalikan')->count() }})"
                                                     title="Hapus anggota">
                                                 <i class="fas fa-trash"></i>
                                             </button>
@@ -257,7 +246,6 @@
     </div>
 </div>
 
-<!-- Form untuk Hapus Individu (hidden) -->
 <form id="deleteForm" action="" method="POST" style="display: none;">
     @csrf
     @method('DELETE')
