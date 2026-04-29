@@ -324,14 +324,21 @@ class PinjamanController extends Controller
 
     /**
      * Process book return and calculate fine.
+     * 🔥 PERBAIKAN: Penyesuaian Zona Waktu dan Akurasi Hitungan Hari
      */
     private function processPengembalian(Pinjaman $pinjaman, $tanggalKembali = null)
     {
-        $tanggalPengembalian = $tanggalKembali ? Carbon::parse($tanggalKembali) : Carbon::now();
-        $tanggalPinjam = Carbon::parse($pinjaman->tanggal_pinjam);
-        $tanggalJatuhTempo = $tanggalPinjam->copy()->addDays(7);
+        // Set timezone ke Asia/Jakarta dan reset jam ke 00:00:00 (startOfDay)
+        $tanggalPengembalian = $tanggalKembali 
+            ? Carbon::parse($tanggalKembali)->timezone('Asia/Jakarta')->startOfDay() 
+            : Carbon::now('Asia/Jakarta')->startOfDay();
+            
+        $tanggalPinjam = Carbon::parse($pinjaman->tanggal_pinjam)->timezone('Asia/Jakarta')->startOfDay();
+        $tanggalJatuhTempo = $tanggalPinjam->copy()->addDays(7); // Asumsi jatuh tempo 7 hari
         
         $keterlambatan = 0;
+        
+        // Bandingkan murni harinya saja, jika lebih maka hitung selisihnya
         if ($tanggalPengembalian->gt($tanggalJatuhTempo)) {
             $keterlambatan = $tanggalJatuhTempo->diffInDays($tanggalPengembalian);
         }

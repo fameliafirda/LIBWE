@@ -41,13 +41,16 @@ class PengembalianController extends Controller
             return redirect()->back()->with('error', 'Pengembalian untuk peminjaman ini sudah dicatat.');
         }
 
-        $tanggalPinjam = Carbon::parse($pinjaman->tanggal_pinjam);
+        // PERBAIKAN: Set zona waktu ke Asia/Jakarta dan reset ke jam 00:00 (startOfDay)
+        $tanggalPinjam = Carbon::parse($pinjaman->tanggal_pinjam)->timezone('Asia/Jakarta')->startOfDay();
         $tanggalHarusKembali = $tanggalPinjam->copy()->addDays(7);
-        $tanggalPengembalian = Carbon::parse($validated['tanggal_pengembalian']);
+        $tanggalPengembalian = Carbon::parse($validated['tanggal_pengembalian'])->timezone('Asia/Jakarta')->startOfDay();
 
-        $lamaTerlambat = $tanggalPengembalian->gt($tanggalHarusKembali)
-            ? $tanggalPengembalian->diffInDays($tanggalHarusKembali)
-            : 0;
+        // Bandingkan murni harinya saja
+        $lamaTerlambat = 0;
+        if ($tanggalPengembalian->gt($tanggalHarusKembali)) {
+            $lamaTerlambat = $tanggalHarusKembali->diffInDays($tanggalPengembalian);
+        }
 
         $denda = $lamaTerlambat * 500;
 
@@ -56,19 +59,23 @@ class PengembalianController extends Controller
             'nama' => $pinjaman->nama,
             'kelas' => $pinjaman->kelas,
             'judul_buku' => $pinjaman->judul_buku,
-            'tanggal_kembali' => $pinjaman->tanggal_kembali,
+            'tanggal_kembali' => $tanggalHarusKembali->toDateString(), 
             'tanggal_pengembalian' => $tanggalPengembalian->toDateString(),
             'keterlambatan' => $lamaTerlambat,
             'denda' => $denda
         ]);
 
-        // Update status pinjaman
-        $pinjaman->update(['status' => 'sudah dikembalikan']);
+        // Update status pinjaman (tambahkan update denda dan tanggal kembali agar sinkron di semua halaman)
+        $pinjaman->update([
+            'status' => 'sudah dikembalikan', 
+            'denda' => $denda, 
+            'tanggal_kembali' => $tanggalPengembalian->toDateString()
+        ]);
         
         // TAMBAH STOK BUKU
         $buku = Book::where('judul', $pinjaman->judul_buku)->first();
         if ($buku) {
-            $buku->tambahStok(); // Menggunakan method dari model Book
+            $buku->increment('stok'); // Gunakan fungsi bawaan Laravel agar lebih stabil
         }
 
         return redirect()->route('pengembalians.index')->with('success', 'Pengembalian berhasil dicatat.');
@@ -86,13 +93,17 @@ class PengembalianController extends Controller
         ]);
 
         $pinjaman = $pengembalian->pinjaman;
-        $tanggalPinjam = Carbon::parse($pinjaman->tanggal_pinjam);
+        
+        // PERBAIKAN: Set zona waktu ke Asia/Jakarta dan reset ke jam 00:00 (startOfDay)
+        $tanggalPinjam = Carbon::parse($pinjaman->tanggal_pinjam)->timezone('Asia/Jakarta')->startOfDay();
         $tanggalHarusKembali = $tanggalPinjam->copy()->addDays(7);
-        $tanggalPengembalian = Carbon::parse($validated['tanggal_pengembalian']);
+        $tanggalPengembalian = Carbon::parse($validated['tanggal_pengembalian'])->timezone('Asia/Jakarta')->startOfDay();
 
-        $lamaTerlambat = $tanggalPengembalian->gt($tanggalHarusKembali)
-            ? $tanggalPengembalian->diffInDays($tanggalHarusKembali)
-            : 0;
+        // Bandingkan murni harinya saja
+        $lamaTerlambat = 0;
+        if ($tanggalPengembalian->gt($tanggalHarusKembali)) {
+            $lamaTerlambat = $tanggalHarusKembali->diffInDays($tanggalPengembalian);
+        }
 
         $denda = $lamaTerlambat * 500;
 
@@ -101,6 +112,14 @@ class PengembalianController extends Controller
             'keterlambatan' => $lamaTerlambat,
             'denda' => $denda
         ]);
+
+        // Update juga data di tabel pinjaman agar kedua halamannya sinkron
+        if ($pinjaman) {
+            $pinjaman->update([
+                'denda' => $denda, 
+                'tanggal_kembali' => $tanggalPengembalian->toDateString()
+            ]);
+        }
 
         return redirect()->route('pengembalians.index')->with('success', 'Data pengembalian berhasil diperbarui.');
     }
@@ -111,12 +130,17 @@ class PengembalianController extends Controller
         
         // KEMBALIKAN STATUS PINJAMAN
         if ($pinjaman) {
-            $pinjaman->update(['status' => 'belum dikembalikan']);
+            $pinjaman->update([
+                'status' => 'belum dikembalikan', 
+                'denda' => 0, 
+                'tanggal_kembali' => null
+            ]);
             
-            // KEMBALIKAN STOK BUKU
+            // PERBAIKAN LOGIKA: Jika pengembalian dibatalkan, berarti buku MASIH DIPINJAM.
+            // Jadi stok di perpustakaan harus BERKURANG, bukan bertambah.
             $buku = Book::where('judul', $pinjaman->judul_buku)->first();
-            if ($buku) {
-                $buku->tambahStok(); // Stok ditambah karena pengembalian dihapus
+            if ($buku && $buku->stok > 0) {
+                $buku->decrement('stok'); 
             }
         }
         
