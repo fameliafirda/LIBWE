@@ -37,7 +37,7 @@
     }
 
     /* ============================================================
-       2. AMBIENT BACKGROUND GLOW
+       2. AMBIENT BACKGROUND GLOW (INTERAKTIF & AESTHETIC)
        =========================================================== */
     .ambient-glow-1, .ambient-glow-2, .ambient-glow-3 {
         position: fixed; border-radius: 50%; filter: blur(120px); z-index: 0; pointer-events: none; opacity: 0.4;
@@ -53,17 +53,8 @@
         100% { transform: translate(-20px, 20px) scale(0.9); }
     }
 
-    .floating-gif {
-        animation: floatUpDown 3s ease-in-out infinite;
-        filter: drop-shadow(0 10px 15px rgba(255, 200, 221, 0.3));
-    }
-    @keyframes floatUpDown {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-15px); }
-    }
-
     /* ============================================================
-       3. NAVIGASI
+       3. NAVIGASI (FROSTED GLASS)
        =========================================================== */
     .catalog-nav {
         position: fixed; top: 0; left: 0; width: 100%;
@@ -84,14 +75,14 @@
     }
 
     /* ============================================================
-       4. HERO SECTION
+       4. HERO SECTION (ANIMATED TEXT)
        =========================================================== */
     .hero-section {
-        padding: 150px 20px 80px; text-align: center; position: relative; z-index: 10;
+        padding: 160px 20px 80px; text-align: center; position: relative; z-index: 10;
         display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
     .animated-title {
-        font-family: 'Unbounded', sans-serif; font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 900; line-height: 1.1; margin-bottom: 15px;
+        font-family: 'Unbounded', sans-serif; font-size: clamp(3rem, 6vw, 4.5rem); font-weight: 900; line-height: 1.1; margin-bottom: 15px;
         background: linear-gradient(to right, var(--color-4), var(--color-1), var(--color-3), var(--color-4)); background-size: 200% auto;
         -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientText 5s linear infinite;
         display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
@@ -100,7 +91,7 @@
     .hero-subtitle { color: var(--text-muted); font-size: 1.1rem; font-weight: 500; max-width: 600px; margin: 0 auto; letter-spacing: 0.5px; }
 
     /* ============================================================
-       5. SEARCH BAR
+       5. SEARCH BAR (NEON GLOW)
        =========================================================== */
     .search-wrapper { max-width: 850px; margin: 0 auto 60px; position: relative; z-index: 10; padding: 0 20px; width: 100%; }
     .search-glass {
@@ -114,7 +105,7 @@
         border: none; background: transparent; padding: 15px 20px; font-size: 1rem; color: var(--text-main);
         font-family: 'Plus Jakarta Sans'; font-weight: 500; outline: none; width: 100%;
     }
-    .search-glass input::placeholder { color: #888; }
+    .search-glass input::placeholder { color: #555; }
     .search-glass input { flex: 2; }
     .search-glass select { flex: 1; border-left: 1px solid var(--glass-border); color: var(--text-main); cursor: pointer; }
     .search-glass select option { background: var(--color-black); color: var(--text-main); }
@@ -278,8 +269,7 @@
     </div>
 </nav>
 
-
-    
+<section class="hero-section">
     <h1 class="animated-title">
         KATALOG BUKU 
         <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/2728/512.gif" alt="Bintang" width="50" style="vertical-align: top; margin-top: -10px;">
@@ -292,12 +282,12 @@
         <i class="fas fa-search ms-3 d-none d-md-block" style="color: var(--color-1); font-size: 1.2rem;"></i>
         <input type="text" id="keyword" placeholder="Ketik judul buku yang mau kamu baca..." value="{{ request('search') }}">
         <select id="kat_id">
-            <option value="">Kategori Buku</option>
+            <option value="">Semua Jenis Buku</option>
             @foreach($kategoris as $k)
                 <option value="{{ $k->id }}" {{ request('kategori') == $k->id ? 'selected' : '' }}>{{ $k->nama }}</option>
             @endforeach
         </select>
-        <button class="btn-search" onclick="filterBuku()"><i class="fas fa-magic me-2 d-md-none"></i>CARI</button>
+        <button class="btn-search" onclick="filterBuku()"><i class="fas fa-magic me-2 d-md-none"></i>CARI SEKARANG</button>
     </div>
 </div>
 
@@ -306,7 +296,7 @@
     <div class="recommendation-bg" id="rekomendasi">
         <h2 class="section-title">
             <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f31f/512.gif" alt="Bintang" width="35" class="me-2"> 
-            Rekomendasi Buku
+            Paling Sering Dipinjam Teman-Teman
         </h2>
         <div class="slider-wrapper-rel">
             <button class="slider-nav-btn btn-prev" onclick="moveSlide(-250)"><i class="fas fa-chevron-left"></i></button>
@@ -317,7 +307,7 @@
                 <div class="book-card-top">
                     <div class="rank-badge">#{{ $index + 1 }}</div>
                     
-                    <div class="borrow-badge">⭐ {{ $pb->total_dipinjam ?? 0 }}x Dipinjam</div>
+                    <div class="borrow-badge">⭐ Dipinjam {{ $pb->total_dipinjam ?? 0 }}x</div>
                     
                     @if($pb->gambar)
                         <img src="{{ asset($pb->gambar) }}" alt="{{ $pb->judul }}" class="book-cover">
@@ -369,7 +359,7 @@
                         
                         @if($b->stok > 0)
                             <div class="c-stock-wrapper stock-in">
-                                <i class="fas fa-check-circle me-2"></i> Stok Buku: {{ $b->stok }}
+                                <i class="fas fa-check-circle me-2"></i> Bisa Dipinjam: {{ $b->stok }} Buku
                             </div>
                         @else
                             <div class="c-stock-wrapper stock-out">
