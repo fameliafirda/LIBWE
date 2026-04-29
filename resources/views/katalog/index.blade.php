@@ -8,7 +8,7 @@
 
 <style>
     /* ============================================================
-       1. COLOR PALETTE (NEON PASTEL GLASS)
+       1. COLOR PALETTE (USER CUSTOM: NEON PASTEL GLASS)
        ============================================================ */
     :root {
         --color-black: #0a0a0a;
@@ -37,7 +37,7 @@
     }
 
     /* ============================================================
-       2. AMBIENT BACKGROUND GLOW & ANIMATIONS
+       2. AMBIENT BACKGROUND GLOW (INTERAKTIF & AESTHETIC)
        =========================================================== */
     .ambient-glow-1, .ambient-glow-2, .ambient-glow-3 {
         position: fixed; border-radius: 50%; filter: blur(120px); z-index: 0; pointer-events: none; opacity: 0.4;
@@ -51,15 +51,6 @@
         0% { transform: translate(0, 0) scale(1); }
         50% { transform: translate(30px, 50px) scale(1.1); }
         100% { transform: translate(-20px, 20px) scale(0.9); }
-    }
-
-    .floating-gif {
-        animation: floatUpDown 3s ease-in-out infinite;
-        filter: drop-shadow(0 10px 15px rgba(255, 200, 221, 0.3));
-    }
-    @keyframes floatUpDown {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-15px); }
     }
 
     /* ============================================================
@@ -84,17 +75,16 @@
     }
 
     /* ============================================================
-       4. HERO SECTION
+       4. HERO SECTION (ANIMATED TEXT)
        =========================================================== */
     .hero-section {
-        padding: 150px 20px 80px; text-align: center; position: relative; z-index: 10;
+        padding: 160px 20px 80px; text-align: center; position: relative; z-index: 10;
         display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
     .animated-title {
-        font-family: 'Unbounded', sans-serif; font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 900; line-height: 1.1; margin-bottom: 15px;
+        font-family: 'Unbounded', sans-serif; font-size: clamp(3rem, 6vw, 4.5rem); font-weight: 900; line-height: 1.1; margin-bottom: 15px;
         background: linear-gradient(to right, var(--color-4), var(--color-1), var(--color-3), var(--color-4)); background-size: 200% auto;
         -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientText 5s linear infinite;
-        display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
     }
     @keyframes gradientText { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
     .hero-subtitle { color: var(--text-muted); font-size: 1.1rem; font-weight: 500; max-width: 600px; margin: 0 auto; letter-spacing: 0.5px; }
@@ -116,7 +106,7 @@
     }
     .search-glass input::placeholder { color: #555; }
     .search-glass input { flex: 2; }
-    .search-glass select { flex: 1; border-left: 1px solid var(--glass-border); color: var(--text-main); cursor: pointer; }
+    .search-glass select { flex: 1; border-left: 1px solid var(--glass-border); color: var(--text-main); }
     .search-glass select option { background: var(--color-black); color: var(--text-main); }
     
     .btn-search {
@@ -166,7 +156,7 @@
         color: var(--color-4); padding: 5px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; z-index: 2; border: 1px solid rgba(189,224,254,0.3);
     }
 
-    .book-cover { width: 100%; height: 250px; object-fit: cover; border-radius: 12px; margin-bottom: 15px; background: #111; transition: 0.4s; border: 1px solid rgba(255,255,255,0.05); }
+    .book-cover { width: 100%; height: 250px; object-fit: cover; border-radius: 12px; margin-bottom: 15px; background: #111; transition: 0.4s; }
     .book-card-top:hover .book-cover { transform: scale(1.03); }
     .book-title { font-family: 'Unbounded', sans-serif; font-size: 0.9rem; font-weight: 700; line-height: 1.3; color: var(--text-main); margin-bottom: 5px; transition: 0.3s;}
     .book-card-top:hover .book-title { color: var(--color-2); }
@@ -187,8 +177,8 @@
         box-shadow: 0 15px 35px rgba(189, 224, 254, 0.15); 
     }
 
-    .card-img-wrapper { position: relative; height: 280px; width: 100%; overflow: hidden; background: #111; border-bottom: 1px solid var(--glass-border); }
-    .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; filter: brightness(0.9); }
+    .card-img-wrapper { position: relative; height: 280px; width: 100%; overflow: hidden; background: #111; filter: brightness(0.9); }
+    .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
     .book-card:hover .card-img-wrapper { filter: brightness(1.1); }
     .book-card:hover .card-img-wrapper img { transform: scale(1.08); }
 
@@ -237,7 +227,7 @@
     @media (max-width: 768px) {
         .catalog-nav { padding: 15px 20px; }
         .hero-section { padding-top: 120px; }
-        .animated-title { font-size: 2rem; }
+        .animated-title { font-size: 2.2rem; }
         .search-glass { flex-direction: column; border-radius: 25px; padding: 15px; }
         .search-glass select { border-left: none; border-top: 1px solid var(--glass-border); }
         .btn-search { width: 100%; }
@@ -266,14 +256,7 @@
 </nav>
 
 <section class="hero-section">
-    <div class="mb-3">
-        <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4d6/512.gif" alt="Animated Book" width="100" class="floating-gif">
-    </div>
-    
-    <h1 class="animated-title">
-        Eksplorasi Dunia Buku 
-        <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/2728/512.gif" alt="Sparkles" width="50" style="vertical-align: top; margin-top: -10px;">
-    </h1>
+    <h1 class="animated-title">KATALOG BUKU</h1>
     <p class="hero-subtitle">Temukan ribuan ilmu dan cerita menarik di Perpustakaan SDN Berat Wetan 1. Ketik judul yang kamu cari di bawah ini.</p>
 </section>
 
@@ -357,7 +340,7 @@
             </div>
             @empty
             <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px; background: var(--glass); border-radius: 30px; border: 1px dashed var(--glass-border); backdrop-filter: blur(10px);">
-                <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f50d/512.gif" alt="🔍" width="100" class="mb-3" style="opacity: 0.8;">
+                <i class="fas fa-box-open fa-4x mb-3" style="color: var(--color-1); opacity: 0.5;"></i>
                 <h3 style="font-family: 'Unbounded'; color: var(--text-main);">Buku Tidak Ditemukan</h3>
                 <p style="color: var(--text-muted);">Coba gunakan kata kunci atau kategori yang berbeda.</p>
             </div>
@@ -431,7 +414,7 @@
                 } else {
                     html = `
                     <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px; background: var(--glass); border-radius: 30px; border: 1px dashed var(--glass-border); backdrop-filter: blur(10px);">
-                        <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f50d/512.gif" alt="🔍" width="100" class="mb-3" style="opacity: 0.8;">
+                        <i class="fas fa-box-open fa-4x mb-3" style="color: var(--color-1); opacity: 0.5;"></i>
                         <h3 style="font-family: 'Unbounded'; color: var(--text-main);">Buku Tidak Ditemukan</h3>
                         <p style="color: var(--text-muted);">Coba gunakan kata kunci atau kategori yang berbeda.</p>
                     </div>`;
