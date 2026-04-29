@@ -92,7 +92,6 @@
     </form>
 </div>
 
-<!-- SweetAlert2 CSS & JS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -121,8 +120,8 @@
             saranBuku.innerHTML = '';
             
             try {
-                // Gunakan route check-book yang sudah dibuat
-                const checkUrl = '/check-book?judul=' + encodeURIComponent(judul);
+                // 🔥 PERBAIKAN: Menggunakan fungsi route() bawaan Laravel agar alamat URL 100% akurat
+                const checkUrl = '{{ route("check-book") }}?judul=' + encodeURIComponent(judul);
                 
                 console.log('Mengecek URL:', checkUrl); // Untuk debugging
                 
@@ -185,7 +184,7 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Gagal Memeriksa Buku',
-                    text: 'Error: ' + error.message + '\n\nPastikan server berjalan di ' + window.location.origin,
+                    text: 'Error: ' + error.message + '\n\nPastikan koneksi internet stabil.',
                     confirmButtonText: 'OK'
                 });
                 return false;
