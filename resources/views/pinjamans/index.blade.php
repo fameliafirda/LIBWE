@@ -359,12 +359,12 @@
 
                 @if(method_exists($pinjamans, 'links') && $pinjamans->hasPages())
                 <div class="card-footer bg-white border-0 py-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="text-muted small">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                        <div class="text-muted small mb-2 mb-md-0">
                             Menampilkan {{ $pinjamans->firstItem() ?? 0 }} - {{ $pinjamans->lastItem() ?? 0 }} dari {{ $pinjamans->total() ?? 0 }} data
                         </div>
                         <div>
-                            {{ $pinjamans->links() }}
+                            {{ $pinjamans->links('pagination::bootstrap-4') }}
                         </div>
                     </div>
                 </div>
