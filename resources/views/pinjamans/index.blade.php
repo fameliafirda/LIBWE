@@ -151,22 +151,36 @@
             <div class="card border-0 shadow-sm" style="border-radius: 20px;">
                 <div class="card-body p-3">
                     <form method="GET" action="{{ route('pinjamans.index') }}" class="d-flex flex-wrap align-items-center gap-3">
+                        
                         <div class="d-flex align-items-center">
-                            <label class="fw-semibold text-muted mb-0 me-3">
-                                <i class="fas fa-filter me-2" style="color: #8b5cf6;"></i>Filter Kelas:
+                            <label class="fw-semibold text-muted mb-0 me-2">
+                                <i class="fas fa-filter me-1" style="color: #8b5cf6;"></i>Kelas:
                             </label>
-                            <select name="kelas" class="form-control" style="border-radius: 50px; border: 1px solid #e0e0e0; min-width: 200px;">
+                            <select name="kelas" class="form-control form-select-sm" style="border-radius: 50px; border: 1px solid #e0e0e0; min-width: 150px;">
                                 <option value="">Semua Kelas</option>
                                 @foreach($kelasList as $kelas)
                                     <option value="{{ $kelas }}" {{ request('kelas') == $kelas ? 'selected' : '' }}>{{ $kelas }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        <button type="submit" class="btn" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000; border-radius: 50px; padding: 8px 25px;">
-                            <i class="fas fa-filter me-2"></i> Terapkan
+
+                        <div class="d-flex align-items-center">
+                            <label class="fw-semibold text-muted mb-0 me-2">
+                                <i class="fas fa-info-circle me-1" style="color: #8b5cf6;"></i>Status:
+                            </label>
+                            <select name="status" class="form-control form-select-sm" style="border-radius: 50px; border: 1px solid #e0e0e0; min-width: 180px;">
+                                <option value="semua">Semua Status</option>
+                                <option value="belum dikembalikan" {{ request('status') == 'belum dikembalikan' ? 'selected' : '' }}>Belum Dikembalikan</option>
+                                <option value="sudah dikembalikan" {{ request('status') == 'sudah dikembalikan' ? 'selected' : '' }}>Sudah Dikembalikan</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-sm" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000; border-radius: 50px; padding: 6px 20px;">
+                            <i class="fas fa-search me-1"></i> Terapkan
                         </button>
-                        @if(request('kelas'))
-                            <a href="{{ route('pinjamans.index') }}" class="btn btn-sm" style="background-color: #ff6b6b; color: white; border-radius: 50px; padding: 8px 20px;">
+                        
+                        @if(request('kelas') || request('status') && request('status') != 'semua')
+                            <a href="{{ route('pinjamans.index') }}" class="btn btn-sm" style="background-color: #ff6b6b; color: white; border-radius: 50px; padding: 6px 20px;">
                                 <i class="fas fa-times me-1"></i> Reset
                             </a>
                         @endif
@@ -339,7 +353,6 @@
 
 @push('scripts')
 <script>
-    // Tooltip initialization
     document.addEventListener('DOMContentLoaded', function() {
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -347,7 +360,6 @@
         });
     });
 
-    // Search functionality
     document.getElementById('searchInput').addEventListener('keyup', function() {
         let searchValue = this.value.toLowerCase();
         let tableRows = document.querySelectorAll('#pinjamanTable tbody tr');
