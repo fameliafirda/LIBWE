@@ -1,7 +1,5 @@
-<!-- Main Sidebar Container - Modern Futuristik -->
 <aside class="main-sidebar elevation-4" style="background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); font-family: 'Poppins', sans-serif; position: fixed; height: 100vh; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #ec4899 #1a1a2e;">
   
-  <!-- Custom Scrollbar Style -->
   <style>
     .main-sidebar::-webkit-scrollbar {
       width: 6px;
@@ -63,18 +61,31 @@
       text-shadow: 0 0 10px rgba(236, 72, 153, 0.5);
     }
 
-    /* Mobile Responsiveness */
-    @media (max-width: 768px) {
+    /* ========================================================
+       PERBAIKAN Mobile Responsiveness (Off-Canvas Mode)
+       ======================================================== */
+    @media (max-width: 991.98px) {
       body {
         margin-left: 0;
       }
 
+      /* Ubah dari width 100% relative menjadi 250px fixed */
       .main-sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-        padding-top: 20px;
-        overflow-y: visible;
+        width: 250px !important;
+        height: 100vh !important;
+        position: fixed !important;
+        top: 0;
+        left: -260px; /* Sembunyikan di luar layar kiri */
+        padding-top: 0;
+        overflow-y: auto !important;
+        z-index: 1050 !important;
+        transition: left 0.3s ease-in-out !important;
+      }
+
+      /* Saat tombol menu burger ditekan, sidebar akan masuk ke dalam layar */
+      body.sidebar-open .main-sidebar {
+        left: 0 !important;
+        box-shadow: 10px 0 30px rgba(0,0,0,0.5) !important;
       }
 
       .main-sidebar .brand-link {
@@ -93,12 +104,12 @@
         text-align: center;
       }
 
-      /* Collapsing Sidebar Links */
+      /* Kembalikan text-align ke kiri agar rapi */
       .sidebar .nav-link {
         font-size: 14px;
-        padding: 10px;
-        margin: 5px 0;
-        text-align: center;
+        padding: 10px 15px;
+        margin: 5px 10px;
+        text-align: left;
       }
 
       .sidebar .nav-link:hover {
@@ -108,7 +119,8 @@
       /* Adjust User Panel */
       .user-panel {
         padding: 10px;
-        text-align: center;
+        text-align: left;
+        justify-content: flex-start !important;
       }
 
       /* Nav Treeview (nested menu) */
@@ -126,42 +138,31 @@
         border-radius: 5px;
         background-color: rgba(0, 0, 0, 0.1);
       }
-
-      /* Collapse Sidebar by Default */
-      .main-sidebar.collapsed {
-        width: 50px;
-      }
-
-      .main-sidebar.collapsed .nav-link {
-        padding-left: 15px;
-      }
     }
 
     /* For very small devices (mobile phone) */
     @media (max-width: 576px) {
       .nav-link {
-        font-size: 12px;
+        font-size: 13px !important;
       }
 
       .sidebar .nav-link {
-        font-size: 13px;
+        font-size: 13px !important;
       }
 
       /* Menu Treeview Adjustment */
       .nav-treeview .nav-link {
-        font-size: 12px;
+        font-size: 12px !important;
       }
     }
   </style>
 
-  <!-- Brand Logo -->
   <a href="{{ url('/') }}" class="brand-link text-center py-4" style="display: flex; align-items: center; justify-content: center;">
     <img src="{{ asset('dist/img/libwe.png') }}" alt="LIBWE Logo" class="brand-image img-circle elevation-3" style="opacity: 1; width: 40px; margin-right: 8px; filter: drop-shadow(0 0 10px rgba(236, 72, 153, 0.5));">
     <span class="brand-text font-weight-bold" style="font-size: 1.5rem; background: linear-gradient(45deg, #ec4899, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(236, 72, 153, 0.3);">LIBWE</span>
   </a>
 
   <div class="sidebar">
-    <!-- User Panel -->
     <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center px-3">
       <div class="image">
         <img src="{{ asset('dist/img/admroblox.jpeg') }}" class="img-circle elevation-2" alt="User Image" style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #ec4899; box-shadow: 0 0 15px rgba(236, 72, 153, 0.5);">
@@ -172,10 +173,8 @@
       </div>
     </div>
 
-    <!-- Sidebar Menu -->
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
-        <!-- Dashboard -->
         <li class="nav-item">
           <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" style="color: #fff; margin: 5px 10px; padding: 12px 15px; border-radius: 12px;">
             <i class="fas fa-home" style="margin-right: 10px; color: #ec4899;"></i>
@@ -183,7 +182,6 @@
           </a>
         </li>
 
-        <!-- Buku -->
         <li class="nav-item {{ request()->is('books*') ? 'menu-open' : '' }}">
           <a href="#" class="nav-link {{ request()->is('books*') ? 'active' : '' }}" style="color: #fff; margin: 5px 10px; padding: 12px 15px; border-radius: 12px;">
             <i class="fas fa-book" style="margin-right: 10px; color: #8b5cf6;"></i>
@@ -207,7 +205,6 @@
           </ul>
         </li>
 
-        <!-- Kategori -->
         <li class="nav-item">
           <a href="{{ route('categories.index') }}" class="nav-link {{ request()->routeIs('categories.index') ? 'active' : '' }}" style="color: #fff; margin: 5px 10px; padding: 12px 15px; border-radius: 12px;">
             <i class="fas fa-tags" style="margin-right: 10px; color: #f472b6;"></i>
@@ -215,7 +212,6 @@
           </a>
         </li>
 
-        <!-- Data Anggota -->
         <li class="nav-item">
           <a href="{{ route('anggotas.index') }}" class="nav-link {{ request()->routeIs('anggotas.index') ? 'active' : '' }}" style="color: #fff; margin: 5px 10px; padding: 12px 15px; border-radius: 12px;">
             <i class="fas fa-users" style="margin-right: 10px; color: #48dbfb;"></i>
@@ -223,7 +219,6 @@
           </a>
         </li>
 
-        <!-- Peminjaman -->
         <li class="nav-item">
           <a href="{{ route('pinjamans.index') }}" class="nav-link {{ request()->routeIs('pinjamans.index') ? 'active' : '' }}" style="color: #fff; margin: 5px 10px; padding: 12px 15px; border-radius: 12px;">
             <i class="fas fa-hand-holding-heart" style="margin-right: 10px; color: #ff9ff3;"></i>
@@ -231,7 +226,6 @@
           </a>
         </li>
 
-        <!-- Pengembalian -->
         <li class="nav-item">
           <a href="{{ route('pengembalians.index') }}" class="nav-link {{ request()->routeIs('pengembalians.index') ? 'active' : '' }}" style="color: #fff; margin: 5px 10px; padding: 12px 15px; border-radius: 12px;">
             <i class="fas fa-undo-alt" style="margin-right: 10px; color: #1dd1a1;"></i>
@@ -239,7 +233,6 @@
           </a>
         </li>
 
-        <!-- Laporan -->
         <li class="nav-item {{ request()->is('laporan*') ? 'menu-open' : '' }}">
           <a href="#" class="nav-link {{ request()->is('laporan*') ? 'active' : '' }}" style="color: #fff; margin: 5px 10px; padding: 12px 15px; border-radius: 12px;">
             <i class="fas fa-chart-bar" style="margin-right: 10px; color: #feca57;"></i>
@@ -267,12 +260,10 @@
           </ul>
         </li>
 
-        <!-- Divider -->
         <li class="nav-item" style="margin: 10px 10px;">
           <hr style="border-color: rgba(255,255,255,0.1); margin: 0;">
         </li>
 
-        <!-- Logout -->
         <li class="nav-item">
           <a href="{{ route('logout') }}" class="nav-link text-danger" style="margin: 5px 10px; padding: 12px 15px; border-radius: 12px; color: #ff6b6b !important;"
              onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -288,25 +279,18 @@
   </div>
 </aside>
 
-<!-- CSS untuk mengatur konten utama agar tidak ketimpa sidebar fixed -->
 <style>
-  .main-sidebar {
-    width: 250px;
-    left: 0;
-    top: 0;
-    z-index: 1000;
+  /* Menghindari penumpukan di tampilan desktop */
+  @media (min-width: 992px) {
+    .main-sidebar {
+      width: 250px;
+      left: 0;
+      top: 0;
+      z-index: 1000;
+    }
   }
+
   .content-wrapper {
     min-height: 100vh;
-  }
-  @media (max-width: 768px) {
-    body {
-      margin-left: 0;
-    }
-    .main-sidebar {
-      width: 100%;
-      height: auto;
-      position: relative;
-    }
   }
 </style>
