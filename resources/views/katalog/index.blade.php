@@ -278,10 +278,7 @@
     </div>
 </nav>
 
-<section class="hero-section">
-    <div class="mb-3">
-        <img src="{{ asset('web-perpus/img/bukubaru.png') }}" alt="Main Book">class="floating-gif">
-    </div>
+
     
     <h1 class="animated-title">
         KATALOG BUKU 
