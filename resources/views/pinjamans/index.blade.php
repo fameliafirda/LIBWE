@@ -214,23 +214,28 @@
                                 <tr>
                                     <th class="text-center" style="width: 50px;">No</th>
                                     <th style="width: 150px;">Nama</th>
-                                    <th style="width: 100px;">Kelas</th>
+                                    <th class="text-center" style="width: 80px;">Kelas</th>
                                     <th style="width: 250px;">Judul Buku</th>
-                                    <th style="width: 120px;" class="text-center">Tanggal Pinjam</th>
-                                    <th style="width: 120px;" class="text-center">Tanggal Kembali</th>
-                                    <th style="width: 120px;" class="text-center">Status</th>
-                                    <th style="width: 200px;" class="text-center">Aksi</th>
+                                    <th style="width: 120px;" class="text-center">Tgl Pinjam</th>
+                                    <th style="width: 120px;" class="text-center">Jatuh Tempo</th>
+                                    <th style="width: 120px;" class="text-center">Tgl Kembali</th>
+                                    <th style="width: 150px;" class="text-center">Status</th>
+                                    <th style="width: 180px;" class="text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($pinjamans as $i => $pinjaman)
                                     @php
+                                        // LOGIKA PERHITUNGAN JATUH TEMPO (Tanggal Pinjam + 7 Hari)
+                                        $tglPinjam = \Carbon\Carbon::parse($pinjaman->tanggal_pinjam);
+                                        $jatuhTempo = $tglPinjam->copy()->addDays(7);
                                         $terlambat = 0;
+                                        
                                         if($pinjaman->status == 'belum dikembalikan') {
                                             $hariIni = \Carbon\Carbon::now();
-                                            $tanggalKembali = \Carbon\Carbon::parse($pinjaman->tanggal_kembali);
-                                            if($hariIni->gt($tanggalKembali)) {
-                                                $terlambat = $hariIni->diffInDays($tanggalKembali);
+                                            if($hariIni->gt($jatuhTempo)) {
+                                                // Jika hari ini melebihi jatuh tempo
+                                                $terlambat = $jatuhTempo->diffInDays($hariIni);
                                             }
                                         }
                                     @endphp
@@ -244,25 +249,27 @@
                                                 <span class="fw-semibold">{{ $pinjaman->anggota->nama ?? $pinjaman->nama }}</span>
                                             </div>
                                         </td>
-                                        <td>
+                                        <td class="text-center">
                                             <span class="badge bg-light text-dark px-3 py-2">{{ $pinjaman->anggota->kelas ?? $pinjaman->kelas }}</span>
                                         </td>
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <i class="fas fa-book me-2" style="color: #8b5cf6;"></i>
-                                                {{ $pinjaman->judul_buku ?? '-' }}
+                                                {{ Str::limit($pinjaman->judul_buku ?? '-', 35) }}
                                             </div>
                                         </td>
+                                        
                                         <td class="text-center">
                                             <span class="badge bg-info text-dark px-3 py-2">
                                                 <i class="fas fa-calendar-alt me-1"></i>
-                                                {{ \Carbon\Carbon::parse($pinjaman->tanggal_pinjam)->format('d/m/Y') }}
+                                                {{ $tglPinjam->format('d/m/Y') }}
                                             </span>
                                         </td>
+                                        
                                         <td class="text-center">
-                                            <span class="badge bg-info text-dark px-3 py-2">
-                                                <i class="fas fa-calendar-check me-1"></i>
-                                                {{ \Carbon\Carbon::parse($pinjaman->tanggal_kembali)->format('d/m/Y') }}
+                                            <span class="badge {{ $terlambat > 0 ? 'bg-danger' : 'bg-secondary' }} px-3 py-2">
+                                                <i class="fas fa-clock me-1"></i>
+                                                {{ $jatuhTempo->format('d/m/Y') }}
                                             </span>
                                             @if($terlambat > 0)
                                                 <span class="badge bg-danger d-block mt-1">
@@ -270,6 +277,20 @@
                                                 </span>
                                             @endif
                                         </td>
+
+                                        <td class="text-center">
+                                            @if($pinjaman->status === 'sudah dikembalikan' && $pinjaman->tanggal_kembali)
+                                                <span class="badge bg-success px-3 py-2">
+                                                    <i class="fas fa-calendar-check me-1"></i>
+                                                    {{ \Carbon\Carbon::parse($pinjaman->tanggal_kembali)->format('d/m/Y') }}
+                                                </span>
+                                            @else
+                                                <span class="badge bg-light text-muted px-3 py-2" style="border: 1px solid #e0e0e0;">
+                                                    <i class="fas fa-minus"></i> Belum Kembali
+                                                </span>
+                                            @endif
+                                        </td>
+
                                         <td class="text-center">
                                             @if($pinjaman->status === 'sudah dikembalikan')
                                                 <span class="badge bg-success px-3 py-2">
@@ -277,10 +298,11 @@
                                                 </span>
                                             @else
                                                 <span class="badge bg-warning text-dark px-3 py-2">
-                                                    <i class="fas fa-clock me-1"></i> Belum Dikembalikan
+                                                    <i class="fas fa-hourglass-half me-1"></i> Belum Dikembalikan
                                                 </span>
                                             @endif
                                         </td>
+
                                         <td class="text-center">
                                             <div class="d-flex flex-wrap gap-2 justify-content-center">
                                                 @if($pinjaman->status == 'belum dikembalikan')
@@ -317,7 +339,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="8" class="text-center py-5">
+                                        <td colspan="9" class="text-center py-5">
                                             <div class="text-muted">
                                                 <i class="fas fa-book-open fa-4x mb-3" style="color: #dfe6e9;"></i>
                                                 <h6>Belum ada data peminjaman</h6>
