@@ -256,7 +256,7 @@
 </nav>
 
 <section class="hero-section">
-    <h1 class="animated-title">Eksplorasi Dunia Buku</h1>
+    <h1 class="animated-title">KATALOG BUKU</h1>
     <p class="hero-subtitle">Temukan ribuan ilmu dan cerita menarik di Perpustakaan SDN Berat Wetan 1. Ketik judul yang kamu cari di bawah ini.</p>
 </section>
 
