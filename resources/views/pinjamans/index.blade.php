@@ -4,7 +4,6 @@
 
 @section('content')
 <div class="container-fluid px-4 py-3">
-    <!-- Header Gradient -->
     <div class="row g-0 mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 0 20px 20px 0;">
@@ -27,7 +26,6 @@
         </div>
     </div>
 
-    <!-- Alert Messages -->
     @if(session('success'))
     <div class="row g-0 mb-4">
         <div class="col-12">
@@ -50,7 +48,6 @@
     </div>
     @endif
 
-    <!-- NOTIFIKASI STOK HABIS - Dipercantik -->
     @php
         $bukuHabis = App\Models\Book::where('stok', '<=', 0)->get();
     @endphp
@@ -83,7 +80,6 @@
     </div>
     @endif
 
-    <!-- Statistik Peminjaman -->
     <div class="row g-3 mb-4">
         <div class="col-12 col-md-3">
             <div class="card border-0 shadow-sm h-100" style="border-radius: 20px; background: linear-gradient(135deg, #f7c0ec 0%, #a7bdea 100%);">
@@ -91,7 +87,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <p class="text-dark mb-1" style="opacity: 0.8;">Total Peminjaman</p>
-                            <h2 class="text-dark mb-0 fw-bold">{{ $pinjamans->count() }}</h2>
+                            <h2 class="text-dark mb-0 fw-bold">{{ $pinjamans->total() }}</h2>
                         </div>
                         <div class="bg-white bg-opacity-25 rounded-circle p-3">
                             <i class="fas fa-book-reader fa-2x text-dark"></i>
@@ -107,7 +103,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <p class="text-dark mb-1" style="opacity: 0.8;">Belum Dikembalikan</p>
-                            <h2 class="text-dark mb-0 fw-bold">{{ $pinjamans->where('status', 'belum dikembalikan')->count() }}</h2>
+                            <h2 class="text-dark mb-0 fw-bold">{{ App\Models\Pinjaman::where('status', 'belum dikembalikan')->count() }}</h2>
                         </div>
                         <div class="bg-white bg-opacity-25 rounded-circle p-3">
                             <i class="fas fa-clock fa-2x text-dark"></i>
@@ -123,7 +119,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <p class="text-dark mb-1" style="opacity: 0.8;">Sudah Dikembalikan</p>
-                            <h2 class="text-dark mb-0 fw-bold">{{ $pinjamans->where('status', 'sudah dikembalikan')->count() }}</h2>
+                            <h2 class="text-dark mb-0 fw-bold">{{ App\Models\Pinjaman::where('status', 'sudah dikembalikan')->count() }}</h2>
                         </div>
                         <div class="bg-white bg-opacity-25 rounded-circle p-3">
                             <i class="fas fa-check-circle fa-2x text-dark"></i>
@@ -150,7 +146,6 @@
         </div>
     </div>
 
-    <!-- Filter Section -->
     <div class="row g-0 mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-sm" style="border-radius: 20px;">
@@ -181,7 +176,6 @@
         </div>
     </div>
 
-    <!-- Tabel Peminjaman -->
     <div class="row g-0">
         <div class="col-12">
             <div class="card border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
@@ -227,7 +221,7 @@
                                         }
                                     @endphp
                                     <tr style="vertical-align: middle;" class="{{ $terlambat > 0 ? 'bg-danger bg-opacity-10' : '' }}">
-                                        <td class="text-center fw-bold">{{ $i + 1 }}</td>
+                                        <td class="text-center fw-bold">{{ $pinjamans->firstItem() + $i }}</td>
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-2" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
@@ -274,12 +268,24 @@
                                             @endif
                                         </td>
                                         <td class="text-center">
-                                            <div class="d-flex flex-wrap gap-1 justify-content-center">
+                                            <div class="d-flex flex-wrap gap-2 justify-content-center">
+                                                @if($pinjaman->status == 'belum dikembalikan')
+                                                    <form action="{{ route('pinjamans.mark-returned', $pinjaman->id) }}" method="POST" class="d-inline">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-sm"
+                                                                style="background-color: #28a745; color: white; border: none; border-radius: 8px; padding: 6px 10px;"
+                                                                onclick="return confirm('Tandai buku ini sudah dikembalikan HARI INI?')"
+                                                                data-bs-toggle="tooltip" title="Tandai Sudah Dikembalikan">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                    </form>
+                                                @endif
+
                                                 <a href="{{ route('pinjamans.edit', $pinjaman->id) }}"
                                                    class="btn btn-sm"
                                                    style="background-color: #ffe066; color: #000; border: none; border-radius: 8px; padding: 6px 10px;"
                                                    data-bs-toggle="tooltip" title="Edit peminjaman">
-                                                   <i class="fas fa-edit"></i>
+                                                    <i class="fas fa-edit"></i>
                                                 </a>
                                                 
                                                 <form action="{{ route('pinjamans.destroy', $pinjaman->id) }}" method="POST" class="d-inline">
