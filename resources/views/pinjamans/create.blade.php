@@ -32,63 +32,99 @@
     <form action="{{ route('pinjamans.store') }}" method="POST" id="pinjamanForm">
         @csrf
 
-        <div class="mb-3">
-            <label for="nama" class="form-label">Nama</label>
-            <input type="text" name="nama" class="form-control" value="{{ old('nama') }}" required>
-        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card shadow-sm mb-4 border-0" style="border-radius: 15px;">
+                    <div class="card-header bg-white" style="border-radius: 15px 15px 0 0; padding: 20px;">
+                        <h5 class="mb-0 fw-bold"><i class="fas fa-user text-primary me-2"></i> Data Peminjam</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <label for="nama" class="form-label fw-semibold">Nama Peminjam</label>
+                            <input type="text" name="nama" class="form-control" value="{{ old('nama') }}" placeholder="Masukkan nama..." required>
+                        </div>
 
-        <div class="mb-3">
-            <label for="kelas" class="form-label">Kelas</label>
-            <input type="text" name="kelas" class="form-control" value="{{ old('kelas') }}" required>
-        </div>
+                        <div class="mb-3">
+                            <label for="kelas" class="form-label fw-semibold">Kelas</label>
+                            <input type="text" name="kelas" class="form-control" value="{{ old('kelas') }}" placeholder="Contoh: 1A, 2B, 3C..." required>
+                        </div>
 
-        <div class="mb-3">
-            <label for="jenis_kelamin" class="form-label">Jenis Kelamin</label>
-            <select name="jenis_kelamin" class="form-control" required>
-                <option value="">-- Pilih Jenis Kelamin --</option>
-                <option value="Laki-laki" {{ old('jenis_kelamin') == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
-                <option value="Perempuan" {{ old('jenis_kelamin') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
-            </select>
-        </div>
+                        <div class="mb-3">
+                            <label for="jenis_kelamin" class="form-label fw-semibold">Jenis Kelamin</label>
+                            <select name="jenis_kelamin" class="form-select" required>
+                                <option value="">-- Pilih Jenis Kelamin --</option>
+                                <option value="Laki-laki" {{ old('jenis_kelamin') == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                                <option value="Perempuan" {{ old('jenis_kelamin') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                            </select>
+                        </div>
 
-        <div class="mb-3">
-            <label for="judul_buku" class="form-label">Judul Buku</label>
-            <div class="input-group">
-                <input type="text" name="judul_buku" id="judul_buku" class="form-control" value="{{ old('judul_buku') }}" required autocomplete="off" list="daftarBuku">
-                <datalist id="daftarBuku">
-                    @foreach($bookTitles ?? [] as $title)
-                        <option value="{{ $title }}">{{ $title }}</option>
-                    @endforeach
-                </datalist>
-                <button type="button" class="btn btn-outline-primary" id="cekBukuBtn">
-                    <i class="fas fa-search"></i> Cek Buku
-                </button>
+                        <div class="mb-3">
+                            <label for="tanggal_pinjam" class="form-label fw-semibold">Tanggal Pinjam</label>
+                            <input type="date" name="tanggal_pinjam" class="form-control" value="{{ old('tanggal_pinjam', date('Y-m-d')) }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="tanggal_kembali" class="form-label fw-semibold">Tanggal Kembali (Estimasi/Aktual)</label>
+                            <input type="date" name="tanggal_kembali" class="form-control" value="{{ old('tanggal_kembali', date('Y-m-d', strtotime('+7 days'))) }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="status" class="form-label fw-semibold">Status Peminjaman</label>
+                            <select name="status" class="form-select" required>
+                                <option value="belum dikembalikan" selected>Belum Dikembalikan (Sedang Dipinjam)</option>
+                                <option value="sudah dikembalikan">Sudah Dikembalikan (Selesai)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div id="statusBuku" class="mt-2"></div>
-            <div id="saranBuku" class="mt-1"></div>
-        </div>
 
-        <div class="mb-3">
-            <label for="tanggal_pinjam" class="form-label">Tanggal Pinjam</label>
-            <input type="date" name="tanggal_pinjam" class="form-control" value="{{ old('tanggal_pinjam') }}" required>
-        </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm mb-4 border-0" style="border-radius: 15px;">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center" style="border-radius: 15px 15px 0 0; padding: 20px;">
+                        <h5 class="mb-0 fw-bold"><i class="fas fa-book text-success me-2"></i> Buku yang Dipinjam</h5>
+                        <button type="button" class="btn btn-sm btn-success" id="btnTambahBuku" style="border-radius: 50px; padding: 5px 15px;">
+                            <i class="fas fa-plus"></i> Tambah Buku
+                        </button>
+                    </div>
+                    <div class="card-body p-4">
+                        
+                        <datalist id="daftarBuku">
+                            @foreach($bookTitles ?? [] as $title)
+                                <option value="{{ $title }}">{{ $title }}</option>
+                            @endforeach
+                        </datalist>
 
-        <div class="mb-3">
-            <label for="tanggal_kembali" class="form-label">Tanggal Kembali</label>
-            <input type="date" name="tanggal_kembali" class="form-control" value="{{ old('tanggal_kembali') }}" required>
-        </div>
+                        <div id="buku-container">
+                            <div class="book-row mb-3 pb-3 border-bottom">
+                                <label class="form-label fw-bold">Judul Buku <span class="book-number text-primary">1</span></label>
+                                <div class="input-group">
+                                    <input type="text" name="judul_buku[]" class="form-control judul-buku-input" placeholder="Ketik atau pilih judul buku..." required autocomplete="off" list="daftarBuku">
+                                    <button type="button" class="btn btn-outline-primary btn-cek-buku">
+                                        <i class="fas fa-search"></i> Cek
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger btn-hapus-buku" style="display:none;" title="Hapus baris ini">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                <div class="status-buku mt-2 fw-medium"></div>
+                                <div class="saran-buku mt-1"></div>
+                            </div>
+                        </div>
 
-        <div class="mb-3">
-            <label for="status" class="form-label">Status</label>
-            <select name="status" class="form-control" required>
-                <option value="">-- Pilih Status --</option>
-                <option value="belum dikembalikan" {{ old('status') == 'belum dikembalikan' ? 'selected' : '' }}>Belum Dikembalikan</option>
-                <option value="sudah dikembalikan" {{ old('status') == 'sudah dikembalikan' ? 'selected' : '' }}>Sudah Dikembalikan</option>
-            </select>
-        </div>
+                    </div>
+                </div>
 
-        <button type="submit" class="btn btn-primary" id="submitBtn">Simpan</button>
-        <a href="{{ route('pinjamans.index') }}" class="btn btn-secondary">Batal</a>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" style="border-radius: 12px; font-weight: 600;">
+                        <i class="fas fa-save me-2"></i> Simpan Transaksi
+                    </button>
+                    <a href="{{ route('pinjamans.index') }}" class="btn btn-light btn-lg" style="border-radius: 12px; font-weight: 600; color: #6c757d;">
+                        <i class="fas fa-arrow-left me-2"></i> Batal / Kembali
+                    </a>
+                </div>
+            </div>
+        </div>
     </form>
 </div>
 
@@ -97,187 +133,167 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const judulBukuInput = document.getElementById('judul_buku');
-        const cekBukuBtn = document.getElementById('cekBukuBtn');
-        const statusBuku = document.getElementById('statusBuku');
-        const saranBuku = document.getElementById('saranBuku');
-        const submitBtn = document.getElementById('submitBtn');
-        const form = document.getElementById('pinjamanForm');
-
-        // Daftar buku yang tersedia dari server
+        const container = document.getElementById('buku-container');
+        const btnTambah = document.getElementById('btnTambahBuku');
         const availableBooks = @json($bookTitles ?? []);
 
-        // Fungsi untuk mengecek apakah buku ada di database
-        async function cekKetersediaanBuku(judul) {
-            if (!judul.trim()) {
-                statusBuku.innerHTML = '<span class="text-warning">⚠️ Masukkan judul buku terlebih dahulu</span>';
-                saranBuku.innerHTML = '';
-                submitBtn.disabled = true;
-                return false;
-            }
+        // Fungsi Update Nomor Urut Buku
+        function updateBookNumbers() {
+            const rows = container.querySelectorAll('.book-row');
+            rows.forEach((row, index) => {
+                row.querySelector('.book-number').textContent = index + 1;
+                // Tombol hapus hanya muncul jika form buku lebih dari 1
+                const btnHapus = row.querySelector('.btn-hapus-buku');
+                if (rows.length > 1) {
+                    btnHapus.style.display = 'block';
+                } else {
+                    btnHapus.style.display = 'none';
+                }
+            });
+        }
 
-            statusBuku.innerHTML = '<span class="text-info"><i class="fas fa-spinner fa-spin"></i> Sedang memeriksa buku...</span>';
-            saranBuku.innerHTML = '';
+        // Fungsi Tambah Kolom Buku Baru
+        btnTambah.addEventListener('click', function() {
+            const rowCount = container.querySelectorAll('.book-row').length + 1;
+            
+            const newRow = document.createElement('div');
+            newRow.className = 'book-row mb-3 pb-3 border-bottom';
+            newRow.innerHTML = `
+                <label class="form-label fw-bold">Judul Buku <span class="book-number text-primary">${rowCount}</span></label>
+                <div class="input-group">
+                    <input type="text" name="judul_buku[]" class="form-control judul-buku-input" placeholder="Ketik atau pilih judul buku..." required autocomplete="off" list="daftarBuku">
+                    <button type="button" class="btn btn-outline-primary btn-cek-buku">
+                        <i class="fas fa-search"></i> Cek
+                    </button>
+                    <button type="button" class="btn btn-outline-danger btn-hapus-buku" title="Hapus baris ini">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <div class="status-buku mt-2 fw-medium"></div>
+                <div class="saran-buku mt-1"></div>
+            `;
+            container.appendChild(newRow);
+            updateBookNumbers();
+        });
+
+        // Event Listener untuk Tombol Hapus & Cek (Menggunakan Event Delegation)
+        container.addEventListener('click', async function(e) {
+            // Jika tombol hapus ditekan
+            if (e.target.closest('.btn-hapus-buku')) {
+                const row = e.target.closest('.book-row');
+                row.remove();
+                updateBookNumbers();
+            }
+            
+            // Jika tombol cek ditekan
+            if (e.target.closest('.btn-cek-buku')) {
+                const row = e.target.closest('.book-row');
+                const input = row.querySelector('.judul-buku-input');
+                const statusElement = row.querySelector('.status-buku');
+                const saranElement = row.querySelector('.saran-buku');
+                const judul = input.value.trim();
+
+                if (!judul) {
+                    Swal.fire({ 
+                        icon: 'warning', 
+                        title: 'Kosong', 
+                        text: 'Silakan masukkan judul buku terlebih dahulu!',
+                        confirmButtonColor: '#3085d6'
+                    });
+                    return;
+                }
+                
+                await cekKetersediaanBuku(judul, statusElement, saranElement);
+            }
+        });
+
+        // Event Blur untuk input otomatis cek ketika selesai ngetik
+        container.addEventListener('focusout', async function(e) {
+            if (e.target.classList.contains('judul-buku-input')) {
+                const row = e.target.closest('.book-row');
+                const statusElement = row.querySelector('.status-buku');
+                const saranElement = row.querySelector('.saran-buku');
+                const judul = e.target.value.trim();
+
+                if (judul) {
+                    await cekKetersediaanBuku(judul, statusElement, saranElement);
+                }
+            }
+        });
+
+        // Fungsi Cek Ketersediaan Buku ke Server
+        async function cekKetersediaanBuku(judul, statusEl, saranEl) {
+            statusEl.innerHTML = '<span class="text-info"><i class="fas fa-spinner fa-spin"></i> Memeriksa ketersediaan buku...</span>';
+            saranEl.innerHTML = '';
             
             try {
-                // 🔥 PERBAIKAN: Menggunakan fungsi route() bawaan Laravel agar alamat URL 100% akurat
+                // Menggunakan route('check-book') bawaan laravel untuk URL absolut
                 const checkUrl = '{{ route("check-book") }}?judul=' + encodeURIComponent(judul);
-                
-                console.log('Mengecek URL:', checkUrl); // Untuk debugging
-                
                 const response = await fetch(checkUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
+                    headers: { 
+                        'Accept': 'application/json', 
+                        'X-Requested-With': 'XMLHttpRequest' 
                     }
                 });
                 
-                if (!response.ok) {
-                    throw new Error('HTTP ' + response.status + ': ' + response.statusText);
-                }
-                
+                if (!response.ok) throw new Error('HTTP Error');
                 const data = await response.json();
                 
                 if (data.exists) {
-                    statusBuku.innerHTML = '<span class="text-success">✅ Buku ditemukan! <strong>' + (data.judul || judul) + '</strong> - Stok: ' + data.stok + '</span>';
-                    saranBuku.innerHTML = '';
-                    submitBtn.disabled = false;
-                    
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Buku Ditemukan!',
-                        text: 'Buku "' + judul + '" tersedia di perpustakaan. Stok: ' + data.stok,
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
+                    statusEl.innerHTML = `<span class="text-success"><i class="fas fa-check-circle"></i> Tersedia! Stok tersisa: ${data.stok} buku</span>`;
                     return true;
                 } else {
-                    statusBuku.innerHTML = '<span class="text-danger">❌ ' + data.message + '</span>';
-                    submitBtn.disabled = true;
+                    statusEl.innerHTML = `<span class="text-danger"><i class="fas fa-times-circle"></i> ${data.message}</span>`;
                     
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Buku Tidak Ditemukan!',
-                        text: data.message,
-                        confirmButtonColor: '#d33',
-                        confirmButtonText: 'OK'
-                    });
-                    
-                    // Tampilkan saran buku yang mirip
+                    // Saran buku jika salah ketik
                     if (availableBooks.length > 0) {
-                        let similarBooks = availableBooks.filter(book => 
-                            book.toLowerCase().includes(judul.toLowerCase())
-                        );
+                        let similarBooks = availableBooks.filter(book => book.toLowerCase().includes(judul.toLowerCase()));
                         if (similarBooks.length > 0) {
-                            saranBuku.innerHTML = '<span class="text-info">💡 Apakah yang Anda maksud: ' + similarBooks.slice(0, 3).join(', ') + '?</span>';
+                            saranEl.innerHTML = '<span class="text-primary small"><i class="fas fa-lightbulb"></i> Maksud Anda: <strong>' + similarBooks.slice(0, 3).join('</strong> atau <strong>') + '</strong>?</span>';
                         }
                     }
                     return false;
                 }
             } catch (error) {
-                console.error('Fetch error:', error);
-                statusBuku.innerHTML = '<span class="text-danger">❌ Gagal memeriksa buku. Error: ' + error.message + '</span>';
-                saranBuku.innerHTML = '';
-                submitBtn.disabled = true;
-                
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal Memeriksa Buku',
-                    text: 'Error: ' + error.message + '\n\nPastikan koneksi internet stabil.',
-                    confirmButtonText: 'OK'
-                });
+                statusEl.innerHTML = '<span class="text-danger"><i class="fas fa-exclamation-triangle"></i> Gagal memeriksa koneksi.</span>';
                 return false;
             }
-        }
-
-        // Event klik tombol cek buku
-        if (cekBukuBtn) {
-            cekBukuBtn.addEventListener('click', async function() {
-                const judul = judulBukuInput.value.trim();
-                if (!judul) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Judul Buku Kosong',
-                        text: 'Silakan masukkan judul buku terlebih dahulu!',
-                        confirmButtonText: 'OK'
-                    });
-                    return;
-                }
-                await cekKetersediaanBuku(judul);
-            });
-        }
-
-        // Event blur (ketika input kehilangan fokus)
-        if (judulBukuInput) {
-            judulBukuInput.addEventListener('blur', async function() {
-                const judul = this.value.trim();
-                if (judul) {
-                    await cekKetersediaanBuku(judul);
-                }
-            });
-        }
-
-        // Event submit form
-        if (form) {
-            form.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const judul = judulBukuInput.value.trim();
-                
-                if (!judul) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Judul Buku Kosong',
-                        text: 'Silakan masukkan judul buku terlebih dahulu!',
-                        confirmButtonText: 'OK'
-                    });
-                    return;
-                }
-                
-                Swal.fire({
-                    title: 'Memeriksa Buku...',
-                    text: 'Mohon tunggu sebentar',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-                
-                const isValid = await cekKetersediaanBuku(judul);
-                Swal.close();
-                
-                if (isValid) {
-                    form.submit();
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Buku Tidak Valid!',
-                        text: 'Buku "' + judul + '" tidak ditemukan di database. Silakan pilih buku dari daftar yang tersedia.',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            });
         }
     });
 </script>
 
 <style>
-    #statusBuku {
-        display: block;
-        margin-top: 5px;
-        font-size: 0.875rem;
+    body {
+        background-color: #f8f9fc;
     }
-    #saranBuku {
-        font-size: 0.875rem;
-        margin-top: 5px;
+    .status-buku { 
+        font-size: 0.85rem; 
+    }
+    .saran-buku { 
+        font-size: 0.8rem; 
+    }
+    .book-row { 
+        animation: fadeIn 0.3s ease-in-out; 
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #8b5cf6;
+        box-shadow: 0 0 0 0.25rem rgba(139, 92, 246, 0.25);
+    }
+    .btn-outline-primary {
+        color: #8b5cf6;
+        border-color: #8b5cf6;
     }
     .btn-outline-primary:hover {
-        background-color: #0d6efd;
+        background-color: #8b5cf6;
+        border-color: #8b5cf6;
         color: white;
     }
-    datalist {
-        max-height: 200px;
-        overflow-y: auto;
+    .text-primary {
+        color: #8b5cf6 !important;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 </style>
 @endsection

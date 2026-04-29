@@ -115,59 +115,89 @@ class PinjamanController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * 🔥 PERBAIKAN: Diperbarui untuk menangani array judul_buku (Banyak buku sekaligus)
      */
     public function store(Request $request)
     {
         $request->validate([
-            'nama' => 'required|string|max:255',
-            'kelas' => 'required|string|max:100',
-            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
-            'judul_buku' => 'required|string|max:255',
-            'tanggal_pinjam' => 'required|date',
-            'status' => 'required|in:belum dikembalikan,sudah dikembalikan',
+            'nama'            => 'required|string|max:255',
+            'kelas'           => 'required|string|max:100',
+            'jenis_kelamin'   => 'required|in:Laki-laki,Perempuan',
+            'judul_buku'      => 'required|array|min:1', // Berubah menjadi array karena bisa pinjam lebih dari 1
+            'judul_buku.*'    => 'required|string|max:255', // Validasi isi array
+            'tanggal_pinjam'  => 'required|date',
+            'status'          => 'required|in:belum dikembalikan,sudah dikembalikan',
             'tanggal_kembali' => 'nullable|date|after_or_equal:tanggal_pinjam',
         ]);
 
         DB::beginTransaction();
 
         try {
-            $buku = Book::where('judul', 'LIKE', '%' . $request->judul_buku . '%')->first();
-            
-            if (!$buku) {
-                return redirect()->back()->with('error', 'Buku "' . $request->judul_buku . '" tidak ditemukan di database perpustakaan! Silakan tambahkan buku terlebih dahulu.')->withInput();
-            }
-            
-            if ($buku->stok <= 0 && $request->status == 'belum dikembalikan') {
-                return redirect()->back()->with('error', 'Stok buku "' . $buku->judul . '" habis!')->withInput();
-            }
-
+            // 1. Simpan atau ambil data Anggota
             $anggota = Anggota::firstOrCreate([
-                'nama' => $request->nama,
-                'kelas' => $request->kelas,
+                'nama'          => $request->nama,
+                'kelas'         => $request->kelas,
                 'jenis_kelamin' => $request->jenis_kelamin,
             ]);
 
-            $pinjaman = Pinjaman::create([
-                'anggota_id' => $anggota->id,
-                'buku_id' => $buku->id,
-                'nama' => $anggota->nama,
-                'kelas' => $anggota->kelas,
-                'jenis_kelamin' => $anggota->jenis_kelamin,
-                'judul_buku' => $buku->judul,
-                'tanggal_pinjam' => $request->tanggal_pinjam,
-                'tanggal_kembali' => $request->status == 'sudah dikembalikan' ? $request->tanggal_kembali : null,
-                'status' => $request->status,
-                'denda' => 0,
-            ]);
+            $berhasil = 0;
+            $gagal = [];
 
-            if ($pinjaman->status === 'sudah dikembalikan') {
-                $this->processPengembalian($pinjaman, $request->tanggal_kembali);
-            } else {
-                $buku->decrement('stok');
+            // 2. Looping (Perulangan) untuk setiap judul buku yang di-input
+            foreach ($request->judul_buku as $judul) {
+                // Lewati jika judul kosong
+                if (trim($judul) == '') continue;
+
+                $buku = Book::where('judul', 'LIKE', '%' . trim($judul) . '%')->first();
+                
+                // Jika buku tidak ada di database
+                if (!$buku) {
+                    $gagal[] = $judul . " (Tidak ditemukan)";
+                    continue; // Lanjut ke buku berikutnya
+                }
+                
+                // Jika stok habis tapi statusnya ingin meminjam
+                if ($buku->stok <= 0 && $request->status == 'belum dikembalikan') {
+                    $gagal[] = $buku->judul . " (Stok habis)";
+                    continue; // Lanjut ke buku berikutnya
+                }
+
+                // 3. Simpan data pinjaman (masing-masing buku akan jadi 1 baris di tabel pinjaman)
+                $pinjaman = Pinjaman::create([
+                    'anggota_id'      => $anggota->id,
+                    'buku_id'         => $buku->id,
+                    'nama'            => $anggota->nama,
+                    'kelas'           => $anggota->kelas,
+                    'jenis_kelamin'   => $anggota->jenis_kelamin,
+                    'judul_buku'      => $buku->judul,
+                    'tanggal_pinjam'  => $request->tanggal_pinjam,
+                    'tanggal_kembali' => $request->status == 'sudah dikembalikan' ? $request->tanggal_kembali : null,
+                    'status'          => $request->status,
+                    'denda'           => 0,
+                ]);
+
+                // 4. Update stok buku atau proses pengembalian langsung
+                if ($pinjaman->status === 'sudah dikembalikan') {
+                    $this->processPengembalian($pinjaman, $request->tanggal_kembali);
+                } else {
+                    $buku->decrement('stok');
+                }
+
+                $berhasil++;
             }
 
             DB::commit();
-            return redirect()->route('pinjamans.index')->with('success', 'Data pinjaman berhasil disimpan!');
+
+            // 5. Feedback Berdasarkan Hasil Looping
+            if (count($gagal) > 0 && $berhasil > 0) {
+                $pesanGagal = implode(', ', $gagal);
+                return redirect()->route('pinjamans.index')->with('warning', "$berhasil buku berhasil dipinjam. Namun buku berikut gagal diproses: $pesanGagal");
+            } elseif (count($gagal) > 0 && $berhasil == 0) {
+                $pesanGagal = implode(', ', $gagal);
+                return redirect()->back()->with('error', "Semua buku gagal dipinjam! Alasan: $pesanGagal")->withInput();
+            }
+
+            return redirect()->route('pinjamans.index')->with('success', 'Semua data pinjaman berhasil disimpan!');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -198,16 +228,17 @@ class PinjamanController extends Controller
 
     /**
      * Update the specified resource in storage.
+     * (Tetap menggunakan string biasa, karena proses edit dilakukan satu per satu per peminjaman buku)
      */
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nama' => 'required|string|max:255',
-            'kelas' => 'required|string|max:100',
-            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
-            'judul_buku' => 'required|string|max:255',
-            'tanggal_pinjam' => 'required|date',
-            'status' => 'required|in:belum dikembalikan,sudah dikembalikan',
+            'nama'            => 'required|string|max:255',
+            'kelas'           => 'required|string|max:100',
+            'jenis_kelamin'   => 'required|in:Laki-laki,Perempuan',
+            'judul_buku'      => 'required|string|max:255',
+            'tanggal_pinjam'  => 'required|date',
+            'status'          => 'required|in:belum dikembalikan,sudah dikembalikan',
             'tanggal_kembali' => 'nullable|date|after_or_equal:tanggal_pinjam',
         ]);
 
@@ -224,21 +255,21 @@ class PinjamanController extends Controller
             }
             
             $anggota = Anggota::firstOrCreate([
-                'nama' => $request->nama,
-                'kelas' => $request->kelas,
+                'nama'          => $request->nama,
+                'kelas'         => $request->kelas,
                 'jenis_kelamin' => $request->jenis_kelamin,
             ]);
 
             $pinjaman->update([
-                'anggota_id' => $anggota->id,
-                'buku_id' => $buku ? $buku->id : $pinjaman->buku_id,
-                'nama' => $anggota->nama,
-                'kelas' => $anggota->kelas,
-                'jenis_kelamin' => $anggota->jenis_kelamin,
-                'judul_buku' => $request->judul_buku,
-                'tanggal_pinjam' => $request->tanggal_pinjam,
+                'anggota_id'      => $anggota->id,
+                'buku_id'         => $buku ? $buku->id : $pinjaman->buku_id,
+                'nama'            => $anggota->nama,
+                'kelas'           => $anggota->kelas,
+                'jenis_kelamin'   => $anggota->jenis_kelamin,
+                'judul_buku'      => $request->judul_buku,
+                'tanggal_pinjam'  => $request->tanggal_pinjam,
                 'tanggal_kembali' => $request->status == 'sudah dikembalikan' ? $request->tanggal_kembali : null,
-                'status' => $request->status,
+                'status'          => $request->status,
             ]);
 
             if ($buku) {
@@ -315,13 +346,13 @@ class PinjamanController extends Controller
         Pengembalian::updateOrCreate(
             ['pinjaman_id' => $pinjaman->id],
             [
-                'nama' => $pinjaman->nama,
-                'kelas' => $pinjaman->kelas,
-                'judul_buku' => $pinjaman->judul_buku,
-                'tanggal_kembali' => $tanggalJatuhTempo->toDateString(),
+                'nama'                 => $pinjaman->nama,
+                'kelas'                => $pinjaman->kelas,
+                'judul_buku'           => $pinjaman->judul_buku,
+                'tanggal_kembali'      => $tanggalJatuhTempo->toDateString(),
                 'tanggal_pengembalian' => $tanggalPengembalian->toDateString(),
-                'keterlambatan' => $keterlambatan,
-                'denda' => $denda,
+                'keterlambatan'        => $keterlambatan,
+                'denda'                => $denda,
             ]
         );
     }
@@ -367,16 +398,16 @@ class PinjamanController extends Controller
         
         if ($buku) {
             return response()->json([
-                'exists' => true,
-                'stok' => $buku->stok,
+                'exists'   => true,
+                'stok'     => $buku->stok,
                 'tersedia' => $buku->stok > 0,
-                'id' => $buku->id
+                'id'       => $buku->id
             ]);
         }
         
         return response()->json([
-            'exists' => false,
-            'stok' => 0,
+            'exists'   => false,
+            'stok'     => 0,
             'tersedia' => false
         ]);
     }
