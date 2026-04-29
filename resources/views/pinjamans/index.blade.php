@@ -226,16 +226,17 @@
                             <tbody>
                                 @forelse ($pinjamans as $i => $pinjaman)
                                     @php
-                                        // LOGIKA PERHITUNGAN JATUH TEMPO (Tanggal Pinjam + 7 Hari)
-                                        $tglPinjam = \Carbon\Carbon::parse($pinjaman->tanggal_pinjam);
+                                        // PERBAIKAN LOGIKA: Set Timezone dan hilangkan detik/menit dengan startOfDay() 
+                                        // Lalu bulatkan hasil menggunakan intval/round agar tidak ada angka koma-koma
+                                        $tglPinjam = \Carbon\Carbon::parse($pinjaman->tanggal_pinjam)->timezone('Asia/Jakarta')->startOfDay();
                                         $jatuhTempo = $tglPinjam->copy()->addDays(7);
                                         $terlambat = 0;
                                         
                                         if($pinjaman->status == 'belum dikembalikan') {
-                                            $hariIni = \Carbon\Carbon::now();
+                                            $hariIni = \Carbon\Carbon::now('Asia/Jakarta')->startOfDay();
                                             if($hariIni->gt($jatuhTempo)) {
-                                                // Jika hari ini melebihi jatuh tempo
-                                                $terlambat = $jatuhTempo->diffInDays($hariIni);
+                                                // Hitung selisih hari dan pastikan hasilnya bilangan bulat
+                                                $terlambat = (int) round($jatuhTempo->diffInDays($hariIni));
                                             }
                                         }
                                     @endphp
