@@ -62,30 +62,48 @@
     }
 
     /* ========================================================
-       PERBAIKAN Mobile Responsiveness (Off-Canvas Mode)
+       MEMATIKAN EFEK TEKS MENGHILANG BAWAAN ADMINLTE DI HP
        ======================================================== */
     @media (max-width: 991.98px) {
+      /* Paksa teks tetap tampil penuh */
+      .sidebar-mini.sidebar-collapse .main-sidebar .nav-link p,
+      .sidebar-collapse .main-sidebar .nav-link p,
+      .sidebar-mini.sidebar-collapse .main-sidebar .brand-text,
+      .sidebar-mini.sidebar-collapse .main-sidebar .user-panel .info {
+        display: inline-block !important;
+        width: auto !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        animation: none !important;
+      }
+
+      .sidebar-mini.sidebar-collapse .main-sidebar .nav-link {
+        text-align: left !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        padding: 12px 20px !important;
+        width: 100% !important;
+      }
+
+      .sidebar-mini.sidebar-collapse .main-sidebar .nav-link i {
+        margin-right: 15px !important;
+        font-size: 18px !important;
+      }
+
+      .sidebar-mini.sidebar-collapse .main-sidebar .brand-link {
+        justify-content: center !important;
+      }
+
+      .sidebar-mini.sidebar-collapse .main-sidebar .user-panel {
+        justify-content: flex-start !important;
+        padding-left: 15px !important;
+      }
+    }
+
+    @media (max-width: 768px) {
       body {
         margin-left: 0;
-      }
-
-      /* Ubah dari width 100% relative menjadi 250px fixed */
-      .main-sidebar {
-        width: 250px !important;
-        height: 100vh !important;
-        position: fixed !important;
-        top: 0;
-        left: -260px; /* Sembunyikan di luar layar kiri */
-        padding-top: 0;
-        overflow-y: auto !important;
-        z-index: 1050 !important;
-        transition: left 0.3s ease-in-out !important;
-      }
-
-      /* Saat tombol menu burger ditekan, sidebar akan masuk ke dalam layar */
-      body.sidebar-open .main-sidebar {
-        left: 0 !important;
-        box-shadow: 10px 0 30px rgba(0,0,0,0.5) !important;
       }
 
       .main-sidebar .brand-link {
@@ -104,12 +122,12 @@
         text-align: center;
       }
 
-      /* Kembalikan text-align ke kiri agar rapi */
+      /* Kembalikan Nav Link agar rapi di HP */
       .sidebar .nav-link {
         font-size: 14px;
-        padding: 10px 15px;
+        padding: 10px 15px !important;
         margin: 5px 10px;
-        text-align: left;
+        text-align: left !important;
       }
 
       .sidebar .nav-link:hover {
@@ -118,9 +136,8 @@
 
       /* Adjust User Panel */
       .user-panel {
-        padding: 10px;
+        padding: 10px 15px !important;
         text-align: left;
-        justify-content: flex-start !important;
       }
 
       /* Nav Treeview (nested menu) */
@@ -143,16 +160,16 @@
     /* For very small devices (mobile phone) */
     @media (max-width: 576px) {
       .nav-link {
-        font-size: 13px !important;
+        font-size: 12px;
       }
 
       .sidebar .nav-link {
-        font-size: 13px !important;
+        font-size: 13px;
       }
 
       /* Menu Treeview Adjustment */
       .nav-treeview .nav-link {
-        font-size: 12px !important;
+        font-size: 12px;
       }
     }
   </style>
@@ -278,19 +295,3 @@
     </nav>
   </div>
 </aside>
-
-<style>
-  /* Menghindari penumpukan di tampilan desktop */
-  @media (min-width: 992px) {
-    .main-sidebar {
-      width: 250px;
-      left: 0;
-      top: 0;
-      z-index: 1000;
-    }
-  }
-
-  .content-wrapper {
-    min-height: 100vh;
-  }
-</style>

@@ -85,43 +85,51 @@
     font-weight: 600;
   }
 
-  /* =======================================================
-     PERBAIKAN SIDEBAR UNTUK MOBILE (Off-Canvas Overlay)
-     ======================================================= */
+  /* ========================================================
+     Mencegah Layar Bocor ke Kanan di HP & Set Overlay
+     ======================================================== */
+  html, body {
+    overflow-x: hidden !important;
+    max-width: 100vw;
+  }
+
+  .wrapper {
+    overflow-x: hidden !important;
+  }
+
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+    z-index: 1040;
+  }
+
+  body.sidebar-open .sidebar-overlay {
+    display: block;
+  }
+
+  /* Responsive Design Adjustments */
   @media (max-width: 991.98px) {
     .main-sidebar {
       position: fixed !important;
       top: 0;
+      left: -260px !important;
       bottom: 0;
-      left: -260px; /* Sembunyikan sidebar ke kiri */
-      height: 100vh;
-      width: 250px;
+      height: 100vh !important;
+      width: 250px !important;
       z-index: 1050 !important;
-      transition: left 0.3s ease-in-out;
-      box-shadow: none;
+      transition: left 0.3s ease-in-out !important;
+      box-shadow: none !important;
     }
 
-    /* Saat tombol menu diklik, sidebar masuk ke layar */
     body.sidebar-open .main-sidebar {
-      left: 0;
-      box-shadow: 10px 0 30px rgba(0,0,0,0.5);
-    }
-
-    /* Latar belakang gelap saat sidebar terbuka */
-    .sidebar-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(2px);
-      z-index: 1040;
-    }
-
-    body.sidebar-open .sidebar-overlay {
-      display: block;
+      left: 0 !important;
+      box-shadow: 10px 0 30px rgba(0,0,0,0.5) !important;
     }
 
     .content-wrapper {
@@ -130,7 +138,6 @@
     }
   }
 
-  /* Responsive Design Adjustments Asli Milikmu */
   @media (max-width: 768px) {
     .content-wrapper {
       padding: 15px;
@@ -162,10 +169,6 @@
     .table {
       width: 100% !important;
       margin-bottom: 15px;
-    }
-
-    .container-fluid {
-      padding: 0 10px;
     }
 
     .content-header h1 {
@@ -252,18 +255,16 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-{{-- Script untuk memunculkan/menyembunyikan sidebar di mobile --}}
+{{-- Custom Toggle Sidebar untuk HP --}}
 <script>
   function toggleSidebar() {
     document.body.classList.toggle('sidebar-open');
   }
 
   document.addEventListener('DOMContentLoaded', function () {
-    // Tangkap tombol hamburger (pastikan di layouts.navbar milikmu tombolnya punya attribute data-widget="pushmenu")
     const menuBtn = document.querySelector('[data-widget="pushmenu"]');
     if (menuBtn) {
       menuBtn.addEventListener('click', function (e) {
-        // Cegah AdminLTE bawaan bentrok jika di HP, kita pakai sistem toggle kita sendiri
         if(window.innerWidth <= 991.98) {
            e.preventDefault();
            e.stopPropagation();
@@ -274,7 +275,7 @@
   });
 </script>
 
-{{-- Accordion Sidebar Toggle (Bawaan milikmu) --}}
+{{-- Accordion Sidebar Toggle --}}
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const toggleParents = document.querySelectorAll('.nav-item.has-treeview > a');
