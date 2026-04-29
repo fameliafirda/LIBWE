@@ -282,12 +282,12 @@
         <i class="fas fa-search ms-3 d-none d-md-block" style="color: var(--color-1); font-size: 1.2rem;"></i>
         <input type="text" id="keyword" placeholder="Ketik judul buku yang mau kamu baca..." value="{{ request('search') }}">
         <select id="kat_id">
-            <option value="">Semua Jenis Buku</option>
+            <option value="">Kategori Buku</option>
             @foreach($kategoris as $k)
                 <option value="{{ $k->id }}" {{ request('kategori') == $k->id ? 'selected' : '' }}>{{ $k->nama }}</option>
             @endforeach
         </select>
-        <button class="btn-search" onclick="filterBuku()"><i class="fas fa-magic me-2 d-md-none"></i>CARI SEKARANG</button>
+        <button class="btn-search" onclick="filterBuku()"><i class="fas fa-magic me-2 d-md-none"></i>CARI</button>
     </div>
 </div>
 
@@ -296,7 +296,7 @@
     <div class="recommendation-bg" id="rekomendasi">
         <h2 class="section-title">
             <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f31f/512.gif" alt="Bintang" width="35" class="me-2"> 
-            Paling Sering Dipinjam Teman-Teman
+            Rekomendasi Buku
         </h2>
         <div class="slider-wrapper-rel">
             <button class="slider-nav-btn btn-prev" onclick="moveSlide(-250)"><i class="fas fa-chevron-left"></i></button>
@@ -307,7 +307,7 @@
                 <div class="book-card-top">
                     <div class="rank-badge">#{{ $index + 1 }}</div>
                     
-                    <div class="borrow-badge">⭐ Dipinjam {{ $pb->total_dipinjam ?? 0 }}x</div>
+                    <div class="borrow-badge">⭐ {{ $pb->total_dipinjam ?? 0 }}x Dipinjam </div>
                     
                     @if($pb->gambar)
                         <img src="{{ asset($pb->gambar) }}" alt="{{ $pb->judul }}" class="book-cover">
@@ -359,7 +359,7 @@
                         
                         @if($b->stok > 0)
                             <div class="c-stock-wrapper stock-in">
-                                <i class="fas fa-check-circle me-2"></i> Bisa Dipinjam: {{ $b->stok }} Buku
+                                <i class="fas fa-check-circle me-2"></i> Stok Buku: {{ $b->stok }}
                             </div>
                         @else
                             <div class="c-stock-wrapper stock-out">
@@ -387,7 +387,7 @@
 </div>
 
 <a href="{{ url('/') }}" class="btn-float-back">
-    <i class="fas fa-home"></i> MENU UTAMA
+    <i class="fas fa-home"></i> Kembali ke Beranda
 </a>
 
 <script>
