@@ -220,7 +220,7 @@
                                             <td>
                                                 <div class="d-flex align-items-center">
                                                     @if($book->gambar)
-                                                        <img src="{{ asset('storage/' . $book->gambar) }}" 
+                                                        <img src="{{ Str::startsWith($book->gambar, ['http://', 'https://']) ? $book->gambar : asset('storage/' . $book->gambar) }}" 
                                                              width="30" height="40" 
                                                              style="object-fit: cover; border-radius: 5px; margin-right: 10px;"
                                                              alt="cover">
