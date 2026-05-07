@@ -4,7 +4,6 @@
 
 @section('content')
 <div class="container-fluid px-4 py-3 laporan-buku-page">
-    <!-- Header Gradient -->
     <div class="row g-0 mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-lg laporan-header-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 0 20px 20px 0;">
@@ -27,7 +26,6 @@
         </div>
     </div>
 
-    <!-- Filter Section -->
     <div class="row g-0 mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-sm" style="border-radius: 20px;">
@@ -70,7 +68,6 @@
         </div>
     </div>
 
-    <!-- Statistik Buku -->
     @php
         $totalBuku = $books->total();
         $totalStok = App\Models\Book::sum('stok');
@@ -140,7 +137,6 @@
         </div>
     </div>
 
-    <!-- Navigasi Bulanan -->
     <div class="row g-0 mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-sm" style="border-radius: 20px;">
@@ -164,7 +160,6 @@
         </div>
     </div>
 
-    <!-- Tabel Buku per Bulan -->
     @php
         $groupedBooks = $books->groupBy(function($item) {
             return \Carbon\Carbon::parse($item->created_at)->format('Y-m');
@@ -220,7 +215,7 @@
                                             <td>
                                                 <div class="d-flex align-items-center">
                                                     @if($book->gambar)
-                                                        <img src="{{ Str::startsWith($book->gambar, ['http://', 'https://']) ? $book->gambar : asset('storage/' . $book->gambar) }}" 
+                                                        <img src="{{ asset($book->gambar) }}" 
                                                              width="30" height="40" 
                                                              style="object-fit: cover; border-radius: 5px; margin-right: 10px;"
                                                              alt="cover">
@@ -285,7 +280,6 @@
         </div>
     @endforelse
 
-    <!-- Pagination -->
     @if(method_exists($books, 'links') && $books->hasPages())
     <div class="row g-0 mt-4">
         <div class="col-12">
