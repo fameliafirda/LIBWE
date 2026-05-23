@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Daftar Kategori')
+@section('title', 'Daftar Buku')
 
 @section('content')
 <div class="container-fluid px-4 py-3">
@@ -11,13 +11,13 @@
                     <div class="row align-items-center">
                         <div class="col-md-8">
                             <h3 class="text-white mb-2" style="font-weight: 600;">
-                                <i class="fas fa-tags me-2"></i> Daftar Kategori Buku
+                                <i class="fas fa-book me-2"></i> Daftar Buku Perpustakaan
                             </h3>
-                            <p class="text-white opacity-75 mb-0">Kelola kategori buku perpustakaan SDN Berat Wetan 1</p>
+                            <p class="text-white opacity-75 mb-0">Kelola koleksi buku perpustakaan SDN Berat Wetan 1</p>
                         </div>
                         <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                            <a href="{{ route('categories.create') }}" class="btn btn-light" style="border-radius: 50px; padding: 10px 25px; font-weight: 500; color: #667eea; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
-                                <i class="fas fa-plus-circle me-2"></i> Tambah Kategori
+                            <a href="{{ route('books.create') }}" class="btn btn-light" style="border-radius: 50px; padding: 10px 25px; font-weight: 500; color: #667eea; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+                                <i class="fas fa-plus-circle me-2"></i> Tambah Buku
                             </a>
                         </div>
                     </div>
@@ -124,97 +124,110 @@
                 <div class="card-header bg-white border-0 py-3 px-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0" style="color: #2d3436; font-weight: 600;">
-                            <i class="fas fa-list me-2" style="color: #8b5cf6;"></i> Daftar Kategori
+                            <i class="fas fa-list me-2" style="color: #8b5cf6;"></i> Koleksi Buku
+                            <span class="badge ms-2" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000;">{{ $books->total() }} buku</span>
                         </h5>
-                        <div class="input-group" style="width: 250px;">
-                            <input type="text" class="form-control form-control-sm" placeholder="Cari kategori..." id="searchInput" style="border-radius: 50px 0 0 50px; border: 1px solid #e0e0e0;">
-                            <button class="btn btn-sm" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); border-radius: 0 50px 50px 0; color: #000;" type="button">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
+                        <span class="text-muted small">
+                            <i class="fas fa-info-circle me-1"></i> Halaman {{ $books->currentPage() }} dari {{ $books->lastPage() }}
+                        </span>
                     </div>
                 </div>
 
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover mb-0" id="categoryTable">
+                        <table class="table table-hover mb-0" style="min-width: 1200px;">
                             <thead style="background: linear-gradient(45deg, #f7c0ec, #a7bdea);">
                                 <tr>
                                     <th class="text-center" style="width: 50px;">#</th>
-                                    <th>Nama Kategori</th>
-                                    <th class="text-center" style="width: 150px;">Jumlah Buku</th>
-                                    <th class="text-center" style="width: 200px;">Info Stok</th>
-                                    <th class="text-center" style="width: 150px;">Aksi</th>
+                                    <th style="width: 250px;">Judul</th>
+                                    <th style="width: 200px;">Penulis</th>
+                                    <th style="width: 150px;">Kategori</th>
+                                    <th style="width: 100px;" class="text-center">Tahun Terbit</th>
+                                    <th style="width: 100px;" class="text-center">Stok</th>
+                                    <th style="width: 100px;" class="text-center">Cover</th>
+                                    <th style="width: 150px;" class="text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($categories as $index => $category)
+                                @forelse($books as $index => $book)
                                 <tr style="vertical-align: middle;">
-                                    <td class="text-center fw-bold">{{ $index + 1 }}</td>
+                                    <td class="text-center fw-bold">{{ $books->firstItem() + $index }}</td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-2" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                                                <i class="fas fa-folder" style="color: #8b5cf6;"></i>
+                                            <div class="me-2">
+                                                <i class="fas fa-book" style="color: #8b5cf6;"></i>
                                             </div>
-                                            <span class="fw-semibold">{{ $category->nama }}</span>
+                                            <span class="fw-semibold">{{ $book->judul }}</span>
                                         </div>
                                     </td>
-                                    <td class="text-center">
-                                        <span class="badge" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000; padding: 6px 15px; font-size: 14px;">
-                                            {{ $category->books_count }} buku
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-user-edit me-2" style="color: #f472b6;"></i>
+                                            {{ $book->penulis }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000; padding: 6px 12px;">
+                                            {{ $book->kategori->nama ?? '-' }}
                                         </span>
                                     </td>
                                     <td class="text-center">
-                                        @php
-                                            $totalStok = 0;
-                                            $bukuHabis = 0;
-                                            foreach($category->books as $buku) {
-                                                $totalStok += $buku->stok;
-                                                if($buku->stok == 0) $bukuHabis++;
-                                            }
-                                        @endphp
-                                        <div class="d-flex justify-content-center gap-2">
-                                            <span class="badge bg-info text-white px-3 py-2" data-bs-toggle="tooltip" title="Total stok tersedia">
-                                                <i class="fas fa-boxes me-1"></i> {{ $totalStok }}
-                                            </span>
-                                            @if($bukuHabis > 0)
-                                                <span class="badge bg-danger px-3 py-2" data-bs-toggle="tooltip" title="Buku dengan stok habis">
-                                                    <i class="fas fa-exclamation-triangle me-1"></i> {{ $bukuHabis }} habis
-                                                </span>
-                                            @endif
-                                        </div>
+                                        <span class="badge bg-light text-dark px-3 py-2">
+                                            <i class="fas fa-calendar-alt me-1" style="color: #8b5cf6;"></i>
+                                            {{ $book->tahun_terbit }}
+                                        </span>
                                     </td>
                                     <td class="text-center">
-                                        <div class="d-flex justify-content-center align-items-center gap-5">
-                                            <a href="{{ route('categories.edit', $category->id) }}" 
-                                               class="bg-transparent border-0 p-0 m-0" 
-                                               style="color: #f59e0b; transition: 0.2s;"
-                                               onmouseover="this.style.transform='scale(1.2)'"
-                                               onmouseout="this.style.transform='scale(1)'"
-                                               data-bs-toggle="tooltip" title="Edit kategori">
-                                                <i class="fas fa-edit" style="font-size: 1.25rem;"></i>
+                                        @if($book->stok > 5)
+                                            <span class="badge bg-success px-3 py-2">
+                                                <i class="fas fa-check-circle me-1"></i> {{ $book->stok }}
+                                            </span>
+                                        @elseif($book->stok > 0)
+                                            <span class="badge bg-warning text-dark px-3 py-2">
+                                                <i class="fas fa-exclamation-circle me-1"></i> {{ $book->stok }}
+                                            </span>
+                                        @else
+                                            <span class="badge bg-danger px-3 py-2">
+                                                <i class="fas fa-times-circle me-1"></i> Habis
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        @if($book->gambar)
+                                            <div class="position-relative d-inline-block">
+                                                <img src="{{ asset($book->gambar) }}" 
+                                                     width="50" 
+                                                     height="70" 
+                                                     alt="Cover {{ $book->judul }}"
+                                                     style="object-fit: cover; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
+                                                     data-bs-toggle="tooltip" 
+                                                     data-bs-placement="top" 
+                                                     title="{{ $book->judul }}">
+                                            </div>
+                                        @else
+                                            <div class="bg-light d-inline-flex align-items-center justify-content-center" 
+                                                 style="width: 50px; height: 70px; border-radius: 8px; border: 1px dashed #ccc;">
+                                                <i class="fas fa-image text-muted"></i>
+                                            </div>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ route('books.edit', $book->id) }}" 
+                                               class="btn btn-sm" 
+                                               style="background-color: #ffe066; color: #000; border: none; border-radius: 8px 0 0 8px; padding: 8px 12px;">
+                                                <i class="fas fa-edit"></i>
                                             </a>
-                                            <a href="{{ route('books.index', ['kategori' => $category->id]) }}" 
-                                               class="bg-transparent border-0 p-0 m-0" 
-                                               style="color: #10b981; transition: 0.2s;"
-                                               onmouseover="this.style.transform='scale(1.2)'"
-                                               onmouseout="this.style.transform='scale(1)'"
-                                               data-bs-toggle="tooltip" title="Lihat buku dalam kategori ini">
-                                                <i class="fas fa-eye" style="font-size: 1.25rem;"></i>
-                                            </a>
-                                            <form action="{{ route('categories.destroy', $category->id) }}" 
+                                            <form action="{{ route('books.destroy', $book->id) }}" 
                                                   method="POST" 
-                                                  class="m-0 p-0"
-                                                  onsubmit="return confirm('Yakin ingin menghapus kategori ini? Semua buku dalam kategori ini akan kehilangan kategori.');">
+                                                  class="d-inline"
+                                                  onsubmit="return confirm('Yakin ingin menghapus buku ini? Data terkait seperti peminjaman mungkin terpengaruh.');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" 
-                                                        class="bg-transparent border-0 p-0 m-0" 
-                                                        style="color: #ef4444; transition: 0.2s;"
-                                                        onmouseover="this.style.transform='scale(1.2)'"
-                                                        onmouseout="this.style.transform='scale(1)'"
-                                                        data-bs-toggle="tooltip" title="Hapus kategori">
-                                                    <i class="fas fa-trash-alt" style="font-size: 1.25rem;"></i>
+                                                        class="btn btn-sm" 
+                                                        style="background-color: #ff6b6b; color: white; border: none; border-radius: 0 8px 8px 0; padding: 8px 12px;">
+                                                    <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>
                                         </div>
@@ -222,13 +235,13 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="5" class="text-center py-5">
+                                    <td colspan="8" class="text-center py-5">
                                         <div class="text-muted">
-                                            <i class="fas fa-folder-open fa-4x mb-3" style="color: #dfe6e9;"></i>
-                                            <h6>Belum ada data kategori</h6>
-                                            <p class="small mb-3">Silakan tambah kategori baru</p>
-                                            <a href="{{ route('categories.create') }}" class="btn btn-sm" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000;">
-                                                <i class="fas fa-plus-circle me-1"></i> Tambah Kategori
+                                            <i class="fas fa-book-open fa-4x mb-3" style="color: #dfe6e9;"></i>
+                                            <h6>Belum ada data buku</h6>
+                                            <p class="small mb-3">Silakan tambah buku baru</p>
+                                            <a href="{{ route('books.create') }}" class="btn btn-sm" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000;">
+                                                <i class="fas fa-plus-circle me-1"></i> Tambah Buku
                                             </a>
                                         </div>
                                     </td>
@@ -238,84 +251,24 @@
                         </table>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
-    @if($categories->count() > 0)
-    <div class="row g-0 mt-4">
-        <div class="col-12">
-            <div class="card border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
-                <div class="card-header bg-white border-0 py-3 px-4">
-                    <h5 class="mb-0" style="color: #2d3436; font-weight: 600;">
-                        <i class="fas fa-chevron-circle-down me-2" style="color: #8b5cf6;"></i> Detail Stok Buku per Kategori
-                    </h5>
-                </div>
-                <div class="card-body p-0">
-                    <div class="accordion" id="accordionKategori">
-                        @foreach($categories as $index => $category)
-                            @if($category->books_count > 0)
-                            <div class="accordion-item border-0 border-bottom">
-                                <h2 class="accordion-header" id="heading{{ $index }}">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $index }}" style="background-color: #f8f9fa;">
-                                        <div class="d-flex align-items-center w-100">
-                                            <i class="fas fa-folder me-3" style="color: #8b5cf6;"></i>
-                                            <span class="fw-semibold me-3">{{ $category->nama }}</span>
-                                            <span class="badge bg-info me-2">{{ $category->books_count }} buku</span>
-                                            @php
-                                                $totalStok = $category->books->sum('stok');
-                                                $bukuHabis = $category->books->where('stok', 0)->count();
-                                            @endphp
-                                            <span class="badge bg-success me-2">Stok: {{ $totalStok }}</span>
-                                            @if($bukuHabis > 0)
-                                                <span class="badge bg-danger">Habis: {{ $bukuHabis }}</span>
-                                            @endif
-                                        </div>
-                                    </button>
-                                </h2>
-                                <div id="collapse{{ $index }}" class="accordion-collapse collapse" data-bs-parent="#accordionKategori">
-                                    <div class="accordion-body p-0">
-                                        <table class="table table-sm mb-0">
-                                            <thead class="bg-light">
-                                                <tr>
-                                                    <th class="ps-4">Judul Buku</th>
-                                                    <th class="text-center" style="width: 100px;">Stok</th>
-                                                    <th class="text-center" style="width: 100px;">Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach($category->books as $buku)
-                                                <tr>
-                                                    <td class="ps-4">
-                                                        <i class="fas fa-book me-2" style="color: #8b5cf6; font-size: 12px;"></i>
-                                                        {{ $buku->judul }}
-                                                    </td>
-                                                    <td class="text-center">{{ $buku->stok }}</td>
-                                                    <td class="text-center">
-                                                        @if($buku->stok > 5)
-                                                            <span class="badge bg-success">Tersedia</span>
-                                                        @elseif($buku->stok > 0)
-                                                            <span class="badge bg-warning text-dark">Sisa {{ $buku->stok }}</span>
-                                                        @else
-                                                            <span class="badge bg-danger">Habis</span>
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            @endif
-                        @endforeach
+                @if(method_exists($books, 'links') && $books->hasPages())
+                <div class="card-footer bg-white border-0 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-muted small">
+                            Menampilkan {{ $books->firstItem() }} - {{ $books->lastItem() }} dari {{ $books->total() }} buku
+                        </div>
+                        <div>
+                            {{ $books->links() }}
+                        </div>
                     </div>
                 </div>
+                @endif
             </div>
         </div>
     </div>
-    @endif
 </div>
+@endsection
 
 @push('scripts')
 <script>
@@ -326,21 +279,5 @@
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
     });
-
-    // Search functionality
-    document.getElementById('searchInput').addEventListener('keyup', function() {
-        let searchValue = this.value.toLowerCase();
-        let tableRows = document.querySelectorAll('#categoryTable tbody tr');
-        
-        tableRows.forEach(function(row) {
-            let text = row.textContent.toLowerCase();
-            if (text.indexOf(searchValue) > -1) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-    });
 </script>
 @endpush
-@endsection

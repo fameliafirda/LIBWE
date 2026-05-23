@@ -37,6 +37,17 @@
     </div>
     @endif
 
+    @if(session('error'))
+    <div class="row g-0 mb-4">
+        <div class="col-12">
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 15px; border-left: 5px solid #dc3545;">
+                <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+    @endif
+
     @php
         $bukuHabis = App\Models\Book::where('stok', '<=', 0)->get();
     @endphp
@@ -185,36 +196,33 @@
                                         </div>
                                     </td>
                                     <td class="text-center">
-                                        <div class="d-flex justify-content-center align-items-center gap-3">
+                                        <div class="d-flex justify-content-center align-items-center gap-4">
                                             <a href="{{ route('categories.edit', $category->id) }}" 
-                                               class="bg-transparent border-0 p-0 m-0" 
-                                               style="color: #f59e0b; transition: 0.2s; transform-origin: center;"
+                                               style="color: #f59e0b; font-size: 1.3rem; transition: 0.2s; text-decoration: none;"
                                                onmouseover="this.style.transform='scale(1.2)'"
                                                onmouseout="this.style.transform='scale(1)'"
-                                               data-bs-toggle="tooltip" title="Edit kategori">
-                                                <i class="fas fa-edit" style="font-size: 1.25rem;"></i>
+                                               data-bs-toggle="tooltip" title="Edit">
+                                                <i class="fas fa-edit"></i>
                                             </a>
                                             <a href="{{ route('books.index', ['kategori' => $category->id]) }}" 
-                                               class="bg-transparent border-0 p-0 m-0" 
-                                               style="color: #10b981; transition: 0.2s; transform-origin: center;"
+                                               style="color: #10b981; font-size: 1.3rem; transition: 0.2s; text-decoration: none;"
                                                onmouseover="this.style.transform='scale(1.2)'"
                                                onmouseout="this.style.transform='scale(1)'"
-                                               data-bs-toggle="tooltip" title="Lihat buku dalam kategori ini">
-                                                <i class="fas fa-eye" style="font-size: 1.25rem;"></i>
+                                               data-bs-toggle="tooltip" title="Lihat Buku">
+                                                <i class="fas fa-eye"></i>
                                             </a>
                                             <form action="{{ route('categories.destroy', $category->id) }}" 
                                                   method="POST" 
                                                   class="m-0 p-0"
-                                                  onsubmit="return confirm('Yakin ingin menghapus kategori ini? Semua buku dalam kategori ini akan kehilangan kategori.');">
+                                                  onsubmit="return confirm('Yakin ingin menghapus?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" 
-                                                        class="bg-transparent border-0 p-0 m-0" 
-                                                        style="color: #ef4444; transition: 0.2s; transform-origin: center;"
+                                                        style="background: transparent; border: none; color: #ef4444; font-size: 1.3rem; transition: 0.2s; padding: 0;"
                                                         onmouseover="this.style.transform='scale(1.2)'"
                                                         onmouseout="this.style.transform='scale(1)'"
-                                                        data-bs-toggle="tooltip" title="Hapus kategori">
-                                                    <i class="fas fa-trash-alt" style="font-size: 1.25rem;"></i>
+                                                        data-bs-toggle="tooltip" title="Hapus">
+                                                    <i class="fas fa-trash-alt"></i>
                                                 </button>
                                             </form>
                                         </div>
@@ -226,10 +234,6 @@
                                         <div class="text-muted">
                                             <i class="fas fa-folder-open fa-4x mb-3" style="color: #dfe6e9;"></i>
                                             <h6>Belum ada data kategori</h6>
-                                            <p class="small mb-3">Silakan tambah kategori baru</p>
-                                            <a href="{{ route('categories.create') }}" class="btn btn-sm" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000;">
-                                                <i class="fas fa-plus-circle me-1"></i> Tambah Kategori
-                                            </a>
                                         </div>
                                     </td>
                                 </tr>
@@ -319,7 +323,6 @@
 
 @push('scripts')
 <script>
-    // Tooltip initialization
     document.addEventListener('DOMContentLoaded', function() {
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -327,7 +330,6 @@
         });
     });
 
-    // Search functionality
     document.getElementById('searchInput').addEventListener('keyup', function() {
         let searchValue = this.value.toLowerCase();
         let tableRows = document.querySelectorAll('#categoryTable tbody tr');
