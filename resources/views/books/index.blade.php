@@ -212,7 +212,7 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        <div class="d-flex justify-content-center align-items-center gap-5">
+                                        <div class="d-flex justify-content-center align-items-center gap-8">
                                             <a href="{{ route('books.edit', $book->id) }}" 
                                                class="bg-transparent border-0 p-0 m-0" 
                                                style="color: #f59e0b; transition: 0.2s;"
