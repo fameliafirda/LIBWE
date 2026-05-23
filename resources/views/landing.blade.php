@@ -25,10 +25,10 @@
         :root {
             --color-black: #fbf8cc;
             --color-1: #ffcfd2;
-            --color-2: #cfbaf0;
+            --color-2: #b23a48;
             --color-3: #ffafcc; /* Hot Pink */
-            --color-4: #bde0fe; /* Cyan/Blue */
-            --color-5: #a2d2ff;
+            --color-4: #598392; /* Cyan/Blue */
+            --color-5: #9f86c0;
             --glass: rgba(20, 20, 20, 0.45);
             --glass-border: rgba(255, 255, 255, 0.1);
         }
