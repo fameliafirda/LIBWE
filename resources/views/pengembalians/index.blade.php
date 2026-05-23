@@ -4,7 +4,6 @@
 
 @section('content')
 <div class="container-fluid py-4">
-    <!-- Header dengan gradient -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px;">
@@ -25,7 +24,6 @@
         </div>
     </div>
 
-    <!-- Alert Messages -->
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 15px; border-left: 5px solid #28a745;">
             <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
@@ -40,7 +38,6 @@
         </div>
     @endif
 
-    <!-- Statistik Cards -->
     <div class="row mb-4">
         <div class="col-12 col-md-4 mb-3">
             <div class="card border-0 shadow-sm h-100" style="border-radius: 20px; background: linear-gradient(135deg, #f7c0ec 0%, #a7bdea 100%);">
@@ -91,7 +88,6 @@
         </div>
     </div>
 
-    <!-- Tabel Pengembalian -->
     <div class="card border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
         <div class="card-header bg-white border-0 py-3 px-4">
             <div class="d-flex justify-content-between align-items-center">
@@ -167,24 +163,24 @@
                                 </span>
                             </td>
                             <td class="text-center">
-                                <div class="btn-group" role="group">
+                                <div class="d-flex justify-content-center align-items-center gap-2">
                                     <a href="{{ route('pengembalians.edit', $pengembalian->id) }}" 
-                                       class="btn btn-sm" 
-                                       style="background-color: #ffe066; color: #000; border: none; border-radius: 8px 0 0 8px; padding: 8px 12px;"
+                                       class="btn shadow-sm text-dark d-inline-flex align-items-center justify-content-center" 
+                                       style="background-color: #ffe066; border: none; border-radius: 10px; width: 38px; height: 38px; transition: 0.2s;"
                                        data-bs-toggle="tooltip" title="Edit">
-                                        <i class="fas fa-edit"></i>
+                                        <i class="fas fa-pen" style="font-size: 0.95rem;"></i>
                                     </a>
                                     <form action="{{ route('pengembalians.destroy', $pengembalian->id) }}" 
                                           method="POST" 
-                                          class="d-inline"
+                                          class="m-0 p-0"
                                           onsubmit="return confirm('Yakin ingin menghapus data pengembalian ini? Stok buku akan dikembalikan.');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" 
-                                                class="btn btn-sm" 
-                                                style="background-color: #ff6b6b; color: white; border: none; border-radius: 0 8px 8px 0; padding: 8px 12px;"
+                                                class="btn shadow-sm text-white d-inline-flex align-items-center justify-content-center" 
+                                                style="background-color: #ff6b6b; border: none; border-radius: 10px; width: 38px; height: 38px; transition: 0.2s;"
                                                 data-bs-toggle="tooltip" title="Hapus">
-                                            <i class="fas fa-trash"></i>
+                                            <i class="fas fa-trash-alt" style="font-size: 0.95rem;"></i>
                                         </button>
                                     </form>
                                 </div>

@@ -4,7 +4,6 @@
 
 @section('content')
 <div class="container-fluid px-4 py-3">
-    <!-- Header Gradient -->
     <div class="row g-0 mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 0 20px 20px 0;">
@@ -27,7 +26,6 @@
         </div>
     </div>
 
-    <!-- Alert Success -->
     @if(session('success'))
     <div class="row g-0 mb-4">
         <div class="col-12">
@@ -39,7 +37,6 @@
     </div>
     @endif
 
-    <!-- Notifikasi Stok Habis -->
     @php
         $bukuHabis = App\Models\Book::where('stok', '<=', 0)->get();
     @endphp
@@ -69,7 +66,6 @@
     </div>
     @endif
 
-    <!-- Filter Kategori -->
     @if(isset($filterKategori))
     <div class="row g-0 mb-4">
         <div class="col-12">
@@ -86,7 +82,6 @@
     </div>
     @endif
 
-    <!-- Search & Filter Bar -->
     <div class="row g-0 mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-sm" style="border-radius: 20px;">
@@ -123,7 +118,6 @@
         </div>
     </div>
 
-    <!-- Tabel Kategori -->
     <div class="row g-0">
         <div class="col-12">
             <div class="card border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
@@ -191,30 +185,30 @@
                                         </div>
                                     </td>
                                     <td class="text-center">
-                                        <div class="btn-group" role="group">
+                                        <div class="d-flex justify-content-center align-items-center gap-2">
                                             <a href="{{ route('categories.edit', $category->id) }}" 
-                                               class="btn btn-sm" 
-                                               style="background-color: #ffe066; color: #000; border: none; border-radius: 8px 0 0 8px; padding: 6px 12px;"
+                                               class="btn shadow-sm text-dark d-inline-flex align-items-center justify-content-center" 
+                                               style="background-color: #ffe066; border: none; border-radius: 10px; width: 38px; height: 38px; transition: 0.2s;"
                                                data-bs-toggle="tooltip" title="Edit kategori">
-                                                <i class="fas fa-edit"></i>
+                                                <i class="fas fa-pen" style="font-size: 0.95rem;"></i>
                                             </a>
                                             <a href="{{ route('books.index', ['kategori' => $category->id]) }}" 
-                                               class="btn btn-sm" 
-                                               style="background-color: #8fd19e; color: #000; border: none; border-radius: 0; padding: 6px 12px;"
+                                               class="btn shadow-sm text-dark d-inline-flex align-items-center justify-content-center" 
+                                               style="background-color: #8fd19e; border: none; border-radius: 10px; width: 38px; height: 38px; transition: 0.2s;"
                                                data-bs-toggle="tooltip" title="Lihat buku dalam kategori ini">
-                                                <i class="fas fa-eye"></i>
+                                                <i class="fas fa-eye" style="font-size: 0.95rem;"></i>
                                             </a>
                                             <form action="{{ route('categories.destroy', $category->id) }}" 
                                                   method="POST" 
-                                                  class="d-inline"
+                                                  class="m-0 p-0"
                                                   onsubmit="return confirm('Yakin ingin menghapus kategori ini? Semua buku dalam kategori ini akan kehilangan kategori.');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" 
-                                                        class="btn btn-sm" 
-                                                        style="background-color: #ff6b6b; color: white; border: none; border-radius: 0 8px 8px 0; padding: 6px 12px;"
+                                                        class="btn shadow-sm text-white d-inline-flex align-items-center justify-content-center" 
+                                                        style="background-color: #ff6b6b; border: none; border-radius: 10px; width: 38px; height: 38px; transition: 0.2s;"
                                                         data-bs-toggle="tooltip" title="Hapus kategori">
-                                                    <i class="fas fa-trash"></i>
+                                                    <i class="fas fa-trash-alt" style="font-size: 0.95rem;"></i>
                                                 </button>
                                             </form>
                                         </div>
@@ -242,7 +236,6 @@
         </div>
     </div>
 
-    <!-- Daftar Buku per Kategori (Accordion) -->
     @if($categories->count() > 0)
     <div class="row g-0 mt-4">
         <div class="col-12">

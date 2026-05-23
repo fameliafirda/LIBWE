@@ -305,34 +305,37 @@
                                         </td>
 
                                         <td class="text-center">
-                                            <div class="d-flex flex-wrap gap-2 justify-content-center">
+                                            <div class="d-flex justify-content-center align-items-center gap-2">
                                                 @if($pinjaman->status == 'belum dikembalikan')
-                                                    <form action="{{ route('pinjamans.mark-returned', $pinjaman->id) }}" method="POST" class="d-inline">
+                                                    <form action="{{ route('pinjamans.mark-returned', $pinjaman->id) }}" method="POST" class="m-0 p-0" onsubmit="return confirm('Tandai buku ini sudah dikembalikan HARI INI?')">
                                                         @csrf
-                                                        <button type="submit" class="btn btn-sm"
-                                                                style="background-color: #28a745; color: white; border: none; border-radius: 8px; padding: 6px 10px;"
-                                                                onclick="return confirm('Tandai buku ini sudah dikembalikan HARI INI?')"
+                                                        <button type="submit" 
+                                                                class="btn shadow-sm text-white d-inline-flex align-items-center justify-content-center" 
+                                                                style="background-color: #28a745; border: none; border-radius: 10px; width: 38px; height: 38px; transition: 0.2s;"
                                                                 data-bs-toggle="tooltip" title="Tandai Sudah Dikembalikan">
-                                                            <i class="fas fa-check"></i>
+                                                            <i class="fas fa-check" style="font-size: 0.95rem;"></i>
                                                         </button>
                                                     </form>
                                                 @endif
 
                                                 <a href="{{ route('pinjamans.edit', $pinjaman->id) }}"
-                                                   class="btn btn-sm"
-                                                   style="background-color: #ffe066; color: #000; border: none; border-radius: 8px; padding: 6px 10px;"
+                                                   class="btn shadow-sm text-dark d-inline-flex align-items-center justify-content-center"
+                                                   style="background-color: #ffe066; border: none; border-radius: 10px; width: 38px; height: 38px; transition: 0.2s;"
                                                    data-bs-toggle="tooltip" title="Edit peminjaman">
-                                                    <i class="fas fa-edit"></i>
+                                                    <i class="fas fa-pen" style="font-size: 0.95rem;"></i>
                                                 </a>
                                                 
-                                                <form action="{{ route('pinjamans.destroy', $pinjaman->id) }}" method="POST" class="d-inline">
+                                                <form action="{{ route('pinjamans.destroy', $pinjaman->id) }}" 
+                                                      method="POST" 
+                                                      class="m-0 p-0"
+                                                      onsubmit="return confirm('Yakin ingin menghapus data peminjaman ini? Stok buku akan dikembalikan.')">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm"
-                                                            style="background-color: #ff6b6b; color: white; border: none; border-radius: 8px; padding: 6px 10px;"
-                                                            onclick="return confirm('Yakin ingin menghapus data peminjaman ini? Stok buku akan dikembalikan.')"
+                                                    <button type="submit" 
+                                                            class="btn shadow-sm text-white d-inline-flex align-items-center justify-content-center"
+                                                            style="background-color: #ff6b6b; border: none; border-radius: 10px; width: 38px; height: 38px; transition: 0.2s;"
                                                             data-bs-toggle="tooltip" title="Hapus peminjaman">
-                                                        <i class="fas fa-trash"></i>
+                                                        <i class="fas fa-trash-alt" style="font-size: 0.95rem;"></i>
                                                     </button>
                                                 </form>
                                             </div>
