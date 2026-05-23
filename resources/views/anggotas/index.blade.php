@@ -118,7 +118,8 @@
                             <thead style="background: linear-gradient(45deg, #f7c0ec, #a7bdea);">
                                 <tr>
                                     <th class="text-center" style="width: 50px;">No</th>
-                                    <th style="width: 100px;">NISN</th> <th style="width: 150px;">Nama</th>
+                                    <th style="width: 100px;">NISN</th>
+                                    <th style="width: 150px;">Nama</th>
                                     <th style="width: 100px;">Kelas</th>
                                     <th style="width: 120px;">Jenis Kelamin</th>
                                     <th>Buku yang Dipinjam</th>
@@ -205,7 +206,7 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        <div class="d-flex justify-content-center align-items-center gap-5">
+                                        <div class="d-flex justify-content-center align-items-center" style="gap: 25px;">
                                             <a href="{{ route('anggotas.edit', $item['anggota']->id) }}" 
                                                style="color: #f59e0b; font-size: 1.4rem; transition: 0.2s; text-decoration: none;"
                                                onmouseover="this.style.transform='scale(1.2)'"
