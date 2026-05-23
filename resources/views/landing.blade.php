@@ -24,18 +24,18 @@
            ============================================================ */
         :root {
             /* PALET WARNA CERIA & PASTEL ESTETIK */
-        --color-bg: #fbf8cc;      /* Kuning krem lembut untuk background utama (sebelumnya color-black) */
-        --color-text: #2b2d42;    /* Navy gelap untuk teks utama (jangan pakai hitam pekat agar tetap ramah anak) */
+            --color-bg: #fbf8cc;      /* Kuning krem lembut untuk background utama */
+            --color-text: #2b2d42;    /* Navy gelap untuk teks utama agar ramah anak dan terbaca */
 
-        --color-1: #ffcfd2;       /* Pink pastel yang lembut */
-        --color-2: #ffb703;       /* KUNING SUNSHINE CERIA (Menggantikan maroon tua agar suasana langsung hidup) */
-        --color-3: #ffafcc;       /* Hot Pink / Bubblegum Pink yang ceria */
-        --color-4: #8ecae6;       /* BIRU LANGIT CERAH (Menggantikan biru muted/tua agar lebih fresh) */
-        --color-5: #b5179e;       /* UNGU UNIK / MAGENTA (Aksen cerah yang bikin desain terlihat modern) */
+            --color-1: #ffcfd2;       /* Pink pastel yang lembut */
+            --color-2: #ffb703;       /* KUNING SUNSHINE CERIA */
+            --color-3: #ffafcc;       /* Hot Pink / Bubblegum Pink yang ceria */
+            --color-4: #8ecae6;       /* BIRU LANGIT CERAH */
+            --color-5: #b5179e;       /* UNGU UNIK / MAGENTA */
 
-        /* EFEK KACA PUTIH (LIGHT GLASSMORPHISM) */
-        --glass: rgba(255, 255, 255, 0.45);        
-        --glass-border: rgba(255, 255, 255, 0.3);
+            /* EFEK KACA PUTIH (LIGHT GLASSMORPHISM) */
+            --glass: rgba(255, 255, 255, 0.55);        
+            --glass-border: rgba(255, 255, 255, 0.6);
         }
 
         * {
@@ -48,19 +48,19 @@
             width: 100%;
             overflow-x: hidden;
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--color-black);
-            color: #ffffff;
+            background-color: var(--color-bg);
+            color: var(--color-text);
             scroll-behavior: smooth;
         }
 
-        /* Y2K Grid Background */
+        /* Y2K Grid Background - Disesuaikan untuk Light Mode */
         body::before {
             content: '';
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
             background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+                linear-gradient(rgba(43, 45, 66, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(43, 45, 66, 0.05) 1px, transparent 1px);
             background-size: 40px 40px;
             z-index: -2;
             pointer-events: none;
@@ -77,7 +77,7 @@
 
         ::selection {
             background: var(--color-3);
-            color: var(--color-black);
+            color: var(--color-text);
         }
 
         /* Floating Background Glow with Pulse Animation */
@@ -87,7 +87,7 @@
             border-radius: 50%;
             filter: blur(150px);
             z-index: -1;
-            opacity: 0.15;
+            opacity: 0.35; /* Dinaikkan sedikit agar warnanya lebih keluar di bg putih */
             pointer-events: none;
             animation: pulseGlow 12s infinite alternate ease-in-out;
         }
@@ -98,9 +98,9 @@
         .bg-glow:nth-child(3) { animation-delay: -8s; }
 
         @keyframes pulseGlow {
-            0% { transform: scale(1) translate(0, 0); opacity: 0.12; }
-            50% { transform: scale(1.15) translate(30px, -30px); opacity: 0.25; }
-            100% { transform: scale(0.9) translate(-30px, 30px); opacity: 0.12; }
+            0% { transform: scale(1) translate(0, 0); opacity: 0.25; }
+            50% { transform: scale(1.15) translate(30px, -30px); opacity: 0.45; }
+            100% { transform: scale(0.9) translate(-30px, 30px); opacity: 0.25; }
         }
 
         /* ============================================================
@@ -117,14 +117,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(10, 10, 10, 0.7);
+            background: var(--glass);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
             border-radius: 50px;
             z-index: 1000;
             transition: all 0.4s ease;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
             animation: slideDownNav 1s ease-out forwards;
         }
 
@@ -135,9 +135,9 @@
 
         .libwe-nav.scrolled {
             top: 10px;
-            background: rgba(5, 5, 5, 0.9);
-            border-color: rgba(189, 224, 254, 0.3);
-            box-shadow: 0 10px 25px rgba(189, 224, 254, 0.1);
+            background: rgba(255, 255, 255, 0.85);
+            border-color: rgba(142, 202, 230, 0.5);
+            box-shadow: 0 10px 25px rgba(142, 202, 230, 0.2);
         }
 
         .brand-container {
@@ -149,7 +149,7 @@
         .brand-container img {
             width: 30px;
             height: auto;
-            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+            filter: drop-shadow(0 0 5px rgba(43, 45, 66, 0.1));
             transition: 0.5s ease;
         }
 
@@ -161,7 +161,7 @@
             font-family: 'Unbounded', sans-serif;
             font-size: 1.4rem;
             font-weight: 900;
-            background: linear-gradient(to right, var(--color-4), var(--color-3));
+            background: linear-gradient(to right, var(--color-4), var(--color-5));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: 1px;
@@ -175,8 +175,8 @@
 
         .nav-links a { 
             text-decoration: none; 
-            color: rgba(255,255,255,0.7); 
-            font-weight: 600; 
+            color: var(--color-text); 
+            font-weight: 700; 
             font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -185,12 +185,12 @@
 
         .nav-links a:hover { 
             color: var(--color-3); 
-            text-shadow: 0 0 10px var(--color-3); 
+            text-shadow: 0 0 10px rgba(255, 175, 204, 0.5); 
         }
 
         .btn-login {
             background: var(--color-4);
-            color: var(--color-black) !important;
+            color: var(--color-text) !important;
             padding: 8px 22px;
             border-radius: 30px;
             border: none;
@@ -199,12 +199,12 @@
             font-size: 0.8rem;
             transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
-            box-shadow: 0 0 15px rgba(189, 224, 254, 0.4);
+            box-shadow: 0 0 15px rgba(142, 202, 230, 0.4);
         }
 
         .btn-login:hover {
             background: var(--color-3);
-            color: var(--color-black) !important;
+            color: var(--color-text) !important;
             box-shadow: 0 0 20px rgba(255, 175, 204, 0.6);
             transform: scale(1.05);
         }
@@ -255,17 +255,17 @@
 
         .marquee-content {
             display: flex;
-            animation: scrollText 35s linear infinite; /* Sedikit lebih cepat */
+            animation: scrollText 35s linear infinite;
         }
 
         .marquee-item {
             font-family: 'Syne', sans-serif;
             font-size: 15vw;
             font-weight: 900;
-            font-style: italic; /* Menambah kesan cepat/futuristik */
+            font-style: italic;
             white-space: nowrap;
             color: transparent;
-            -webkit-text-stroke: 2.5px rgba(189, 224, 254, 0.25); /* Garis lebih tebal dan berwarna Cyan */
+            -webkit-text-stroke: 2.5px rgba(142, 202, 230, 0.4); /* Menggunakan tone biru cerah */
             text-transform: uppercase;
             padding-right: 50px;
             letter-spacing: 3px;
@@ -292,7 +292,7 @@
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
-            filter: drop-shadow(0 0 40px rgba(255, 175, 204, 0.3));
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1));
         }
 
         @keyframes floatHero {
@@ -313,22 +313,23 @@
         .hero-content h1 { 
             font-family: 'Unbounded', sans-serif; 
             font-size: clamp(1.8rem, 4vw, 3.5rem); 
-            color: #fff; 
+            color: var(--color-text); 
             margin: 0; 
             line-height: 1.2;
-            text-shadow: 0 5px 15px rgba(0,0,0,0.8);
+            text-shadow: 0 5px 15px rgba(0,0,0,0.05); /* Shadow diperhalus untuk tema terang */
             opacity: 0;
             animation: slideUpFade 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards 0.3s;
         }
 
         .hero-content h1 span {
-            color: var(--color-3);
-            text-shadow: 0 0 20px rgba(255, 175, 204, 0.4);
+            color: var(--color-5); /* Menggunakan magenta agar kontras dengan background */
+            text-shadow: 0 0 20px rgba(181, 23, 158, 0.2);
         }
 
         .hero-content p {
             font-size: clamp(0.85rem, 1.5vw, 1.1rem);
-            color: rgba(255,255,255,0.7);
+            color: var(--color-text);
+            font-weight: 500;
             margin: 2vh 0 4vh;
             max-width: 600px;
             opacity: 0;
@@ -348,8 +349,8 @@
         /* Tombol Y2K Style */
         .btn-hero {
             display: inline-block;
-            background: var(--color-3);
-            color: var(--color-black);
+            background: var(--color-2); /* Kuning Sunshine */
+            color: var(--color-text);
             padding: 15px 40px;
             border-radius: 50px;
             font-family: 'Unbounded', sans-serif;
@@ -358,15 +359,15 @@
             text-decoration: none;
             text-transform: uppercase;
             transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 2px solid var(--color-3);
-            box-shadow: 0 0 20px rgba(255, 175, 204, 0.5), inset 0 0 10px rgba(255,255,255,0.5);
+            border: 2px solid var(--color-2);
+            box-shadow: 0 5px 15px rgba(255, 183, 3, 0.3), inset 0 0 10px rgba(255,255,255,0.5);
             cursor: pointer;
         }
 
         .btn-hero:hover {
             background: transparent;
-            color: var(--color-3);
-            box-shadow: 0 0 30px rgba(255, 175, 204, 0.8);
+            color: var(--color-2);
+            box-shadow: 0 0 30px rgba(255, 183, 3, 0.6);
             transform: scale(1.05);
         }
 
@@ -390,26 +391,26 @@
 
         .section-subtitle {
             letter-spacing: 4px; 
-            color: var(--color-4); 
+            color: var(--color-5); 
             font-weight: 800; 
             font-size: 0.8rem; 
             text-transform: uppercase;
-            background: rgba(189, 224, 254, 0.1);
+            background: rgba(181, 23, 158, 0.1);
             padding: 6px 15px;
             border-radius: 20px;
-            border: 1px solid rgba(189, 224, 254, 0.3);
+            border: 1px solid rgba(181, 23, 158, 0.2);
         }
 
         .section-title {
             font-family: 'Unbounded', sans-serif; 
             font-size: clamp(1.8rem, 3.5vw, 2.5rem); 
             margin-top: 20px;
-            color: #fff;
-            text-shadow: 0 0 10px rgba(255,255,255,0.2);
+            color: var(--color-text);
+            text-shadow: 0 0 10px rgba(0,0,0,0.05);
         }
 
         .glass-card {
-            background: rgba(15, 15, 15, 0.6);
+            background: var(--glass);
             border: 1px solid var(--glass-border);
             padding: 50px;
             border-radius: 30px;
@@ -418,20 +419,20 @@
             width: 100%;
             max-width: 900px;
             transition: 0.5s ease;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05); /* Shadow diperhalus */
             /* Animasi Ambient di Border Card */
             animation: borderGlow 8s infinite alternate;
         }
 
         @keyframes borderGlow {
-            0% { border-color: rgba(255, 255, 255, 0.1); }
-            50% { border-color: rgba(189, 224, 254, 0.25); }
-            100% { border-color: rgba(255, 175, 204, 0.25); }
+            0% { border-color: rgba(255, 255, 255, 0.6); }
+            50% { border-color: rgba(142, 202, 230, 0.5); }
+            100% { border-color: rgba(255, 175, 204, 0.5); }
         }
 
         .glass-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.1);
             border-color: var(--color-3) !important;
             animation: none; /* Matikan animasi ambient saat di-hover */
         }
@@ -439,12 +440,12 @@
         .text-content p {
             line-height: 1.8;
             font-size: 1rem;
-            color: rgba(255, 255, 255, 0.85);
+            color: var(--color-text);
             margin-bottom: 20px;
         }
 
         .text-content strong {
-            color: var(--color-3);
+            color: var(--color-5); /* Magenta */
             font-family: 'Unbounded', sans-serif;
             font-size: 1.05rem;
         }
@@ -452,7 +453,7 @@
         ul, ol {
             padding-left: 20px;
             line-height: 1.8;
-            color: rgba(255, 255, 255, 0.85);
+            color: var(--color-text);
             margin-bottom: 20px;
         }
 
@@ -479,12 +480,13 @@
         .pustakawan-card img:hover {
             transform: scale(1.1) rotate(5deg);
             border-color: var(--color-4);
-            box-shadow: 0 0 30px rgba(189, 224, 254, 0.6);
+            box-shadow: 0 0 30px rgba(142, 202, 230, 0.6);
         }
 
         .pustakawan-card p {
             font-size: 1rem;
             margin-bottom: 10px;
+            color: var(--color-text);
         }
 
         /* Denah & Lokasi */
@@ -498,12 +500,13 @@
         iframe {
             width: 100%;
             height: 350px;
-            filter: grayscale(80%) invert(100%) contrast(90%);
+            /* Filter dark mode dihapus agar peta terlihat normal dan cerah */
+            filter: none; 
             display: block;
         }
 
         .alamat-info {
-            background: rgba(0, 0, 0, 0.4);
+            background: var(--glass);
             padding: 25px;
             border-radius: 20px;
             text-align: center;
@@ -513,12 +516,13 @@
 
         .alamat-info p {
             margin-bottom: 10px;
-            color: rgba(255, 255, 255, 0.8);
+            color: var(--color-text);
             font-size: 0.95rem;
+            font-weight: 500;
         }
 
         .alamat-info i {
-            color: var(--color-4);
+            color: var(--color-5);
             margin-right: 8px;
         }
 
@@ -538,9 +542,9 @@
         footer {
             text-align: center;
             padding: 30px;
-            color: rgba(255, 255, 255, 0.4);
+            color: var(--color-text);
             font-size: 0.85rem;
-            font-weight: 600;
+            font-weight: 700;
             border-top: 1px solid var(--glass-border);
             background: transparent;
         }
@@ -560,7 +564,7 @@
                 position: absolute;
                 top: 70px; left: 0;
                 width: 100%;
-                background: rgba(10, 10, 10, 0.95);
+                background: rgba(255, 255, 255, 0.95); /* Diubah ke light mode */
                 backdrop-filter: blur(20px);
                 flex-direction: column;
                 justify-content: center;
@@ -665,7 +669,7 @@
                     <li>Dengan adanya perpustakaan ini, diharapkan SDN Berat Wetan 1 tidak hanya menjadi tempat belajar akademik, tetapi juga tempat untuk membangun karakter, imajinasi, dan kecintaan terhadap ilmu pengetahuan.</li>
                 </ul>
                 
-                <hr style="border: 0; border-top: 1px dashed rgba(255,255,255,0.2); margin: 30px 0;">
+                <hr style="border: 0; border-top: 1px dashed rgba(43,45,66,0.15); margin: 30px 0;">
                 
                 <p><i class="fas fa-map-marker-alt" style="color: var(--color-4); margin-right: 10px; width: 20px; text-align: center;"></i> <strong>Alamat:</strong> Jl. KH. Abdul Fattah No.04, Berat Wetan, Kec. Gedeg, Kabupaten Mojokerto, Jawa Timur</p>
                 <p><i class="fas fa-envelope" style="color: var(--color-3); margin-right: 10px; width: 20px; text-align: center;"></i> <strong>Email:</strong> berat.wetan1@gmail.com</p>
@@ -708,7 +712,7 @@
                 <img src="{{ asset('web-perpus/img/pustakawan.png') }}" alt="Foto Pustakawan">
                 <p><strong style="color: var(--color-4); font-family: 'Unbounded', sans-serif;">Nama:</strong> Lilik Nurhayati, S.Pd</p>
                 <p><strong style="color: var(--color-3); font-family: 'Unbounded', sans-serif;">Email:</strong> lilik.nur246@guruku.belajar.id</p>
-                <p><strong style="color: var(--color-1); font-family: 'Unbounded', sans-serif;">Jabatan:</strong> Pustakawan</p>
+                <p><strong style="color: var(--color-5); font-family: 'Unbounded', sans-serif;">Jabatan:</strong> Pustakawan</p>
             </div>
         </section>
 
