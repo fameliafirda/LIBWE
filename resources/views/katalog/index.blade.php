@@ -11,16 +11,16 @@
        1. COLOR PALETTE (USER CUSTOM: NEON PASTEL GLASS)
        ============================================================ */
     :root {
-        --color-black: #fbf8cc;
-        --color-1: #cdb4db; /* Lilac */
-        --color-2: #ffc8dd; /* Light Pink */
-        --color-3: #ffafcc; /* Hot Pink */
-        --color-4: #bde0fe; /* Cyan/Blue */
-        --color-5: #a2d2ff; /* Deep Sky Blue */
-        --glass: rgba(20, 20, 20, 0.45);
-        --glass-border: rgba(255, 255, 255, 0.1);
-        --text-main: #ffffff;
-        --text-muted: #a0a0a0;
+        --color-black: #fbf8cc; /* Background utama krem terang */
+        --color-1: #ffcfd2;     /* Pink pastel */
+        --color-2: #ffb703;     /* Kuning sunshine */
+        --color-3: #ffafcc;     /* Hot Pink */
+        --color-4: #8ecae6;     /* Biru Langit */
+        --color-5: #b5179e;     /* Magenta / Ungu cerah */
+        --glass: rgba(255, 255, 255, 0.55);
+        --glass-border: rgba(255, 255, 255, 0.6);
+        --text-main: #2b2d42;   /* Navy gelap agar kontras */
+        --text-muted: #6c757d;  /* Abu-abu gelap */
     }
 
     /* Menyembunyikan elemen layout admin bawaan */
@@ -59,16 +59,16 @@
     .catalog-nav {
         position: fixed; top: 0; left: 0; width: 100%;
         padding: 15px 50px; display: flex; justify-content: space-between; align-items: center;
-        background: rgba(10, 10, 10, 0.7); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border);
+        background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border);
         z-index: 1000;
     }
     .brand-logo { font-family: 'Unbounded', sans-serif; font-size: 1.8rem; font-weight: 900; color: var(--text-main); text-decoration: none; letter-spacing: 1px; }
     .brand-logo span { background: linear-gradient(45deg, var(--color-3), var(--color-4)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .nav-links a { 
-        text-decoration: none; color: var(--text-muted); font-weight: 600; font-size: 0.95rem;
+        text-decoration: none; color: var(--text-muted); font-weight: 700; font-size: 0.95rem;
         margin-left: 35px; transition: 0.3s; position: relative;
     }
-    .nav-links a:hover, .nav-links a.active { color: var(--color-2); }
+    .nav-links a:hover, .nav-links a.active { color: var(--color-5); }
     .nav-links a.active::after {
         content: ''; position: absolute; bottom: -5px; left: 0; width: 100%; height: 2px;
         background: var(--color-3); border-radius: 2px; box-shadow: 0 0 10px var(--color-3);
@@ -83,12 +83,12 @@
     }
     .animated-title {
         font-family: 'Unbounded', sans-serif; font-size: clamp(3rem, 6vw, 4.5rem); font-weight: 900; line-height: 1.1; margin-bottom: 15px;
-        background: linear-gradient(to right, var(--color-4), var(--color-1), var(--color-3), var(--color-4)); background-size: 200% auto;
+        background: linear-gradient(to right, var(--color-4), var(--color-5), var(--color-3), var(--color-4)); background-size: 200% auto;
         -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientText 5s linear infinite;
         display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
     }
     @keyframes gradientText { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
-    .hero-subtitle { color: var(--text-muted); font-size: 1.1rem; font-weight: 500; max-width: 600px; margin: 0 auto; letter-spacing: 0.5px; }
+    .hero-subtitle { color: var(--text-muted); font-size: 1.1rem; font-weight: 600; max-width: 600px; margin: 0 auto; letter-spacing: 0.5px; }
 
     /* ============================================================
        5. SEARCH BAR (NEON GLOW)
@@ -97,24 +97,24 @@
     .search-glass {
         background: var(--glass); backdrop-filter: blur(15px); border-radius: 50px; padding: 8px 12px;
         display: flex; gap: 10px; align-items: center; border: 1px solid var(--glass-border);
-        transition: 0.4s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        transition: 0.4s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     }
-    .search-glass:focus-within { border-color: var(--color-4); box-shadow: 0 0 25px rgba(189, 224, 254, 0.2); transform: translateY(-2px); }
+    .search-glass:focus-within { border-color: var(--color-4); box-shadow: 0 0 25px rgba(142, 202, 230, 0.4); transform: translateY(-2px); }
     
     .search-glass input, .search-glass select {
         border: none; background: transparent; padding: 15px 20px; font-size: 1rem; color: var(--text-main);
-        font-family: 'Plus Jakarta Sans'; font-weight: 500; outline: none; width: 100%;
+        font-family: 'Plus Jakarta Sans'; font-weight: 600; outline: none; width: 100%;
     }
-    .search-glass input::placeholder { color: #555; }
+    .search-glass input::placeholder { color: #888; }
     .search-glass input { flex: 2; }
     .search-glass select { flex: 1; border-left: 1px solid var(--glass-border); color: var(--text-main); cursor: pointer; }
     .search-glass select option { background: var(--color-black); color: var(--text-main); }
     
     .btn-search {
-        background: linear-gradient(135deg, var(--color-4), var(--color-5)); color: var(--color-black); border: none; padding: 15px 40px; border-radius: 40px;
+        background: linear-gradient(135deg, var(--color-4), var(--color-5)); color: #fff; border: none; padding: 15px 40px; border-radius: 40px;
         font-weight: 800; cursor: pointer; transition: 0.3s; font-family: 'Unbounded', sans-serif; letter-spacing: 1px; white-space: nowrap;
     }
-    .btn-search:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(162, 210, 255, 0.5); background: linear-gradient(135deg, var(--color-5), var(--color-4)); }
+    .btn-search:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(181, 23, 158, 0.3); background: linear-gradient(135deg, var(--color-5), var(--color-4)); }
 
     /* ============================================================
        6. SECTION TITLES
@@ -139,36 +139,36 @@
     .slider-container::-webkit-scrollbar { display: none; }
 
     .book-card-top {
-        min-width: 200px; max-width: 200px; background: rgba(10, 10, 10, 0.6); border-radius: 24px; padding: 15px;
+        min-width: 200px; max-width: 200px; background: rgba(255, 255, 255, 0.6); border-radius: 24px; padding: 15px;
         border: 1px solid var(--glass-border); position: relative; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer;
     }
     .book-card-top:hover { 
         transform: translateY(-12px); border-color: var(--color-3); 
-        box-shadow: 0 10px 30px rgba(255, 175, 204, 0.2); 
+        box-shadow: 0 10px 30px rgba(255, 175, 204, 0.4); 
     }
 
     .rank-badge {
-        position: absolute; top: -15px; left: -10px; background: var(--color-3); color: var(--color-black);
+        position: absolute; top: -15px; left: -10px; background: var(--color-3); color: #fff;
         width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
         font-family: 'Unbounded'; font-weight: 900; font-size: 1.1rem; z-index: 2; box-shadow: 0 4px 15px rgba(255, 175, 204, 0.5);
-        border: 3px solid var(--color-black);
+        border: 3px solid #fff;
     }
     
     /* PERBAIKAN TAMPILAN DIPINJAM UNTUK ANAK SD */
     .borrow-badge {
         position: absolute; top: 10px; right: 10px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(5px);
-        color: #ff3f81; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; z-index: 2; 
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 2px solid #ffafcc;
+        color: var(--color-5); padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; z-index: 2; 
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 2px solid var(--color-3);
     }
 
-    .book-cover { width: 100%; height: 260px; object-fit: cover; border-radius: 16px; margin-bottom: 15px; background: #111; transition: 0.4s; border: 1px solid rgba(255,255,255,0.05); }
+    .book-cover { width: 100%; height: 260px; object-fit: cover; border-radius: 16px; margin-bottom: 15px; background: #f0f0f0; transition: 0.4s; border: 1px solid var(--glass-border); }
     .book-card-top:hover .book-cover { transform: scale(1.03); }
     .book-title { font-family: 'Unbounded', sans-serif; font-size: 0.95rem; font-weight: 700; line-height: 1.3; color: var(--text-main); margin-bottom: 5px; transition: 0.3s;}
-    .book-card-top:hover .book-title { color: var(--color-2); }
+    .book-card-top:hover .book-title { color: var(--color-5); }
     
     /* PERBAIKAN TAMPILAN PENULIS */
     .book-author { color: var(--text-muted); font-size: 0.8rem; font-weight: 500; }
-    .book-author span { color: var(--color-1); font-weight: 700; }
+    .book-author span { color: var(--color-5); font-weight: 700; }
 
     /* ============================================================
        8. KOLEKSI BUKU (GLASS GRID & RAMAH ANAK SD)
@@ -182,43 +182,43 @@
     }
     .book-card:hover { 
         transform: translateY(-8px); border-color: var(--color-4); 
-        box-shadow: 0 15px 35px rgba(189, 224, 254, 0.15); 
+        box-shadow: 0 15px 35px rgba(142, 202, 230, 0.3); 
     }
 
-    .card-img-wrapper { position: relative; height: 300px; width: 100%; overflow: hidden; background: #111; border-bottom: 1px solid var(--glass-border); filter: brightness(0.95); }
+    .card-img-wrapper { position: relative; height: 300px; width: 100%; overflow: hidden; background: #f0f0f0; border-bottom: 1px solid var(--glass-border); filter: brightness(0.95); }
     .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
-    .book-card:hover .card-img-wrapper { filter: brightness(1.1); }
+    .book-card:hover .card-img-wrapper { filter: brightness(1.05); }
     .book-card:hover .card-img-wrapper img { transform: scale(1.08); }
 
     .cat-pill {
-        position: absolute; bottom: 10px; left: 10px; background: rgba(10,10,10,0.85); backdrop-filter: blur(4px); color: var(--color-5);
-        padding: 6px 14px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.5px; z-index: 2; border: 1px solid rgba(162,210,255,0.3);
+        position: absolute; bottom: 10px; left: 10px; background: rgba(255,255,255,0.9); backdrop-filter: blur(4px); color: var(--color-5);
+        padding: 6px 14px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.5px; z-index: 2; border: 1px solid rgba(181,23,158,0.2);
     }
 
     .card-info { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
     .c-title { font-family: 'Unbounded', sans-serif; font-size: 1rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; line-height: 1.4; transition: 0.3s; }
-    .book-card:hover .c-title { color: var(--color-4); }
+    .book-card:hover .c-title { color: var(--color-5); }
     
     /* PERBAIKAN DETAIL UNTUK ANAK SD */
-    .c-details-wrapper { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; margin-top: auto; }
+    .c-details-wrapper { background: rgba(255,255,255,0.5); padding: 12px; border-radius: 12px; margin-top: auto; border: 1px solid var(--glass-border); }
     
     .c-author-sd { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 500;}
-    .c-author-sd strong { color: var(--color-2); }
+    .c-author-sd strong { color: var(--color-5); }
     
     .c-year-sd { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 500;}
-    .c-year-sd strong { color: var(--color-1); }
+    .c-year-sd strong { color: var(--color-3); }
 
     .c-stock-wrapper { display: flex; align-items: center; justify-content: center; padding: 8px; border-radius: 12px; font-weight: 800; font-size: 0.85rem; }
-    .stock-in { background: rgba(189, 224, 254, 0.2); color: var(--color-4); border: 1px solid rgba(189,224,254,0.4); }
-    .stock-out { background: rgba(255, 175, 204, 0.2); color: var(--color-3); border: 1px solid rgba(255,175,204,0.4); }
+    .stock-in { background: rgba(142, 202, 230, 0.2); color: #0277bd; border: 1px solid rgba(142, 202, 230, 0.5); }
+    .stock-out { background: rgba(255, 175, 204, 0.3); color: #c1121f; border: 1px solid rgba(255, 175, 204, 0.6); }
 
     /* Navigasi Slider */
     .slider-nav-btn {
         position: absolute; top: 50%; transform: translateY(-50%); width: 45px; height: 45px; border-radius: 50%;
-        background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(5px); color: var(--color-2); border: 1px solid var(--glass-border);
+        background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(5px); color: var(--color-5); border: 1px solid var(--glass-border);
         z-index: 10; display: flex; align-items: center; justify-content: center; transition: 0.3s; font-size: 1.2rem; cursor: pointer;
     }
-    .slider-nav-btn:hover { background: var(--color-3); border-color: var(--color-3); color: var(--color-black); transform: translateY(-50%) scale(1.1); box-shadow: 0 0 15px var(--color-3); }
+    .slider-nav-btn:hover { background: var(--color-3); border-color: var(--color-3); color: #fff; transform: translateY(-50%) scale(1.1); box-shadow: 0 0 15px var(--color-3); }
     .btn-prev { left: -15px; }
     .btn-next { right: -15px; }
     .slider-wrapper-rel { position: relative; }
@@ -227,15 +227,15 @@
     .btn-float-back {
         position: fixed; bottom: 30px; right: 30px; background: var(--glass); backdrop-filter: blur(10px); color: var(--text-main);
         padding: 12px 25px; border-radius: 50px; text-decoration: none; font-weight: 800; font-family: 'Unbounded'; border: 1px solid var(--glass-border);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.5); transition: 0.3s; display: flex; align-items: center; gap: 10px; z-index: 1000;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1); transition: 0.3s; display: flex; align-items: center; gap: 10px; z-index: 1000;
     }
-    .btn-float-back:hover { background: var(--color-1); border-color: var(--color-1); transform: translateY(-5px); color: var(--color-black); box-shadow: 0 0 20px rgba(205,180,219,0.5); }
+    .btn-float-back:hover { background: var(--color-4); border-color: var(--color-4); transform: translateY(-5px); color: #fff; box-shadow: 0 0 20px rgba(142, 202, 230, 0.5); }
 
     /* Pagination */
     .pagination { justify-content: center; margin-top: 60px; gap: 8px; }
     .page-item .page-link { background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-muted); font-weight: 700; border-radius: 12px !important; padding: 10px 18px; transition: 0.3s; }
-    .page-item .page-link:hover { background: rgba(255,255,255,0.1); color: var(--color-4); border-color: var(--color-4); }
-    .page-item.active .page-link { background: var(--color-4); border-color: var(--color-4); color: var(--color-black); box-shadow: 0 0 15px rgba(189,224,254,0.4); }
+    .page-item .page-link:hover { background: rgba(255,255,255,0.8); color: var(--color-5); border-color: var(--color-5); }
+    .page-item.active .page-link { background: var(--color-4); border-color: var(--color-4); color: #fff; box-shadow: 0 0 15px rgba(142, 202, 230, 0.4); }
 
     /* Responsive */
     @media (max-width: 768px) {
@@ -279,7 +279,7 @@
 
 <div class="search-wrapper">
     <div class="search-glass">
-        <i class="fas fa-search ms-3 d-none d-md-block" style="color: var(--color-1); font-size: 1.2rem;"></i>
+        <i class="fas fa-search ms-3 d-none d-md-block" style="color: var(--color-5); font-size: 1.2rem;"></i>
         <input type="text" id="keyword" placeholder="Ketik judul buku yang mau kamu baca..." value="{{ request('search') }}">
         <select id="kat_id">
             <option value="">Kategori Buku</option>
@@ -312,8 +312,8 @@
                     @if($pb->gambar)
                         <img src="{{ asset($pb->gambar) }}" alt="{{ $pb->judul }}" class="book-cover">
                     @else
-                        <div class="book-cover d-flex flex-column align-items-center justify-content-center" style="background: rgba(20,20,20,0.5);">
-                            <i class="fas fa-book-open fa-3x mb-2" style="color: #444;"></i>
+                        <div class="book-cover d-flex flex-column align-items-center justify-content-center" style="background: rgba(255,255,255,0.7);">
+                            <i class="fas fa-book-open fa-3x mb-2" style="color: #ccc;"></i>
                         </div>
                     @endif
                     
@@ -340,9 +340,9 @@
                     @if($b->gambar)
                         <img src="{{ asset($b->gambar) }}" alt="{{ $b->judul }}">
                     @else
-                        <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center" style="background: rgba(20,20,20,0.5);">
-                            <i class="fas fa-book-open fa-3x mb-2" style="color: #444;"></i>
-                            <span style="color: #666; font-size: 0.8rem; font-weight: 700; font-family:'Unbounded';">BELUM ADA FOTO</span>
+                        <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center" style="background: rgba(255,255,255,0.7);">
+                            <i class="fas fa-book-open fa-3x mb-2" style="color: #ccc;"></i>
+                            <span style="color: #888; font-size: 0.8rem; font-weight: 700; font-family:'Unbounded';">BELUM ADA FOTO</span>
                         </div>
                     @endif
                 </div>
@@ -419,7 +419,7 @@
                         
                         let imgHtml = hasCover 
                             ? `<img src="${imgPath}" alt="${escapeHtml(b.judul)}">` 
-                            : `<div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center" style="background: rgba(20,20,20,0.5);"><i class="fas fa-book-open fa-3x mb-2" style="color: #444;"></i><span style="color: #666; font-size: 0.8rem; font-weight: 700; font-family:'Unbounded';">BELUM ADA FOTO</span></div>`;
+                            : `<div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center" style="background: rgba(255,255,255,0.7);"><i class="fas fa-book-open fa-3x mb-2" style="color: #ccc;"></i><span style="color: #888; font-size: 0.8rem; font-weight: 700; font-family:'Unbounded';">BELUM ADA FOTO</span></div>`;
                         
                         let stockClass = b.stok > 0 ? 'stock-in' : 'stock-out';
                         let stockIcon = b.stok > 0 ? '<i class="fas fa-check-circle me-2"></i> Bisa Dipinjam: ' : '<i class="fas fa-times-circle me-2"></i> Wah, Bukunya Sedang Dipinjam';
@@ -471,7 +471,7 @@
             })
             .catch(err => {
                 console.error('Error:', err);
-                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px; background: var(--glass); border-radius: 20px;"><h3 style="color: var(--color-3);">Koneksi terputus, coba lagi yuk!</h3></div>';
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px; background: var(--glass); border-radius: 20px;"><h3 style="color: var(--color-5);">Koneksi terputus, coba lagi yuk!</h3></div>';
                 container.style.opacity = '1';
                 container.style.transform = 'translateY(0)';
             });
