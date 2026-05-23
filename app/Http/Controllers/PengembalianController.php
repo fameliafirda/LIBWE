@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pengembalian;
 use App\Models\Pinjaman;
 use App\Models\Book;
+use App\Models\Anggota; // Menambahkan import model Anggota
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -16,10 +17,13 @@ class PengembalianController extends Controller
         // Ambil semua pengembalian dengan relasi pinjaman
         $pengembalians = Pengembalian::with('pinjaman')->latest()->get();
 
-        // DIPERBAIKI: Menambahkan variabel pinjamans agar view tidak error saat memanggil $pinjamans->total()
+        // Data untuk statistik di view
         $pinjamans = Pinjaman::paginate(10);
+        
+        // Memperbaiki error: Mengambil daftar kelas unik untuk filter
+        $kelasList = Anggota::distinct()->pluck('kelas')->sort();
 
-        return view('pengembalians.index', compact('pengembalians', 'pinjamans'));
+        return view('pengembalians.index', compact('pengembalians', 'pinjamans', 'kelasList'));
     }
 
     // Tampilkan form tambah pengembalian
