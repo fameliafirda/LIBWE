@@ -60,9 +60,11 @@
                             <form method="GET" action="{{ route('anggotas.index') }}" class="d-inline">
                                 <select name="kelas" onchange="this.form.submit()" class="form-control" style="max-width: 300px; border-radius: 50px; border: 1px solid #e0e0e0;">
                                     <option value="">-- Semua Kelas --</option>
-                                    @foreach ($daftar_kelas as $k)
-                                        <option value="{{ $k }}" {{ request('kelas') == $k ? 'selected' : '' }}>{{ $k }}</option>
-                                    @endforeach
+                                    @if(!empty($daftar_kelas))
+                                        @foreach ($daftar_kelas as $k)
+                                            <option value="{{ $k }}" {{ request('kelas') == $k ? 'selected' : '' }}>{{ $k }}</option>
+                                        @endforeach
+                                    @endif
                                 </select>
                             </form>
                             @if(request('kelas'))
@@ -198,33 +200,31 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        <div class="d-flex justify-content-center align-items-center gap-3">
+                                        <div class="d-flex justify-content-center align-items-center gap-5">
                                             <a href="{{ route('anggotas.edit', $item['anggota']->id) }}" 
                                                class="bg-transparent border-0 p-0 m-0" 
-                                               style="color: #f59e0b; transition: 0.2s; transform-origin: center;"
+                                               style="color: #f59e0b; font-size: 1.4rem; transition: 0.2s;"
                                                onmouseover="this.style.transform='scale(1.2)'"
                                                onmouseout="this.style.transform='scale(1)'"
                                                title="Edit anggota">
-                                                <i class="fas fa-edit" style="font-size: 1.25rem;"></i>
+                                                <i class="fas fa-edit"></i>
                                             </a>
-
                                             <a href="{{ route('anggotas.peminjaman', $item['anggota']->id) }}" 
                                                class="bg-transparent border-0 p-0 m-0" 
-                                               style="color: #10b981; transition: 0.2s; transform-origin: center;"
+                                               style="color: #10b981; font-size: 1.4rem; transition: 0.2s;"
                                                onmouseover="this.style.transform='scale(1.2)'"
                                                onmouseout="this.style.transform='scale(1)'"
-                                               title="Lihat riwayat peminjaman">
-                                                <i class="fas fa-eye" style="font-size: 1.25rem;"></i>
+                                               title="Riwayat peminjaman">
+                                                <i class="fas fa-eye"></i>
                                             </a>
-
                                             <button type="button" 
                                                     class="bg-transparent border-0 p-0 m-0" 
-                                                    style="color: #ef4444; transition: 0.2s; transform-origin: center;"
+                                                    style="color: #ef4444; font-size: 1.4rem; transition: 0.2s; cursor: pointer;"
                                                     onmouseover="this.style.transform='scale(1.2)'"
                                                     onmouseout="this.style.transform='scale(1)'"
                                                     onclick="confirmDelete({{ $item['anggota']->id }}, '{{ addslashes($item['anggota']->nama) }}', {{ $item['pinjamans']->where('status', 'belum dikembalikan')->count() }})"
                                                     title="Hapus anggota">
-                                                <i class="fas fa-trash-alt" style="font-size: 1.25rem;"></i>
+                                                <i class="fas fa-trash-alt"></i>
                                             </button>
                                         </div>
                                     </td>
@@ -260,101 +260,43 @@
 
 @push('styles')
 <style>
-    /* Custom scroll untuk list buku */
-    td::-webkit-scrollbar {
-        width: 4px;
-    }
-    td::-webkit-scrollbar-track {
-        background: #f1f1f1;
-    }
-    td::-webkit-scrollbar-thumb {
-        background: linear-gradient(180deg, #f7c0ec, #a7bdea);
-        border-radius: 10px;
-    }
-    td::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(180deg, #ec4899, #8b5cf6);
-    }
-    
-    /* Button hover effects */
-    .btn {
-        transition: all 0.3s ease;
-    }
-    .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
+    td::-webkit-scrollbar { width: 4px; }
+    td::-webkit-scrollbar-track { background: #f1f1f1; }
+    td::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #f7c0ec, #a7bdea); border-radius: 10px; }
+    td::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #ec4899, #8b5cf6); }
+    .btn { transition: all 0.3s ease; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 </style>
 @endpush
 
 @push('scripts')
 <script>
-    // Fungsi untuk konfirmasi hapus individu
     function confirmDelete(id, nama, pinjamanAktif) {
-        let message = `⚠️ HAPUS ANGGOTA\n\n`;
-        message += `Nama: ${nama}\n`;
-        message += `ID: ${id}\n\n`;
-        
-        if (pinjamanAktif > 0) {
-            message += `PERHATIAN! Anggota ini memiliki ${pinjamanAktif} buku yang belum dikembalikan!\n`;
-            message += `Stok buku akan dikembalikan otomatis.\n\n`;
-        }
-        
-        message += `Menghapus anggota akan:\n`;
-        message += `- Menghapus semua data peminjaman\n`;
-        message += `- Mengembalikan stok buku\n`;
-        message += `- Tidak dapat dikembalikan\n\n`;
+        let message = `⚠️ HAPUS ANGGOTA\n\nNama: ${nama}\n\n`;
+        if (pinjamanAktif > 0) message += `PERHATIAN! Memiliki ${pinjamanAktif} buku belum dikembalikan!\n\n`;
         message += `Lanjutkan?`;
-        
         if (confirm(message)) {
-            // Set form action
             document.getElementById('deleteForm').action = `{{ url('anggotas') }}/${id}`;
-            // Submit form
             document.getElementById('deleteForm').submit();
         }
     }
 
-    // Fungsi untuk konfirmasi hapus semua
     function confirmDeleteAll(jumlah) {
-        let message = `⚠️ HAPUS SEMUA ANGGOTA\n\n`;
-        message += `Anda akan menghapus ${jumlah} anggota.\n\n`;
-        message += `KONSEKUENSI:\n`;
-        message += `- Semua data peminjaman akan dihapus\n`;
-        message += `- Stok buku akan dikembalikan otomatis\n`;
-        message += `- Data TIDAK DAPAT dikembalikan\n\n`;
-        message += `KETIK 'HAPUS' untuk melanjutkan:`;
-        
+        let message = `⚠️ HAPUS SEMUA ANGGOTA (${jumlah})\n\nKetik 'HAPUS' untuk melanjutkan:`;
         let konfirmasi = prompt(message);
-        
         if (konfirmasi === 'HAPUS') {
             document.getElementById('deleteAllForm').submit();
-        } else if (konfirmasi !== null) {
-            alert('Penghapusan dibatalkan - Kode salah');
         }
     }
 
-    // Search functionality
-    document.getElementById('searchButton').addEventListener('click', function() {
-        filterTable();
-    });
-
-    document.getElementById('searchInput').addEventListener('keyup', function(e) {
-        if (e.key === 'Enter') {
-            filterTable();
-        }
-    });
+    document.getElementById('searchButton').addEventListener('click', filterTable);
+    document.getElementById('searchInput').addEventListener('keyup', (e) => { if(e.key === 'Enter') filterTable(); });
 
     function filterTable() {
         let searchValue = document.getElementById('searchInput').value.toLowerCase();
-        let tableRows = document.querySelectorAll('#anggotaTable tbody tr');
-        
-        tableRows.forEach(function(row) {
-            if (row.querySelector('td[colspan="7"]')) return; // Skip empty state row
-            let text = row.textContent.toLowerCase();
-            if (text.indexOf(searchValue) > -1) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
+        document.querySelectorAll('#anggotaTable tbody tr').forEach(row => {
+            if (row.querySelector('td[colspan="7"]')) return;
+            row.style.display = row.textContent.toLowerCase().includes(searchValue) ? '' : 'none';
         });
     }
 </script>

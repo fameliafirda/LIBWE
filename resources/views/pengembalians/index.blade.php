@@ -254,50 +254,87 @@
                                                 {{ Str::limit($pinjaman->judul_buku ?? '-', 35) }}
                                             </div>
                                         </td>
+                                        
                                         <td class="text-center">
                                             <span class="badge bg-info text-dark px-3 py-2">
-                                                <i class="fas fa-calendar-alt me-1"></i> {{ $tglPinjam->format('d/m/Y') }}
+                                                <i class="fas fa-calendar-alt me-1"></i>
+                                                {{ $tglPinjam->format('d/m/Y') }}
                                             </span>
                                         </td>
+                                        
                                         <td class="text-center">
                                             <span class="badge {{ $terlambat > 0 ? 'bg-danger' : 'bg-secondary' }} px-3 py-2">
-                                                <i class="fas fa-clock me-1"></i> {{ $jatuhTempo->format('d/m/Y') }}
+                                                <i class="fas fa-clock me-1"></i>
+                                                {{ $jatuhTempo->format('d/m/Y') }}
                                             </span>
+                                            @if($terlambat > 0)
+                                                <span class="badge bg-danger d-block mt-1">
+                                                    Terlambat {{ $terlambat }} hari
+                                                </span>
+                                            @endif
                                         </td>
+
                                         <td class="text-center">
                                             @if($pinjaman->status === 'sudah dikembalikan' && $pinjaman->tanggal_kembali)
                                                 <span class="badge bg-success px-3 py-2">
-                                                    <i class="fas fa-calendar-check me-1"></i> {{ \Carbon\Carbon::parse($pinjaman->tanggal_kembali)->format('d/m/Y') }}
+                                                    <i class="fas fa-calendar-check me-1"></i>
+                                                    {{ \Carbon\Carbon::parse($pinjaman->tanggal_kembali)->format('d/m/Y') }}
                                                 </span>
                                             @else
-                                                <span class="badge bg-light text-muted px-3 py-2" style="border: 1px solid #e0e0e0;"><i class="fas fa-minus"></i> Belum Kembali</span>
+                                                <span class="badge bg-light text-muted px-3 py-2" style="border: 1px solid #e0e0e0;">
+                                                    <i class="fas fa-minus"></i> Belum Kembali
+                                                </span>
                                             @endif
                                         </td>
+
                                         <td class="text-center">
                                             @if($pinjaman->status === 'sudah dikembalikan')
-                                                <span class="badge bg-success px-3 py-2"><i class="fas fa-check-circle me-1"></i> Selesai</span>
+                                                <span class="badge bg-success px-3 py-2">
+                                                    <i class="fas fa-check-circle me-1"></i> Selesai
+                                                </span>
                                             @else
-                                                <span class="badge bg-warning text-dark px-3 py-2"><i class="fas fa-hourglass-half me-1"></i> Dipinjam</span>
+                                                <span class="badge bg-warning text-dark px-3 py-2">
+                                                    <i class="fas fa-hourglass-half me-1"></i> Dipinjam
+                                                </span>
                                             @endif
                                         </td>
+
                                         <td class="text-center">
-                                            <div class="d-flex justify-content-center align-items-center gap-3">
+                                            <div class="d-flex justify-content-center align-items-center" style="gap: 25px;">
                                                 @if($pinjaman->status == 'belum dikembalikan')
                                                     <form action="{{ route('pinjamans.mark-returned', $pinjaman->id) }}" method="POST" class="m-0 p-0" onsubmit="return confirm('Tandai buku ini sudah dikembalikan HARI INI?')">
                                                         @csrf
-                                                        <button type="submit" class="bg-transparent border-0 p-0 m-0" style="color: #28a745; transition: 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" title="Tandai Sudah Dikembalikan">
-                                                            <i class="fas fa-check-circle" style="font-size: 1.25rem;"></i>
+                                                        <button type="submit" 
+                                                                class="bg-transparent border-0 p-0 m-0" 
+                                                                style="color: #28a745; transition: 0.2s; cursor: pointer;" 
+                                                                onmouseover="this.style.transform='scale(1.2)'" 
+                                                                onmouseout="this.style.transform='scale(1)'" 
+                                                                title="Tandai Sudah Dikembalikan">
+                                                            <i class="fas fa-check-circle" style="font-size: 1.3rem;"></i>
                                                         </button>
                                                     </form>
                                                 @endif
-                                                <a href="{{ route('pinjamans.edit', $pinjaman->id) }}" class="bg-transparent border-0 p-0 m-0" style="color: #f59e0b; transition: 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" title="Edit Peminjaman">
-                                                    <i class="fas fa-edit" style="font-size: 1.25rem;"></i>
+                                                <a href="{{ route('pinjamans.edit', $pinjaman->id) }}" 
+                                                   class="bg-transparent border-0 p-0 m-0" 
+                                                   style="color: #f59e0b; transition: 0.2s; cursor: pointer;" 
+                                                   onmouseover="this.style.transform='scale(1.2)'" 
+                                                   onmouseout="this.style.transform='scale(1)'" 
+                                                   title="Edit Peminjaman">
+                                                    <i class="fas fa-edit" style="font-size: 1.3rem;"></i>
                                                 </a>
-                                                <form action="{{ route('pinjamans.destroy', $pinjaman->id) }}" method="POST" class="m-0 p-0" onsubmit="return confirm('Yakin ingin menghapus data peminjaman ini?')">
+                                                <form action="{{ route('pinjamans.destroy', $pinjaman->id) }}" 
+                                                      method="POST" 
+                                                      class="m-0 p-0"
+                                                      onsubmit="return confirm('Yakin ingin menghapus data peminjaman ini?')">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="bg-transparent border-0 p-0 m-0" style="color: #ef4444; transition: 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" title="Hapus Peminjaman">
-                                                        <i class="fas fa-trash-alt" style="font-size: 1.25rem;"></i>
+                                                    <button type="submit" 
+                                                            class="bg-transparent border-0 p-0 m-0" 
+                                                            style="color: #ef4444; transition: 0.2s; cursor: pointer;" 
+                                                            onmouseover="this.style.transform='scale(1.2)'" 
+                                                            onmouseout="this.style.transform='scale(1)'" 
+                                                            title="Hapus Peminjaman">
+                                                        <i class="fas fa-trash-alt" style="font-size: 1.3rem;"></i>
                                                     </button>
                                                 </form>
                                             </div>
@@ -306,7 +343,7 @@
                                 @empty
                                     <tr>
                                         <td colspan="9" class="text-center py-5 text-muted">
-                                            <i class="fas fa-book-open fa-3x mb-3"></i>
+                                            <i class="fas fa-book-open fa-4x mb-3"></i>
                                             <h6>Belum ada data peminjaman</h6>
                                         </td>
                                     </tr>
