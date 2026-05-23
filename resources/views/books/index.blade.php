@@ -212,22 +212,24 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        <div class="btn-group" role="group">
+                                        <div class="d-flex justify-content-center align-items-center gap-2">
                                             <a href="{{ route('books.edit', $book->id) }}" 
-                                               class="btn btn-sm" 
-                                               style="background-color: #ffe066; color: #000; border: none; border-radius: 8px 0 0 8px; padding: 8px 12px;">
-                                                <i class="fas fa-edit"></i>
+                                               class="btn shadow-sm text-dark d-inline-flex align-items-center justify-content-center" 
+                                               style="background-color: #ffe066; border: none; border-radius: 10px; width: 38px; height: 38px; transition: 0.2s;"
+                                               data-bs-toggle="tooltip" title="Edit Buku">
+                                                <i class="fas fa-pen" style="font-size: 0.95rem;"></i>
                                             </a>
                                             <form action="{{ route('books.destroy', $book->id) }}" 
                                                   method="POST" 
-                                                  class="d-inline"
+                                                  class="m-0 p-0"
                                                   onsubmit="return confirm('Yakin ingin menghapus buku ini? Data terkait seperti peminjaman mungkin terpengaruh.');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" 
-                                                        class="btn btn-sm" 
-                                                        style="background-color: #ff6b6b; color: white; border: none; border-radius: 0 8px 8px 0; padding: 8px 12px;">
-                                                    <i class="fas fa-trash"></i>
+                                                        class="btn shadow-sm text-white d-inline-flex align-items-center justify-content-center" 
+                                                        style="background-color: #ff6b6b; border: none; border-radius: 10px; width: 38px; height: 38px; transition: 0.2s;"
+                                                        data-bs-toggle="tooltip" title="Hapus Buku">
+                                                    <i class="fas fa-trash-alt" style="font-size: 0.95rem;"></i>
                                                 </button>
                                             </form>
                                         </div>
