@@ -212,7 +212,7 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        <div class="d-flex justify-content-center align-items-center gap-4">
+                                        <div class="d-flex justify-content-center align-items-center gap-5">
                                             <a href="{{ route('books.edit', $book->id) }}" 
                                                class="bg-transparent border-0 p-0 m-0" 
                                                style="color: #f59e0b; transition: 0.2s;"
@@ -278,6 +278,7 @@
 
 @push('scripts')
 <script>
+    // Tooltip initialization
     document.addEventListener('DOMContentLoaded', function() {
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         tooltipTriggerList.map(function (tooltipTriggerEl) {
