@@ -151,7 +151,6 @@
             <div class="card border-0 shadow-sm" style="border-radius: 20px;">
                 <div class="card-body p-3">
                     <form method="GET" action="{{ route('pinjamans.index') }}" class="d-flex flex-wrap align-items-center gap-3">
-                        
                         <div class="d-flex align-items-center">
                             <label class="fw-semibold text-muted mb-0 me-2">
                                 <i class="fas fa-filter me-1" style="color: #8b5cf6;"></i>Kelas:
@@ -179,7 +178,7 @@
                             <i class="fas fa-search me-1"></i> Terapkan
                         </button>
                         
-                        @if(request('kelas') || request('status') && request('status') != 'semua')
+                        @if(request('kelas') || (request('status') && request('status') != 'semua'))
                             <a href="{{ route('pinjamans.index') }}" class="btn btn-sm" style="background-color: #ff6b6b; color: white; border-radius: 50px; padding: 6px 20px;">
                                 <i class="fas fa-times me-1"></i> Reset
                             </a>
@@ -226,16 +225,12 @@
                             <tbody>
                                 @forelse ($pinjamans as $i => $pinjaman)
                                     @php
-                                        // PERBAIKAN LOGIKA: Set Timezone dan hilangkan detik/menit dengan startOfDay() 
-                                        // Lalu bulatkan hasil menggunakan intval/round agar tidak ada angka koma-koma
                                         $tglPinjam = \Carbon\Carbon::parse($pinjaman->tanggal_pinjam)->timezone('Asia/Jakarta')->startOfDay();
                                         $jatuhTempo = $tglPinjam->copy()->addDays(7);
                                         $terlambat = 0;
-                                        
                                         if($pinjaman->status == 'belum dikembalikan') {
                                             $hariIni = \Carbon\Carbon::now('Asia/Jakarta')->startOfDay();
                                             if($hariIni->gt($jatuhTempo)) {
-                                                // Hitung selisih hari dan pastikan hasilnya bilangan bulat
                                                 $terlambat = (int) round($jatuhTempo->diffInDays($hariIni));
                                             }
                                         }
@@ -295,11 +290,11 @@
                                         <td class="text-center">
                                             @if($pinjaman->status === 'sudah dikembalikan')
                                                 <span class="badge bg-success px-3 py-2">
-                                                    <i class="fas fa-check-circle me-1"></i> Sudah Dikembalikan
+                                                    <i class="fas fa-check-circle me-1"></i> Selesai
                                                 </span>
                                             @else
                                                 <span class="badge bg-warning text-dark px-3 py-2">
-                                                    <i class="fas fa-hourglass-half me-1"></i> Belum Dikembalikan
+                                                    <i class="fas fa-hourglass-half me-1"></i> Dipinjam
                                                 </span>
                                             @endif
                                         </td>
@@ -310,32 +305,33 @@
                                                     <form action="{{ route('pinjamans.mark-returned', $pinjaman->id) }}" method="POST" class="m-0 p-0" onsubmit="return confirm('Tandai buku ini sudah dikembalikan HARI INI?')">
                                                         @csrf
                                                         <button type="submit" 
-                                                                class="btn shadow-sm text-white d-inline-flex align-items-center justify-content-center" 
-                                                                style="background-color: #28a745; border: none; border-radius: 10px; width: 38px; height: 38px; transition: 0.2s;"
-                                                                data-bs-toggle="tooltip" title="Tandai Sudah Dikembalikan">
-                                                            <i class="fas fa-check" style="font-size: 0.95rem;"></i>
+                                                                style="background: transparent; border: none; color: #28a745; transition: 0.2s; cursor: pointer; padding: 0;" 
+                                                                onmouseover="this.style.transform='scale(1.2)'" 
+                                                                onmouseout="this.style.transform='scale(1)'" 
+                                                                title="Tandai Sudah Dikembalikan">
+                                                            <i class="fas fa-check-circle" style="font-size: 1.3rem;"></i>
                                                         </button>
                                                     </form>
                                                 @endif
-
-                                                <a href="{{ route('pinjamans.edit', $pinjaman->id) }}"
-                                                   class="btn shadow-sm text-dark d-inline-flex align-items-center justify-content-center"
-                                                   style="background-color: #ffe066; border: none; border-radius: 10px; width: 38px; height: 38px; transition: 0.2s;"
-                                                   data-bs-toggle="tooltip" title="Edit peminjaman">
-                                                    <i class="fas fa-pen" style="font-size: 0.95rem;"></i>
+                                                <a href="{{ route('pinjamans.edit', $pinjaman->id) }}" 
+                                                   style="background: transparent; border: none; color: #f59e0b; transition: 0.2s; cursor: pointer; padding: 0; text-decoration: none;"
+                                                   onmouseover="this.style.transform='scale(1.2)'" 
+                                                   onmouseout="this.style.transform='scale(1)'" 
+                                                   title="Edit Peminjaman">
+                                                    <i class="fas fa-edit" style="font-size: 1.3rem;"></i>
                                                 </a>
-                                                
                                                 <form action="{{ route('pinjamans.destroy', $pinjaman->id) }}" 
                                                       method="POST" 
                                                       class="m-0 p-0"
-                                                      onsubmit="return confirm('Yakin ingin menghapus data peminjaman ini? Stok buku akan dikembalikan.')">
+                                                      onsubmit="return confirm('Yakin ingin menghapus data peminjaman ini?')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" 
-                                                            class="btn shadow-sm text-white d-inline-flex align-items-center justify-content-center"
-                                                            style="background-color: #ff6b6b; border: none; border-radius: 10px; width: 38px; height: 38px; transition: 0.2s;"
-                                                            data-bs-toggle="tooltip" title="Hapus peminjaman">
-                                                        <i class="fas fa-trash-alt" style="font-size: 0.95rem;"></i>
+                                                            style="background: transparent; border: none; color: #ef4444; transition: 0.2s; cursor: pointer; padding: 0;"
+                                                            onmouseover="this.style.transform='scale(1.2)'" 
+                                                            onmouseout="this.style.transform='scale(1)'" 
+                                                            title="Hapus Peminjaman">
+                                                        <i class="fas fa-trash-alt" style="font-size: 1.3rem;"></i>
                                                     </button>
                                                 </form>
                                             </div>
@@ -343,15 +339,9 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="9" class="text-center py-5">
-                                            <div class="text-muted">
-                                                <i class="fas fa-book-open fa-4x mb-3" style="color: #dfe6e9;"></i>
-                                                <h6>Belum ada data peminjaman</h6>
-                                                <p class="small mb-3">Silakan tambah peminjaman baru</p>
-                                                <a href="{{ route('pinjamans.create') }}" class="btn btn-sm" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000;">
-                                                    <i class="fas fa-plus-circle me-1"></i> Tambah Peminjaman
-                                                </a>
-                                            </div>
+                                        <td colspan="9" class="text-center py-5 text-muted">
+                                            <i class="fas fa-book-open fa-4x mb-3"></i>
+                                            <h6>Belum ada data peminjaman</h6>
                                         </td>
                                     </tr>
                                 @endforelse
@@ -362,13 +352,8 @@
 
                 @if(method_exists($pinjamans, 'links') && $pinjamans->hasPages())
                 <div class="card-footer bg-white border-0 py-3">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
-                        <div class="text-muted small mb-2 mb-md-0">
-                            Menampilkan {{ $pinjamans->firstItem() ?? 0 }} - {{ $pinjamans->lastItem() ?? 0 }} dari {{ $pinjamans->total() ?? 0 }} data
-                        </div>
-                        <div>
-                            {{ $pinjamans->links('pagination::bootstrap-4') }}
-                        </div>
+                    <div class="d-flex justify-content-end">
+                        {{ $pinjamans->links('pagination::bootstrap-4') }}
                     </div>
                 </div>
                 @endif
@@ -389,14 +374,9 @@
     document.getElementById('searchInput').addEventListener('keyup', function() {
         let searchValue = this.value.toLowerCase();
         let tableRows = document.querySelectorAll('#pinjamanTable tbody tr');
-        
         tableRows.forEach(function(row) {
             let text = row.textContent.toLowerCase();
-            if (text.indexOf(searchValue) > -1) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
+            row.style.display = (text.indexOf(searchValue) > -1) ? '' : 'none';
         });
     });
 </script>
