@@ -118,7 +118,7 @@
                             <thead style="background: linear-gradient(45deg, #f7c0ec, #a7bdea);">
                                 <tr>
                                     <th class="text-center" style="width: 50px;">No</th>
-                                    <th style="width: 150px;">Nama</th>
+                                    <th style="width: 100px;">NISN</th> <th style="width: 150px;">Nama</th>
                                     <th style="width: 100px;">Kelas</th>
                                     <th style="width: 120px;">Jenis Kelamin</th>
                                     <th>Buku yang Dipinjam</th>
@@ -130,6 +130,11 @@
                                 @forelse ($anggotas as $item)
                                 <tr style="vertical-align: middle;" id="row-{{ $item['anggota']->id }}">
                                     <td class="text-center fw-bold">{{ $loop->iteration }}</td>
+                                    
+                                    <td>
+                                        <span class="badge bg-secondary px-2 py-1">{{ $item['anggota']->nisn ?? '-' }}</span>
+                                    </td>
+
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-2" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
@@ -202,24 +207,21 @@
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center align-items-center gap-5">
                                             <a href="{{ route('anggotas.edit', $item['anggota']->id) }}" 
-                                               class="bg-transparent border-0 p-0 m-0" 
-                                               style="color: #f59e0b; font-size: 1.4rem; transition: 0.2s;"
+                                               style="color: #f59e0b; font-size: 1.4rem; transition: 0.2s; text-decoration: none;"
                                                onmouseover="this.style.transform='scale(1.2)'"
                                                onmouseout="this.style.transform='scale(1)'"
                                                title="Edit anggota">
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                             <a href="{{ route('anggotas.peminjaman', $item['anggota']->id) }}" 
-                                               class="bg-transparent border-0 p-0 m-0" 
-                                               style="color: #10b981; font-size: 1.4rem; transition: 0.2s;"
+                                               style="color: #10b981; font-size: 1.4rem; transition: 0.2s; text-decoration: none;"
                                                onmouseover="this.style.transform='scale(1.2)'"
                                                onmouseout="this.style.transform='scale(1)'"
                                                title="Riwayat peminjaman">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                             <button type="button" 
-                                                    class="bg-transparent border-0 p-0 m-0" 
-                                                    style="color: #ef4444; font-size: 1.4rem; transition: 0.2s; cursor: pointer;"
+                                                    style="background: transparent; border: none; color: #ef4444; font-size: 1.4rem; transition: 0.2s; cursor: pointer; padding: 0;"
                                                     onmouseover="this.style.transform='scale(1.2)'"
                                                     onmouseout="this.style.transform='scale(1)'"
                                                     onclick="confirmDelete({{ $item['anggota']->id }}, '{{ addslashes($item['anggota']->nama) }}', {{ $item['pinjamans']->where('status', 'belum dikembalikan')->count() }})"
@@ -231,7 +233,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="7" class="text-center py-5">
+                                    <td colspan="8" class="text-center py-5">
                                         <div class="text-muted">
                                             <i class="fas fa-users fa-4x mb-3" style="color: #dfe6e9;"></i>
                                             <h6>Belum ada data anggota</h6>
@@ -295,7 +297,7 @@
     function filterTable() {
         let searchValue = document.getElementById('searchInput').value.toLowerCase();
         document.querySelectorAll('#anggotaTable tbody tr').forEach(row => {
-            if (row.querySelector('td[colspan="7"]')) return;
+            if (row.querySelector('td[colspan="8"]')) return; // Update colspan karena tambah kolom
             row.style.display = row.textContent.toLowerCase().includes(searchValue) ? '' : 'none';
         });
     }
