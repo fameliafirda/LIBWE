@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pengembalian;
 use App\Models\Pinjaman;
-use App\Models\Book; // TAMBAHKAN MODEL BOOK
+use App\Models\Book;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -16,7 +16,10 @@ class PengembalianController extends Controller
         // Ambil semua pengembalian dengan relasi pinjaman
         $pengembalians = Pengembalian::with('pinjaman')->latest()->get();
 
-        return view('pengembalians.index', compact('pengembalians'));
+        // DIPERBAIKI: Menambahkan variabel pinjamans agar view tidak error saat memanggil $pinjamans->total()
+        $pinjamans = Pinjaman::paginate(10);
+
+        return view('pengembalians.index', compact('pengembalians', 'pinjamans'));
     }
 
     // Tampilkan form tambah pengembalian

@@ -305,7 +305,7 @@
                                         </td>
 
                                         <td class="text-center">
-                                            <div class="d-flex justify-content-center align-items-center gap-2">
+                                            <div class="d-flex justify-content-center align-items-center" style="gap: 25px;">
                                                 @if($pinjaman->status == 'belum dikembalikan')
                                                     <form action="{{ route('pinjamans.mark-returned', $pinjaman->id) }}" method="POST" class="m-0 p-0" onsubmit="return confirm('Tandai buku ini sudah dikembalikan HARI INI?')">
                                                         @csrf
