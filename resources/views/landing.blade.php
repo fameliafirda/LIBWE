@@ -23,9 +23,9 @@
            1. COLOR PALETTE & RESET
            ============================================================ */
         :root {
-            --color-black: #0a0a0a;
-            --color-1: #cdb4db;
-            --color-2: #ffc8dd;
+            --color-black: #fbf8cc;
+            --color-1: #ffcfd2;
+            --color-2: #cfbaf0;
             --color-3: #ffafcc; /* Hot Pink */
             --color-4: #bde0fe; /* Cyan/Blue */
             --color-5: #a2d2ff;

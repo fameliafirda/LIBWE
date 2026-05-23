@@ -11,7 +11,7 @@
        1. COLOR PALETTE (USER CUSTOM: NEON PASTEL GLASS)
        ============================================================ */
     :root {
-        --color-black: #0a0a0a;
+        --color-black: #fbf8cc;
         --color-1: #cdb4db; /* Lilac */
         --color-2: #ffc8dd; /* Light Pink */
         --color-3: #ffafcc; /* Hot Pink */
