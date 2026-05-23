@@ -11,13 +11,20 @@
         <form action="{{ route('anggotas.store') }}" method="POST">
             @csrf
             <div class="form-group">
+                <label>NISN</label>
+                <input type="text" name="nisn" class="form-control" required placeholder="Masukkan NISN Siswa">
+            </div>
+            
+            <div class="form-group">
                 <label>Nama</label>
                 <input type="text" name="nama" class="form-control" required>
             </div>
+            
             <div class="form-group">
                 <label>Kelas</label>
                 <input type="text" name="kelas" class="form-control" required>
             </div>
+            
             <div class="form-group">
                 <label>Jenis Kelamin</label>
                 <select name="jenis_kelamin" class="form-control" required>
@@ -26,7 +33,8 @@
                     <option value="Perempuan">Perempuan</option>
                 </select>
             </div>
-            <button class="btn btn-success">Simpan</button>
+            
+            <button type="submit" class="btn btn-success">Simpan</button>
         </form>
     </div>
 </div>

@@ -9,7 +9,8 @@ class Anggota extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nama', 'kelas', 'jenis_kelamin'];
+    // Menambahkan 'nisn' ke dalam fillable
+    protected $fillable = ['nisn', 'nama', 'kelas', 'jenis_kelamin'];
 
     // Relasi dengan pinjaman
     public function pinjamans()

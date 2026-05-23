@@ -48,7 +48,9 @@ class AnggotaController extends Controller
 
     public function store(Request $request)
     {
+        // Menambahkan validasi untuk NISN (Harus unik di tabel anggotas)
         $validated = $request->validate([
+            'nisn' => 'required|string|max:20|unique:anggotas,nisn',
             'nama' => 'required|string|max:255',
             'kelas' => 'required|string|max:100',
             'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
@@ -72,7 +74,9 @@ class AnggotaController extends Controller
 
     public function update(Request $request, Anggota $anggota)
     {
+        // Validasi update NISN, pengecualian unique untuk ID yang sedang diupdate agar tidak error saat disimpan ulang
         $validated = $request->validate([
+            'nisn' => 'required|string|max:20|unique:anggotas,nisn,' . $anggota->id,
             'nama' => 'required|string|max:255',
             'kelas' => 'required|string|max:100',
             'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',

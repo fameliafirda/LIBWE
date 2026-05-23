@@ -9,9 +9,10 @@ return new class extends Migration {
     {
         Schema::create('anggotas', function (Blueprint $table) {
             $table->id();
+            $table->string('nisn')->unique(); // Kolom NISN ditambahkan di sini
             $table->string('nama');
             $table->string('kelas');
-$table->enum('jenis_kelamin', ['Laki-laki', 'Perempuan']);
+            $table->enum('jenis_kelamin', ['Laki-laki', 'Perempuan']);
             $table->timestamps();
         });
     }
