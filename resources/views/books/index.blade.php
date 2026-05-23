@@ -185,7 +185,7 @@
                                         </div>
                                     </td>
                                     <td class="text-center">
-                                        <div class="d-flex justify-content-center align-items-center gap-3">
+                                        <div class="d-flex justify-content-center align-items-center gap-5">
                                             <a href="{{ route('categories.edit', $category->id) }}" 
                                                class="bg-transparent border-0 p-0 m-0" 
                                                style="color: #f59e0b; transition: 0.2s;"
