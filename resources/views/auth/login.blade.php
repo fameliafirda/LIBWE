@@ -7,22 +7,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #8b5cf6;
-            --primary-hover: #7c3aed;
-            --pink: #ec4899;
-            --blue: #3b82f6;
-            --dark: #0f172a;
-            --darker: #020617;
-            --card-bg: rgba(15, 23, 42, 0.8);
-            --text: #e2e8f0;
-            --text-secondary: #94a3b8;
-            --border: rgba(255, 255, 255, 0.08);
-            --border-focus: rgba(139, 92, 246, 0.5);
+            /* Tema Pastel Ceria */
+            --primary: #ffafcc; /* Hot Pink */
+            --primary-hover: #ff99bb;
+            --pink: #ffcfd2;
+            --blue: #8ecae6; /* Biru Langit */
+            --dark: #fbf8cc; /* Kuning Krem Background */
+            --darker: #ffffff; /* Putih Bersih */
+            --card-bg: rgba(255, 255, 255, 0.7); /* Kaca Putih */
+            --text: #2b2d42; /* Navy Gelap (agar mudah dibaca) */
+            --text-secondary: #6c757d;
+            --border: rgba(142, 202, 230, 0.4);
+            --border-focus: rgba(142, 202, 230, 0.8);
             --error: #ef4444;
-            --back-button: rgba(30, 41, 59, 0.8);
-            --back-button-hover: rgba(30, 41, 59, 1);
-            --glow: 0 0 30px rgba(139, 92, 246, 0.3);
-            --magic-spark: rgba(255, 255, 255, 0.8);
+            --back-button: rgba(255, 255, 255, 0.8);
+            --back-button-hover: rgba(255, 255, 255, 1);
+            --glow: 0 10px 30px rgba(0, 0, 0, 0.05); /* Bayangan Halus */
+            --magic-spark: #ffafcc;
         }
 
         * {
@@ -34,8 +35,8 @@
 
         body {
             background: 
-                radial-gradient(circle at 20% 30%, rgba(236, 72, 153, 0.2) 0%, transparent 30%),
-                radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.2) 0%, transparent 30%),
+                radial-gradient(circle at 20% 30%, rgba(255, 175, 204, 0.4) 0%, transparent 30%),
+                radial-gradient(circle at 80% 70%, rgba(142, 202, 230, 0.4) 0%, transparent 30%),
                 linear-gradient(to bottom, var(--darker), var(--dark));
             color: var(--text);
             display: flex;
@@ -69,13 +70,13 @@
         }
 
         @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
-            70% { box-shadow: 0 0 0 15px rgba(139, 92, 246, 0); }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(142, 202, 230, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(142, 202, 230, 0); }
         }
 
         @keyframes glow {
-            0%, 100% { text-shadow: 0 0 5px rgba(236, 72, 153, 0.5); }
-            50% { text-shadow: 0 0 20px rgba(236, 72, 153, 0.8); }
+            0%, 100% { text-shadow: 0 0 5px rgba(255, 175, 204, 0.3); }
+            50% { text-shadow: 0 0 15px rgba(255, 175, 204, 0.6); }
         }
 
         .login-container {
@@ -101,7 +102,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255, 175, 204, 0.15) 0%, transparent 70%);
             animation: rotate 20s linear infinite;
             z-index: -1;
         }
@@ -127,10 +128,10 @@
             display: block;
             width: 60px;
             height: 3px;
-            background: linear-gradient(to right, var(--pink), var(--primary));
+            background: linear-gradient(to right, var(--blue), var(--primary));
             margin: 12px auto 0;
             border-radius: 3px;
-            box-shadow: 0 0 10px rgba(236, 72, 153, 0.5);
+            box-shadow: 0 0 10px rgba(142, 202, 230, 0.4);
         }
 
         .input-group {
@@ -141,7 +142,7 @@
         input {
             width: 100%;
             padding: 16px 20px;
-            background: rgba(2, 6, 23, 0.5);
+            background: rgba(255, 255, 255, 0.6);
             border: 1px solid var(--border);
             border-radius: 12px;
             color: var(--text);
@@ -159,8 +160,8 @@
         input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--border-focus), 0 0 20px rgba(139, 92, 246, 0.3);
-            background: rgba(2, 6, 23, 0.7);
+            box-shadow: 0 0 0 3px var(--border-focus), 0 0 20px rgba(142, 202, 230, 0.3);
+            background: rgba(255, 255, 255, 0.9);
             animation: pulse 2s infinite;
         }
 
@@ -179,10 +180,10 @@
         }
 
         button {
-            background: linear-gradient(to right, var(--pink), var(--primary));
-            color: var(--text);
+            background: linear-gradient(to right, var(--blue), var(--primary));
+            color: #2b2d42; /* Warna teks gelap agar terbaca jelas di tombol pastel */
             margin-bottom: 16px;
-            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.5);
+            box-shadow: 0 4px 15px rgba(142, 202, 230, 0.4);
             z-index: 1;
         }
 
@@ -193,15 +194,15 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
             transition: 0.5s;
             z-index: -1;
         }
 
         button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.7);
-            background: linear-gradient(to right, #db2777, #7c3aed);
+            box-shadow: 0 8px 25px rgba(255, 175, 204, 0.5);
+            background: linear-gradient(to right, #8ecae6, #ff99bb);
         }
 
         button:hover::before {
@@ -214,12 +215,14 @@
             text-align: center;
             text-decoration: none;
             display: block;
+            border: 1px solid rgba(142, 202, 230, 0.3);
         }
 
         .back-button:hover {
             background-color: var(--back-button-hover);
             color: var(--text);
             transform: translateY(-1px);
+            border-color: rgba(142, 202, 230, 0.6);
         }
 
         .error {
@@ -250,7 +253,7 @@
             width: 60px;
             height: 60px;
             fill: url(#gradient);
-            filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.5));
+            filter: drop-shadow(0 0 10px rgba(255, 175, 204, 0.5));
             animation: float 4s ease-in-out infinite;
         }
 
@@ -274,14 +277,14 @@
 
         .book {
             position: absolute;
-            opacity: 0.1;
+            opacity: 0.3; /* Dinaikkan sedikit agar terlihat di background terang */
             animation: float-up 15s linear infinite;
         }
 
         @keyframes float-up {
             0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.1; }
-            90% { opacity: 0.1; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
             100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
         }
 
@@ -319,8 +322,8 @@
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stop-color="#ec4899" />
-                        <stop offset="100%" stop-color="#8b5cf6" />
+                        <stop offset="0%" stop-color="#8ecae6" />
+                        <stop offset="100%" stop-color="#ffafcc" />
                     </linearGradient>
                 </defs>
                 <path d="M12 3c-4.97 0-9 3.185-9 7.115 0 2.557 1.522 4.82 3.889 6.115l-.78 2.77h2.178l.5-1.758c.633.225 1.313.353 2.013.38v2.393h2v-2.393c.7-.027 1.38-.155 2.013-.38l.5 1.758h2.178l-.78-2.77c2.367-1.295 3.889-3.558 3.889-6.115 0-3.93-4.03-7.115-9-7.115zm0 1c4.418 0 8 2.691 8 6.115 0 2.01-1.217 3.86-3.184 5.027l-.816-2.872h-8l-.816 2.872c-1.967-1.167-3.184-3.017-3.184-5.027 0-3.424 3.582-6.115 8-6.115zm-4 3v1h8v-1h-8zm0 2v1h8v-1h-8zm0 2v1h5v-1h-5z"/>
@@ -368,7 +371,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Create sparkles
             function createSparkles() {
-                const colors = ['#ec4899', '#8b5cf6', '#3b82f6', '#ffffff'];
+                // Warna pastel untuk sparkles disesuaikan dengan tema SD
+                const colors = ['#ffafcc', '#8ecae6', '#ffb703', '#b5179e'];
                 const container = document.body;
                 
                 for (let i = 0; i < 20; i++) {
