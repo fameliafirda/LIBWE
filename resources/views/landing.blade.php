@@ -23,14 +23,19 @@
            1. COLOR PALETTE & RESET
            ============================================================ */
         :root {
-            --color-black: #fbf8cc;
-            --color-1: #ffcfd2;
-            --color-2: #b23a48;
-            --color-3: #ffafcc; /* Hot Pink */
-            --color-4: #598392; /* Cyan/Blue */
-            --color-5: #9f86c0;
-            --glass: rgba(20, 20, 20, 0.45);
-            --glass-border: rgba(255, 255, 255, 0.1);
+            /* PALET WARNA CERIA & PASTEL ESTETIK */
+        --color-bg: #fbf8cc;      /* Kuning krem lembut untuk background utama (sebelumnya color-black) */
+        --color-text: #2b2d42;    /* Navy gelap untuk teks utama (jangan pakai hitam pekat agar tetap ramah anak) */
+
+        --color-1: #ffcfd2;       /* Pink pastel yang lembut */
+        --color-2: #ffb703;       /* KUNING SUNSHINE CERIA (Menggantikan maroon tua agar suasana langsung hidup) */
+        --color-3: #ffafcc;       /* Hot Pink / Bubblegum Pink yang ceria */
+        --color-4: #8ecae6;       /* BIRU LANGIT CERAH (Menggantikan biru muted/tua agar lebih fresh) */
+        --color-5: #b5179e;       /* UNGU UNIK / MAGENTA (Aksen cerah yang bikin desain terlihat modern) */
+
+        /* EFEK KACA PUTIH (LIGHT GLASSMORPHISM) */
+        --glass: rgba(255, 255, 255, 0.45);        
+        --glass-border: rgba(255, 255, 255, 0.3);
         }
 
         * {
