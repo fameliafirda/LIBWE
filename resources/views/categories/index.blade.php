@@ -196,32 +196,29 @@
                                         </div>
                                     </td>
                                     <td class="text-center">
-                                        <div class="d-flex justify-content-center align-items-center gap-4">
+                                        <div class="d-flex justify-content-center align-items-center" style="gap: 25px;">
                                             <a href="{{ route('categories.edit', $category->id) }}" 
-                                               style="color: #f59e0b; font-size: 1.3rem; transition: 0.2s; text-decoration: none;"
+                                               style="color: #f59e0b; font-size: 1.4rem; transition: 0.2s; text-decoration: none;"
                                                onmouseover="this.style.transform='scale(1.2)'"
                                                onmouseout="this.style.transform='scale(1)'"
-                                               data-bs-toggle="tooltip" title="Edit">
+                                               title="Edit Kategori">
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                             <a href="{{ route('books.index', ['kategori' => $category->id]) }}" 
-                                               style="color: #10b981; font-size: 1.3rem; transition: 0.2s; text-decoration: none;"
+                                               style="color: #10b981; font-size: 1.4rem; transition: 0.2s; text-decoration: none;"
                                                onmouseover="this.style.transform='scale(1.2)'"
                                                onmouseout="this.style.transform='scale(1)'"
-                                               data-bs-toggle="tooltip" title="Lihat Buku">
+                                               title="Lihat Buku">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <form action="{{ route('categories.destroy', $category->id) }}" 
-                                                  method="POST" 
-                                                  class="m-0 p-0"
-                                                  onsubmit="return confirm('Yakin ingin menghapus?');">
+                                            <form action="{{ route('categories.destroy', $category->id) }}" method="POST" class="m-0 p-0" onsubmit="return confirm('Yakin ingin menghapus kategori ini?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" 
-                                                        style="background: transparent; border: none; color: #ef4444; font-size: 1.3rem; transition: 0.2s; padding: 0;"
+                                                        style="background: transparent; border: none; color: #ef4444; font-size: 1.4rem; transition: 0.2s; padding: 0; cursor: pointer;"
                                                         onmouseover="this.style.transform='scale(1.2)'"
                                                         onmouseout="this.style.transform='scale(1)'"
-                                                        data-bs-toggle="tooltip" title="Hapus">
+                                                        title="Hapus Kategori">
                                                     <i class="fas fa-trash-alt"></i>
                                                 </button>
                                             </form>
@@ -234,6 +231,10 @@
                                         <div class="text-muted">
                                             <i class="fas fa-folder-open fa-4x mb-3" style="color: #dfe6e9;"></i>
                                             <h6>Belum ada data kategori</h6>
+                                            <p class="small mb-3">Silakan tambah kategori baru</p>
+                                            <a href="{{ route('categories.create') }}" class="btn btn-sm" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000;">
+                                                <i class="fas fa-plus-circle me-1"></i> Tambah Kategori
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>
