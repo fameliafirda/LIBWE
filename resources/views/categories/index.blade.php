@@ -185,18 +185,22 @@
                                         </div>
                                     </td>
                                     <td class="text-center">
-                                        <div class="d-flex justify-content-center align-items-center gap-2">
+                                        <div class="d-flex justify-content-center align-items-center gap-3">
                                             <a href="{{ route('categories.edit', $category->id) }}" 
-                                               class="btn shadow-sm text-dark d-inline-flex align-items-center justify-content-center" 
-                                               style="background-color: #ffe066; border: none; border-radius: 10px; width: 38px; height: 38px; transition: 0.2s;"
+                                               class="bg-transparent border-0 p-0 m-0" 
+                                               style="color: #f59e0b; transition: 0.2s; transform-origin: center;"
+                                               onmouseover="this.style.transform='scale(1.2)'"
+                                               onmouseout="this.style.transform='scale(1)'"
                                                data-bs-toggle="tooltip" title="Edit kategori">
-                                                <i class="fas fa-pen" style="font-size: 0.95rem;"></i>
+                                                <i class="fas fa-edit" style="font-size: 1.25rem;"></i>
                                             </a>
                                             <a href="{{ route('books.index', ['kategori' => $category->id]) }}" 
-                                               class="btn shadow-sm text-dark d-inline-flex align-items-center justify-content-center" 
-                                               style="background-color: #8fd19e; border: none; border-radius: 10px; width: 38px; height: 38px; transition: 0.2s;"
+                                               class="bg-transparent border-0 p-0 m-0" 
+                                               style="color: #10b981; transition: 0.2s; transform-origin: center;"
+                                               onmouseover="this.style.transform='scale(1.2)'"
+                                               onmouseout="this.style.transform='scale(1)'"
                                                data-bs-toggle="tooltip" title="Lihat buku dalam kategori ini">
-                                                <i class="fas fa-eye" style="font-size: 0.95rem;"></i>
+                                                <i class="fas fa-eye" style="font-size: 1.25rem;"></i>
                                             </a>
                                             <form action="{{ route('categories.destroy', $category->id) }}" 
                                                   method="POST" 
@@ -205,10 +209,12 @@
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" 
-                                                        class="btn shadow-sm text-white d-inline-flex align-items-center justify-content-center" 
-                                                        style="background-color: #ff6b6b; border: none; border-radius: 10px; width: 38px; height: 38px; transition: 0.2s;"
+                                                        class="bg-transparent border-0 p-0 m-0" 
+                                                        style="color: #ef4444; transition: 0.2s; transform-origin: center;"
+                                                        onmouseover="this.style.transform='scale(1.2)'"
+                                                        onmouseout="this.style.transform='scale(1)'"
                                                         data-bs-toggle="tooltip" title="Hapus kategori">
-                                                    <i class="fas fa-trash-alt" style="font-size: 0.95rem;"></i>
+                                                    <i class="fas fa-trash-alt" style="font-size: 1.25rem;"></i>
                                                 </button>
                                             </form>
                                         </div>

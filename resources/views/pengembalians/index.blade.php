@@ -1,21 +1,23 @@
 @extends('layouts.app')
 
-@section('title', 'Data Pengembalian')
+@section('title', 'Daftar Peminjaman')
 
 @section('content')
-<div class="container-fluid py-4">
-    <div class="row mb-4">
+<div class="container-fluid px-4 py-3">
+    <div class="row g-0 mb-4">
         <div class="col-12">
-            <div class="card border-0 shadow-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px;">
+            <div class="card border-0 shadow-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 0 20px 20px 0;">
                 <div class="card-body p-4">
                     <div class="row align-items-center">
                         <div class="col-12 col-md-8">
-                            <h3 class="text-white mb-2" style="font-weight: 600;">📦 Data Pengembalian Buku</h3>
-                            <p class="text-white opacity-75 mb-0">Kelola data pengembalian buku perpustakaan</p>
+                            <h3 class="text-white mb-2" style="font-weight: 600;">
+                                <i class="fas fa-hand-holding-heart me-2"></i> Daftar Peminjaman Buku
+                            </h3>
+                            <p class="text-white opacity-75 mb-0">Kelola data peminjaman buku perpustakaan SDN Berat Wetan 1</p>
                         </div>
                         <div class="col-12 col-md-4 text-md-end mt-3 mt-md-0">
-                            <a href="{{ route('pengembalians.create') }}" class="btn btn-light btn-lg" style="border-radius: 50px; padding: 12px 30px; font-weight: 600; color: #667eea; box-shadow: 0 10px 20px rgba(0,0,0,0.2);">
-                                <i class="fas fa-plus-circle me-2"></i> Tambah Pengembalian
+                            <a href="{{ route('pinjamans.create') }}" class="btn btn-light" style="border-radius: 50px; padding: 10px 25px; font-weight: 500; color: #667eea; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+                                <i class="fas fa-plus-circle me-2"></i> Tambah Peminjaman
                             </a>
                         </div>
                     </div>
@@ -25,62 +27,118 @@
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 15px; border-left: 5px solid #28a745;">
-            <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="row g-0 mb-4">
+        <div class="col-12">
+            <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 15px; border-left: 5px solid #28a745;">
+                <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         </div>
+    </div>
     @endif
 
     @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 15px; border-left: 5px solid #dc3545;">
-            <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="row g-0 mb-4">
+        <div class="col-12">
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 15px; border-left: 5px solid #dc3545;">
+                <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         </div>
+    </div>
     @endif
 
-    <div class="row mb-4">
-        <div class="col-12 col-md-4 mb-3">
+    @php
+        $bukuHabis = App\Models\Book::where('stok', '<=', 0)->get();
+    @endphp
+    @if($bukuHabis->count() > 0)
+    <div class="row g-0 mb-4">
+        <div class="col-12">
+            <div class="alert alert-warning alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 15px; border-left: 5px solid #f39c12; background-color: #fff3cd;">
+                <div class="d-flex align-items-start">
+                    <div class="me-3">
+                        <i class="fas fa-exclamation-triangle fa-2x" style="color: #f39c12;"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <strong class="d-block mb-2" style="color: #856404;">⚠️ Perhatian! Stok Buku Habis</strong>
+                        <div class="row">
+                            @foreach($bukuHabis as $buku)
+                            <div class="col-12 col-md-4 mb-2">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-book me-2" style="color: #8b5cf6; font-size: 12px;"></i>
+                                    <span class="fw-semibold small">{{ $buku->judul }}</span>
+                                    <span class="badge bg-secondary ms-2" style="font-size: 10px;">{{ $buku->kategori->nama ?? 'Tanpa Kategori' }}</span>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-3">
             <div class="card border-0 shadow-sm h-100" style="border-radius: 20px; background: linear-gradient(135deg, #f7c0ec 0%, #a7bdea 100%);">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <p class="text-dark mb-1" style="opacity: 0.8;">Total Pengembalian</p>
-                            <h2 class="text-dark mb-0">{{ $pengembalians->count() }}</h2>
+                            <p class="text-dark mb-1" style="opacity: 0.8;">Total Peminjaman</p>
+                            <h2 class="text-dark mb-0 fw-bold">{{ $pinjamans->total() }}</h2>
                         </div>
                         <div class="bg-white bg-opacity-25 rounded-circle p-3">
-                            <i class="fas fa-undo-alt fa-3x text-dark"></i>
+                            <i class="fas fa-book-reader fa-2x text-dark"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="col-12 col-md-4 mb-3">
+        <div class="col-12 col-md-3">
             <div class="card border-0 shadow-sm h-100" style="border-radius: 20px; background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <p class="text-dark mb-1" style="opacity: 0.8;">Total Denda</p>
-                            <h2 class="text-dark mb-0">Rp {{ number_format($pengembalians->sum('denda'), 0, ',', '.') }}</h2>
+                            <p class="text-dark mb-1" style="opacity: 0.8;">Belum Dikembalikan</p>
+                            <h2 class="text-dark mb-0 fw-bold">{{ App\Models\Pinjaman::where('status', 'belum dikembalikan')->count() }}</h2>
                         </div>
                         <div class="bg-white bg-opacity-25 rounded-circle p-3">
-                            <i class="fas fa-money-bill-wave fa-3x text-dark"></i>
+                            <i class="fas fa-clock fa-2x text-dark"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="col-12 col-md-4 mb-3">
+        <div class="col-12 col-md-3">
             <div class="card border-0 shadow-sm h-100" style="border-radius: 20px; background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <p class="text-dark mb-1" style="opacity: 0.8;">Rata-rata Keterlambatan</p>
-                            <h2 class="text-dark mb-0">{{ number_format($pengembalians->avg('keterlambatan'), 1) }} hari</h2>
+                            <p class="text-dark mb-1" style="opacity: 0.8;">Sudah Dikembalikan</p>
+                            <h2 class="text-dark mb-0 fw-bold">{{ App\Models\Pinjaman::where('status', 'sudah dikembalikan')->count() }}</h2>
                         </div>
                         <div class="bg-white bg-opacity-25 rounded-circle p-3">
-                            <i class="fas fa-clock fa-3x text-dark"></i>
+                            <i class="fas fa-check-circle fa-2x text-dark"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-12 col-md-3">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 20px; background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-dark mb-1" style="opacity: 0.8;">Total Anggota</p>
+                            <h2 class="text-dark mb-0 fw-bold">{{ App\Models\Anggota::count() }}</h2>
+                        </div>
+                        <div class="bg-white bg-opacity-25 rounded-circle p-3">
+                            <i class="fas fa-users fa-2x text-dark"></i>
                         </div>
                     </div>
                 </div>
@@ -88,136 +146,190 @@
         </div>
     </div>
 
-    <div class="card border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
-        <div class="card-header bg-white border-0 py-3 px-4">
-            <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0" style="color: #2d3436; font-weight: 600;">
-                    <i class="fas fa-list me-2" style="color: #8b5cf6;"></i> Daftar Pengembalian
-                </h5>
-                <div class="input-group" style="width: 100%; max-width: 300px;">
-                    <input type="text" class="form-control" placeholder="Cari..." id="searchInput" style="border-radius: 50px 0 0 50px; border: 1px solid #e0e0e0;">
-                    <button class="btn" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); border-radius: 0 50px 50px 0; color: #000;" type="button">
-                        <i class="fas fa-search"></i>
-                    </button>
+    <div class="row g-0 mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm" style="border-radius: 20px;">
+                <div class="card-body p-3">
+                    <form method="GET" action="{{ route('pinjamans.index') }}" class="d-flex flex-wrap align-items-center gap-3">
+                        <div class="d-flex align-items-center">
+                            <label class="fw-semibold text-muted mb-0 me-2">
+                                <i class="fas fa-filter me-1" style="color: #8b5cf6;"></i>Kelas:
+                            </label>
+                            <select name="kelas" class="form-control form-select-sm" style="border-radius: 50px; border: 1px solid #e0e0e0; min-width: 150px;">
+                                <option value="">Semua Kelas</option>
+                                @foreach($kelasList as $kelas)
+                                    <option value="{{ $kelas }}" {{ request('kelas') == $kelas ? 'selected' : '' }}>{{ $kelas }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="d-flex align-items-center">
+                            <label class="fw-semibold text-muted mb-0 me-2">
+                                <i class="fas fa-info-circle me-1" style="color: #8b5cf6;"></i>Status:
+                            </label>
+                            <select name="status" class="form-control form-select-sm" style="border-radius: 50px; border: 1px solid #e0e0e0; min-width: 180px;">
+                                <option value="semua">Semua Status</option>
+                                <option value="belum dikembalikan" {{ request('status') == 'belum dikembalikan' ? 'selected' : '' }}>Belum Dikembalikan</option>
+                                <option value="sudah dikembalikan" {{ request('status') == 'sudah dikembalikan' ? 'selected' : '' }}>Sudah Dikembalikan</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-sm" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000; border-radius: 50px; padding: 6px 20px;">
+                            <i class="fas fa-search me-1"></i> Terapkan
+                        </button>
+                        
+                        @if(request('kelas') || (request('status') && request('status') != 'semua'))
+                            <a href="{{ route('pinjamans.index') }}" class="btn btn-sm" style="background-color: #ff6b6b; color: white; border-radius: 50px; padding: 6px 20px;">
+                                <i class="fas fa-times me-1"></i> Reset
+                            </a>
+                        @endif
+                    </form>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0" id="pengembalianTable">
-                    <thead style="background: linear-gradient(45deg, #f7c0ec, #a7bdea);">
-                        <tr>
-                            <th class="text-center" style="width: 50px;">No</th>
-                            <th>Nama</th>
-                            <th>Kelas</th>
-                            <th>Judul Buku</th>
-                            <th>Tanggal Pinjam</th>
-                            <th>Harus Kembali</th>
-                            <th>Tgl Pengembalian</th>
-                            <th class="text-center">Terlambat</th>
-                            <th class="text-end">Denda</th>
-                            <th class="text-center" style="width: 100px;">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($pengembalians as $index => $pengembalian)
-                        <tr style="vertical-align: middle;">
-                            <td class="text-center fw-bold">{{ $index + 1 }}</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-2" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                                        <i class="fas fa-user" style="color: #8b5cf6;"></i>
-                                    </div>
-                                    <span class="fw-semibold">{{ $pengembalian->nama }}</span>
-                                </div>
-                            </td>
-                            <td><span class="badge bg-light text-dark px-3 py-2">{{ $pengembalian->kelas }}</span></td>
-                            <td>
-                                <span class="fw-semibold">{{ $pengembalian->judul_buku }}</span>
-                            </td>
-                            <td>{{ optional($pengembalian->pinjaman)->tanggal_pinjam ? \Carbon\Carbon::parse($pengembalian->pinjaman->tanggal_pinjam)->format('d/m/Y') : '-' }}</td>
-                            <td>{{ $pengembalian->tanggal_kembali ? \Carbon\Carbon::parse($pengembalian->tanggal_kembali)->format('d/m/Y') : '-' }}</td>
-                            <td>
-                                <span class="badge bg-info text-dark px-3 py-2">
-                                    <i class="fas fa-calendar-check me-1"></i>
-                                    {{ \Carbon\Carbon::parse($pengembalian->tanggal_pengembalian)->format('d/m/Y') }}
-                                </span>
-                            </td>
-                            <td class="text-center">
-                                @if($pengembalian->keterlambatan > 0)
-                                    <span class="badge bg-danger text-white px-3 py-2">
-                                        <i class="fas fa-exclamation-triangle me-1"></i>
-                                        {{ $pengembalian->keterlambatan }} hari
-                                    </span>
-                                @else
-                                    <span class="badge bg-success text-white px-3 py-2">
-                                        <i class="fas fa-check me-1"></i>
-                                        Tepat waktu
-                                    </span>
-                                @endif
-                            </td>
-                            <td class="text-end">
-                                <span class="fw-bold" style="color: #e74c3c;">
-                                    Rp {{ number_format($pengembalian->denda, 0, ',', '.') }}
-                                </span>
-                            </td>
-                            <td class="text-center">
-                                <div class="d-flex justify-content-center align-items-center gap-2">
-                                    <a href="{{ route('pengembalians.edit', $pengembalian->id) }}" 
-                                       class="btn shadow-sm text-dark d-inline-flex align-items-center justify-content-center" 
-                                       style="background-color: #ffe066; border: none; border-radius: 10px; width: 38px; height: 38px; transition: 0.2s;"
-                                       data-bs-toggle="tooltip" title="Edit">
-                                        <i class="fas fa-pen" style="font-size: 0.95rem;"></i>
-                                    </a>
-                                    <form action="{{ route('pengembalians.destroy', $pengembalian->id) }}" 
-                                          method="POST" 
-                                          class="m-0 p-0"
-                                          onsubmit="return confirm('Yakin ingin menghapus data pengembalian ini? Stok buku akan dikembalikan.');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" 
-                                                class="btn shadow-sm text-white d-inline-flex align-items-center justify-content-center" 
-                                                style="background-color: #ff6b6b; border: none; border-radius: 10px; width: 38px; height: 38px; transition: 0.2s;"
-                                                data-bs-toggle="tooltip" title="Hapus">
-                                            <i class="fas fa-trash-alt" style="font-size: 0.95rem;"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="10" class="text-center py-5">
-                                <div class="text-muted">
-                                    <i class="fas fa-undo-alt fa-4x mb-3" style="color: #dfe6e9;"></i>
-                                    <h6>Belum ada data pengembalian</h6>
-                                    <p class="small">Silakan tambah pengembalian baru</p>
-                                    <a href="{{ route('pengembalians.create') }}" class="btn btn-sm" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000;">
-                                        <i class="fas fa-plus me-1"></i> Tambah Pengembalian
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+    <div class="row g-0">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                <div class="card-header bg-white border-0 py-3 px-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0" style="color: #2d3436; font-weight: 600;">
+                            <i class="fas fa-list me-2" style="color: #8b5cf6;"></i> Daftar Transaksi Peminjaman
+                        </h5>
+                        <div class="input-group" style="width: 100%; max-width: 250px;">
+                            <input type="text" class="form-control form-control-sm" placeholder="Cari peminjam/buku..." id="searchInput" style="border-radius: 50px 0 0 50px; border: 1px solid #e0e0e0;">
+                            <button class="btn btn-sm" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); border-radius: 0 50px 50px 0; color: #000;" type="button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="pinjamanTable">
+                            <thead style="background: linear-gradient(45deg, #f7c0ec, #a7bdea);">
+                                <tr>
+                                    <th class="text-center" style="width: 50px;">No</th>
+                                    <th style="width: 150px;">Nama</th>
+                                    <th class="text-center" style="width: 80px;">Kelas</th>
+                                    <th style="width: 250px;">Judul Buku</th>
+                                    <th style="width: 120px;" class="text-center">Tgl Pinjam</th>
+                                    <th style="width: 120px;" class="text-center">Jatuh Tempo</th>
+                                    <th style="width: 120px;" class="text-center">Tgl Kembali</th>
+                                    <th style="width: 150px;" class="text-center">Status</th>
+                                    <th style="width: 180px;" class="text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($pinjamans as $i => $pinjaman)
+                                    @php
+                                        $tglPinjam = \Carbon\Carbon::parse($pinjaman->tanggal_pinjam)->timezone('Asia/Jakarta')->startOfDay();
+                                        $jatuhTempo = $tglPinjam->copy()->addDays(7);
+                                        $terlambat = 0;
+                                        if($pinjaman->status == 'belum dikembalikan') {
+                                            $hariIni = \Carbon\Carbon::now('Asia/Jakarta')->startOfDay();
+                                            if($hariIni->gt($jatuhTempo)) {
+                                                $terlambat = (int) round($jatuhTempo->diffInDays($hariIni));
+                                            }
+                                        }
+                                    @endphp
+                                    <tr style="vertical-align: middle;" class="{{ $terlambat > 0 ? 'bg-danger bg-opacity-10' : '' }}">
+                                        <td class="text-center fw-bold">{{ $pinjamans->firstItem() + $i }}</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-2" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fas fa-user" style="color: #8b5cf6;"></i>
+                                                </div>
+                                                <span class="fw-semibold">{{ $pinjaman->anggota->nama ?? $pinjaman->nama }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-light text-dark px-3 py-2">{{ $pinjaman->anggota->kelas ?? $pinjaman->kelas }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-book me-2" style="color: #8b5cf6;"></i>
+                                                {{ Str::limit($pinjaman->judul_buku ?? '-', 35) }}
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-info text-dark px-3 py-2">
+                                                <i class="fas fa-calendar-alt me-1"></i> {{ $tglPinjam->format('d/m/Y') }}
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge {{ $terlambat > 0 ? 'bg-danger' : 'bg-secondary' }} px-3 py-2">
+                                                <i class="fas fa-clock me-1"></i> {{ $jatuhTempo->format('d/m/Y') }}
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            @if($pinjaman->status === 'sudah dikembalikan' && $pinjaman->tanggal_kembali)
+                                                <span class="badge bg-success px-3 py-2">
+                                                    <i class="fas fa-calendar-check me-1"></i> {{ \Carbon\Carbon::parse($pinjaman->tanggal_kembali)->format('d/m/Y') }}
+                                                </span>
+                                            @else
+                                                <span class="badge bg-light text-muted px-3 py-2" style="border: 1px solid #e0e0e0;"><i class="fas fa-minus"></i> Belum Kembali</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-center">
+                                            @if($pinjaman->status === 'sudah dikembalikan')
+                                                <span class="badge bg-success px-3 py-2"><i class="fas fa-check-circle me-1"></i> Selesai</span>
+                                            @else
+                                                <span class="badge bg-warning text-dark px-3 py-2"><i class="fas fa-hourglass-half me-1"></i> Dipinjam</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="d-flex justify-content-center align-items-center gap-3">
+                                                @if($pinjaman->status == 'belum dikembalikan')
+                                                    <form action="{{ route('pinjamans.mark-returned', $pinjaman->id) }}" method="POST" class="m-0 p-0" onsubmit="return confirm('Tandai buku ini sudah dikembalikan HARI INI?')">
+                                                        @csrf
+                                                        <button type="submit" class="bg-transparent border-0 p-0 m-0" style="color: #28a745; transition: 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" title="Tandai Sudah Dikembalikan">
+                                                            <i class="fas fa-check-circle" style="font-size: 1.25rem;"></i>
+                                                        </button>
+                                                    </form>
+                                                @endif
+                                                <a href="{{ route('pinjamans.edit', $pinjaman->id) }}" class="bg-transparent border-0 p-0 m-0" style="color: #f59e0b; transition: 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" title="Edit Peminjaman">
+                                                    <i class="fas fa-edit" style="font-size: 1.25rem;"></i>
+                                                </a>
+                                                <form action="{{ route('pinjamans.destroy', $pinjaman->id) }}" method="POST" class="m-0 p-0" onsubmit="return confirm('Yakin ingin menghapus data peminjaman ini?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="bg-transparent border-0 p-0 m-0" style="color: #ef4444; transition: 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" title="Hapus Peminjaman">
+                                                        <i class="fas fa-trash-alt" style="font-size: 1.25rem;"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="9" class="text-center py-5 text-muted">
+                                            <i class="fas fa-book-open fa-3x mb-3"></i>
+                                            <h6>Belum ada data peminjaman</h6>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                @if(method_exists($pinjamans, 'links') && $pinjamans->hasPages())
+                <div class="card-footer bg-white border-0 py-3">
+                    <div class="d-flex justify-content-end">
+                        {{ $pinjamans->links('pagination::bootstrap-4') }}
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
-        
-        @if(method_exists($pengembalians, 'links') && $pengembalians->hasPages())
-        <div class="card-footer bg-white border-0 py-3">
-            <div class="d-flex justify-content-end">
-                {{ $pengembalians->links() }}
-            </div>
-        </div>
-        @endif
     </div>
 </div>
 
 @push('scripts')
 <script>
-    // Tooltip initialization
     document.addEventListener('DOMContentLoaded', function() {
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -225,18 +337,12 @@
         });
     });
 
-    // Search functionality
     document.getElementById('searchInput').addEventListener('keyup', function() {
         let searchValue = this.value.toLowerCase();
-        let tableRows = document.querySelectorAll('#pengembalianTable tbody tr');
-        
+        let tableRows = document.querySelectorAll('#pinjamanTable tbody tr');
         tableRows.forEach(function(row) {
             let text = row.textContent.toLowerCase();
-            if (text.indexOf(searchValue) > -1) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
+            row.style.display = (text.indexOf(searchValue) > -1) ? '' : 'none';
         });
     });
 </script>

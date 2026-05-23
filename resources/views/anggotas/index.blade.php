@@ -198,27 +198,33 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        <div class="d-flex flex-wrap gap-1 justify-content-center">
+                                        <div class="d-flex justify-content-center align-items-center gap-3">
                                             <a href="{{ route('anggotas.edit', $item['anggota']->id) }}" 
-                                               class="btn btn-sm" 
-                                               style="background-color: #ffe066; color: #000; border: none; border-radius: 8px; padding: 6px 10px;"
+                                               class="bg-transparent border-0 p-0 m-0" 
+                                               style="color: #f59e0b; transition: 0.2s; transform-origin: center;"
+                                               onmouseover="this.style.transform='scale(1.2)'"
+                                               onmouseout="this.style.transform='scale(1)'"
                                                title="Edit anggota">
-                                                <i class="fas fa-edit"></i>
+                                                <i class="fas fa-edit" style="font-size: 1.25rem;"></i>
                                             </a>
 
                                             <a href="{{ route('anggotas.peminjaman', $item['anggota']->id) }}" 
-                                               class="btn btn-sm" 
-                                               style="background-color: #8fd19e; color: #000; border: none; border-radius: 8px; padding: 6px 10px;"
+                                               class="bg-transparent border-0 p-0 m-0" 
+                                               style="color: #10b981; transition: 0.2s; transform-origin: center;"
+                                               onmouseover="this.style.transform='scale(1.2)'"
+                                               onmouseout="this.style.transform='scale(1)'"
                                                title="Lihat riwayat peminjaman">
-                                                <i class="fas fa-eye"></i>
+                                                <i class="fas fa-eye" style="font-size: 1.25rem;"></i>
                                             </a>
 
                                             <button type="button" 
-                                                    class="btn btn-sm" 
-                                                    style="background-color: #ff6b6b; color: white; border: none; border-radius: 8px; padding: 6px 10px;"
+                                                    class="bg-transparent border-0 p-0 m-0" 
+                                                    style="color: #ef4444; transition: 0.2s; transform-origin: center;"
+                                                    onmouseover="this.style.transform='scale(1.2)'"
+                                                    onmouseout="this.style.transform='scale(1)'"
                                                     onclick="confirmDelete({{ $item['anggota']->id }}, '{{ addslashes($item['anggota']->nama) }}', {{ $item['pinjamans']->where('status', 'belum dikembalikan')->count() }})"
                                                     title="Hapus anggota">
-                                                <i class="fas fa-trash"></i>
+                                                <i class="fas fa-trash-alt" style="font-size: 1.25rem;"></i>
                                             </button>
                                         </div>
                                     </td>

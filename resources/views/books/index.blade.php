@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Daftar Buku')
+@section('title', 'Data Anggota')
 
 @section('content')
 <div class="container-fluid px-4 py-3">
@@ -11,13 +11,13 @@
                     <div class="row align-items-center">
                         <div class="col-md-8">
                             <h3 class="text-white mb-2" style="font-weight: 600;">
-                                <i class="fas fa-book me-2"></i> Daftar Buku Perpustakaan
+                                <i class="fas fa-users me-2"></i> Data Anggota Perpustakaan
                             </h3>
-                            <p class="text-white opacity-75 mb-0">Kelola koleksi buku perpustakaan SDN Berat Wetan 1</p>
+                            <p class="text-white opacity-75 mb-0">Kelola data anggota perpustakaan SDN Berat Wetan 1</p>
                         </div>
                         <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                            <a href="{{ route('books.create') }}" class="btn btn-light" style="border-radius: 50px; padding: 10px 25px; font-weight: 500; color: #667eea; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
-                                <i class="fas fa-plus-circle me-2"></i> Tambah Buku
+                            <a href="{{ route('anggotas.create') }}" class="btn btn-light" style="border-radius: 50px; padding: 10px 25px; font-weight: 500; color: #667eea; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+                                <i class="fas fa-user-plus me-2"></i> Tambah Anggota
                             </a>
                         </div>
                     </div>
@@ -37,46 +37,12 @@
     </div>
     @endif
 
-    @php
-        $bukuHabis = App\Models\Book::where('stok', '<=', 0)->get();
-    @endphp
-    @if($bukuHabis->count() > 0)
+    @if(session('error'))
     <div class="row g-0 mb-4">
         <div class="col-12">
-            <div class="alert alert-warning alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 15px; border-left: 5px solid #f39c12;">
-                <div class="d-flex align-items-start">
-                    <div class="me-3">
-                        <i class="fas fa-exclamation-triangle fa-2x" style="color: #f39c12;"></i>
-                    </div>
-                    <div>
-                        <strong class="d-block mb-2">⚠️ Perhatian! Stok Buku Habis</strong>
-                        <ul class="mb-0 ps-3">
-                            @foreach($bukuHabis as $buku)
-                                <li class="mb-1">
-                                    <span class="fw-semibold">{{ $buku->judul }}</span> 
-                                    <span class="badge bg-secondary ms-2">{{ $buku->kategori->nama ?? 'Tanpa Kategori' }}</span>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </div>
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 15px; border-left: 5px solid #dc3545;">
+                <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        </div>
-    </div>
-    @endif
-
-    @if(isset($filterKategori))
-    <div class="row g-0 mb-4">
-        <div class="col-12">
-            <div class="alert alert-info d-flex justify-content-between align-items-center" style="border-radius: 15px; background: rgba(139, 92, 246, 0.1); border-left: 5px solid #8b5cf6;">
-                <div>
-                    <i class="fas fa-filter me-2" style="color: #8b5cf6;"></i>
-                    Menampilkan buku kategori: <strong class="ms-1">{{ $filterKategori }}</strong>
-                </div>
-                <a href="{{ route('books.index') }}" class="btn btn-sm" style="background-color: #ff6b6b; color: white; border-radius: 50px; padding: 5px 15px;">
-                    <i class="fas fa-times me-1"></i> Reset
-                </a>
             </div>
         </div>
     </div>
@@ -86,33 +52,40 @@
         <div class="col-12">
             <div class="card border-0 shadow-sm" style="border-radius: 20px;">
                 <div class="card-body p-3">
-                    <form method="GET" action="{{ route('books.index') }}" class="d-flex flex-wrap align-items-center gap-3">
-                        <div class="d-flex align-items-center flex-grow-1">
-                            <label class="fw-semibold text-muted mb-0 me-3" style="min-width: 70px;">
-                                <i class="fas fa-search me-2" style="color: #8b5cf6;"></i>Cari:
-                            </label>
-                            <input type="text" name="search" class="form-control" placeholder="Cari judul atau penulis..." value="{{ request('search') }}" style="border-radius: 50px; border: 1px solid #e0e0e0; max-width: 300px;">
-                        </div>
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
                         <div class="d-flex align-items-center">
                             <label class="fw-semibold text-muted mb-0 me-3">
-                                <i class="fas fa-tags me-2" style="color: #8b5cf6;"></i>Kategori:
+                                <i class="fas fa-filter me-2" style="color: #8b5cf6;"></i>Filter Kelas:
                             </label>
-                            <select name="kategori" class="form-control" style="border-radius: 50px; border: 1px solid #e0e0e0; min-width: 200px;">
-                                <option value="">Semua Kategori</option>
-                                @foreach($categories as $kategori)
-                                    <option value="{{ $kategori->id }}" {{ request('kategori') == $kategori->id ? 'selected' : '' }}>{{ $kategori->nama }}</option>
-                                @endforeach
-                            </select>
+                            <form method="GET" action="{{ route('anggotas.index') }}" class="d-inline">
+                                <select name="kelas" onchange="this.form.submit()" class="form-control" style="max-width: 300px; border-radius: 50px; border: 1px solid #e0e0e0;">
+                                    <option value="">-- Semua Kelas --</option>
+                                    @foreach ($daftar_kelas as $k)
+                                        <option value="{{ $k }}" {{ request('kelas') == $k ? 'selected' : '' }}>{{ $k }}</option>
+                                    @endforeach
+                                </select>
+                            </form>
+                            @if(request('kelas'))
+                                <a href="{{ route('anggotas.index') }}" class="btn btn-sm ms-3" style="background-color: #ff6b6b; color: white; border-radius: 50px; padding: 8px 20px;">
+                                    <i class="fas fa-times me-1"></i> Reset
+                                </a>
+                            @endif
                         </div>
-                        <button type="submit" class="btn" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000; border-radius: 50px; padding: 8px 25px;">
-                            <i class="fas fa-filter me-2"></i> Filter
+
+                        @if(count($anggotas) > 0)
+                        <button type="button" 
+                                class="btn btn-danger" 
+                                style="border-radius: 50px; padding: 8px 25px; background: linear-gradient(135deg, #ff4757, #ff6b81); border: none;"
+                                onclick="confirmDeleteAll({{ count($anggotas) }})">
+                            <i class="fas fa-user-slash me-2"></i> Hapus Semua Anggota ({{ count($anggotas) }})
                         </button>
-                        @if(request('search') || request('kategori'))
-                            <a href="{{ route('books.index') }}" class="btn btn-sm" style="background-color: #ff6b6b; color: white; border-radius: 50px; padding: 8px 20px;">
-                                <i class="fas fa-times me-1"></i> Reset
-                            </a>
+                        
+                        <form id="deleteAllForm" action="{{ route('anggotas.delete-all') }}" method="POST" style="display: none;">
+                            @csrf
+                            @method('DELETE')
+                        </form>
                         @endif
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -122,128 +95,149 @@
         <div class="col-12">
             <div class="card border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
                 <div class="card-header bg-white border-0 py-3 px-4">
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
                         <h5 class="mb-0" style="color: #2d3436; font-weight: 600;">
-                            <i class="fas fa-list me-2" style="color: #8b5cf6;"></i> Koleksi Buku
-                            <span class="badge ms-2" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000;">{{ $books->total() }} buku</span>
+                            <i class="fas fa-list me-2" style="color: #8b5cf6;"></i> Daftar Anggota
+                            <span class="badge ms-2" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000;">{{ count($anggotas) }} anggota</span>
                         </h5>
-                        <span class="text-muted small">
-                            <i class="fas fa-info-circle me-1"></i> Halaman {{ $books->currentPage() }} dari {{ $books->lastPage() }}
-                        </span>
+                        
+                        <div class="input-group" style="width: 100%; max-width: 300px;">
+                            <input type="text" class="form-control form-control-sm" placeholder="Cari anggota..." id="searchInput" style="border-radius: 50px 0 0 50px; border: 1px solid #e0e0e0;">
+                            <button class="btn btn-sm" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); border-radius: 0 50px 50px 0; color: #000;" type="button" id="searchButton">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover mb-0" style="min-width: 1200px;">
+                        <table class="table table-hover mb-0 text-nowrap" style="min-width: 1200px;" id="anggotaTable">
                             <thead style="background: linear-gradient(45deg, #f7c0ec, #a7bdea);">
                                 <tr>
-                                    <th class="text-center" style="width: 50px;">#</th>
-                                    <th style="width: 250px;">Judul</th>
-                                    <th style="width: 200px;">Penulis</th>
-                                    <th style="width: 150px;">Kategori</th>
-                                    <th style="width: 100px;" class="text-center">Tahun Terbit</th>
-                                    <th style="width: 100px;" class="text-center">Stok</th>
-                                    <th style="width: 100px;" class="text-center">Cover</th>
+                                    <th class="text-center" style="width: 50px;">No</th>
+                                    <th style="width: 150px;">Nama</th>
+                                    <th style="width: 100px;">Kelas</th>
+                                    <th style="width: 120px;">Jenis Kelamin</th>
+                                    <th>Buku yang Dipinjam</th>
+                                    <th style="width: 120px;" class="text-center">Total Denda</th>
                                     <th style="width: 150px;" class="text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($books as $index => $book)
-                                <tr style="vertical-align: middle;">
-                                    <td class="text-center fw-bold">{{ $books->firstItem() + $index }}</td>
+                                @forelse ($anggotas as $item)
+                                <tr style="vertical-align: middle;" id="row-{{ $item['anggota']->id }}">
+                                    <td class="text-center fw-bold">{{ $loop->iteration }}</td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <div class="me-2">
-                                                <i class="fas fa-book" style="color: #8b5cf6;"></i>
+                                            <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-2" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="fas fa-user" style="color: #8b5cf6;"></i>
                                             </div>
-                                            <span class="fw-semibold">{{ $book->judul }}</span>
+                                            <span class="fw-semibold">{{ $item['anggota']->nama }}</span>
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="d-flex align-items-center">
-                                            <i class="fas fa-user-edit me-2" style="color: #f472b6;"></i>
-                                            {{ $book->penulis }}
-                                        </div>
+                                        <span class="badge bg-light text-dark px-3 py-2">{{ $item['anggota']->kelas }}</span>
                                     </td>
                                     <td>
-                                        <span class="badge" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000; padding: 6px 12px;">
-                                            {{ $book->kategori->nama ?? '-' }}
-                                        </span>
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="badge bg-light text-dark px-3 py-2">
-                                            <i class="fas fa-calendar-alt me-1" style="color: #8b5cf6;"></i>
-                                            {{ $book->tahun_terbit }}
-                                        </span>
-                                    </td>
-                                    <td class="text-center">
-                                        @if($book->stok > 5)
-                                            <span class="badge bg-success px-3 py-2">
-                                                <i class="fas fa-check-circle me-1"></i> {{ $book->stok }}
-                                            </span>
-                                        @elseif($book->stok > 0)
-                                            <span class="badge bg-warning text-dark px-3 py-2">
-                                                <i class="fas fa-exclamation-circle me-1"></i> {{ $book->stok }}
+                                        @if($item['anggota']->jenis_kelamin == 'Laki-laki')
+                                            <span class="badge bg-info text-white px-3 py-2">
+                                                <i class="fas fa-mars me-1"></i> Laki-laki
                                             </span>
                                         @else
-                                            <span class="badge bg-danger px-3 py-2">
-                                                <i class="fas fa-times-circle me-1"></i> Habis
+                                            <span class="badge bg-danger text-white px-3 py-2">
+                                                <i class="fas fa-venus me-1"></i> Perempuan
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($item['pinjamans']->count() > 0)
+                                            <div style="max-height: 100px; overflow-y: auto; padding-right: 5px;">
+                                                <ul class="list-unstyled mb-0">
+                                                    @foreach($item['pinjamans'] as $peminjaman)
+                                                        <li class="mb-2 pb-2 border-bottom">
+                                                            <div class="d-flex align-items-start gap-2">
+                                                                <i class="fas fa-book mt-1" style="color: #8b5cf6; font-size: 12px;"></i>
+                                                                <div>
+                                                                    <span class="fw-semibold">{{ $peminjaman->judul_buku ?? 'Buku tidak tersedia' }}</span>
+                                                                    <br>
+                                                                    <small class="text-muted">
+                                                                        <i class="fas fa-calendar-alt me-1"></i>
+                                                                        {{ \Carbon\Carbon::parse($peminjaman->tanggal_pinjam)->format('d/m/Y') }}
+                                                                        @if($peminjaman->tanggal_kembali)
+                                                                            - {{ \Carbon\Carbon::parse($peminjaman->tanggal_kembali)->format('d/m/Y') }}
+                                                                        @else
+                                                                            (Belum dikembalikan)
+                                                                        @endif
+                                                                    </small>
+                                                                    <br>
+                                                                    @if($peminjaman->status == 'belum dikembalikan')
+                                                                        <span class="badge bg-warning text-dark mt-1">Dipinjam</span>
+                                                                    @else
+                                                                        <span class="badge bg-success mt-1">Dikembalikan</span>
+                                                                    @endif
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                        @else
+                                            <span class="text-muted fst-italic">
+                                                <i class="fas fa-info-circle me-1"></i>Belum ada peminjaman
                                             </span>
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        @if($book->gambar)
-                                            <div class="position-relative d-inline-block">
-                                                <img src="{{ asset($book->gambar) }}" 
-                                                     width="50" 
-                                                     height="70" 
-                                                     alt="Cover {{ $book->judul }}"
-                                                     style="object-fit: cover; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
-                                                     data-bs-toggle="tooltip" 
-                                                     data-bs-placement="top" 
-                                                     title="{{ $book->judul }}">
-                                            </div>
+                                        @if($item['pinjamans']->sum('denda') > 0)
+                                            <span class="fw-bold" style="color: #e74c3c;">
+                                                Rp {{ number_format($item['pinjamans']->sum('denda'), 0, ',', '.') }}
+                                            </span>
                                         @else
-                                            <div class="bg-light d-inline-flex align-items-center justify-content-center" 
-                                                 style="width: 50px; height: 70px; border-radius: 8px; border: 1px dashed #ccc;">
-                                                <i class="fas fa-image text-muted"></i>
-                                            </div>
+                                            <span class="badge bg-success px-3 py-2">Rp 0</span>
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        <div class="d-flex justify-content-center align-items-center gap-2">
-                                            <a href="{{ route('books.edit', $book->id) }}" 
-                                               class="btn shadow-sm text-dark d-inline-flex align-items-center justify-content-center" 
-                                               style="background-color: #ffe066; border: none; border-radius: 10px; width: 38px; height: 38px; transition: 0.2s;"
-                                               data-bs-toggle="tooltip" title="Edit Buku">
-                                                <i class="fas fa-pen" style="font-size: 0.95rem;"></i>
+                                        <div class="d-flex justify-content-center align-items-center gap-3">
+                                            <a href="{{ route('anggotas.edit', $item['anggota']->id) }}" 
+                                               class="bg-transparent border-0 p-0 m-0" 
+                                               style="color: #f59e0b; transition: 0.2s; transform-origin: center;"
+                                               onmouseover="this.style.transform='scale(1.2)'"
+                                               onmouseout="this.style.transform='scale(1)'"
+                                               title="Edit anggota">
+                                                <i class="fas fa-edit" style="font-size: 1.25rem;"></i>
                                             </a>
-                                            <form action="{{ route('books.destroy', $book->id) }}" 
-                                                  method="POST" 
-                                                  class="m-0 p-0"
-                                                  onsubmit="return confirm('Yakin ingin menghapus buku ini? Data terkait seperti peminjaman mungkin terpengaruh.');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" 
-                                                        class="btn shadow-sm text-white d-inline-flex align-items-center justify-content-center" 
-                                                        style="background-color: #ff6b6b; border: none; border-radius: 10px; width: 38px; height: 38px; transition: 0.2s;"
-                                                        data-bs-toggle="tooltip" title="Hapus Buku">
-                                                    <i class="fas fa-trash-alt" style="font-size: 0.95rem;"></i>
-                                                </button>
-                                            </form>
+
+                                            <a href="{{ route('anggotas.peminjaman', $item['anggota']->id) }}" 
+                                               class="bg-transparent border-0 p-0 m-0" 
+                                               style="color: #10b981; transition: 0.2s; transform-origin: center;"
+                                               onmouseover="this.style.transform='scale(1.2)'"
+                                               onmouseout="this.style.transform='scale(1)'"
+                                               title="Lihat riwayat peminjaman">
+                                                <i class="fas fa-eye" style="font-size: 1.25rem;"></i>
+                                            </a>
+
+                                            <button type="button" 
+                                                    class="bg-transparent border-0 p-0 m-0" 
+                                                    style="color: #ef4444; transition: 0.2s; transform-origin: center;"
+                                                    onmouseover="this.style.transform='scale(1.2)'"
+                                                    onmouseout="this.style.transform='scale(1)'"
+                                                    onclick="confirmDelete({{ $item['anggota']->id }}, '{{ addslashes($item['anggota']->nama) }}', {{ $item['pinjamans']->where('status', 'belum dikembalikan')->count() }})"
+                                                    title="Hapus anggota">
+                                                <i class="fas fa-trash-alt" style="font-size: 1.25rem;"></i>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="8" class="text-center py-5">
+                                    <td colspan="7" class="text-center py-5">
                                         <div class="text-muted">
-                                            <i class="fas fa-book-open fa-4x mb-3" style="color: #dfe6e9;"></i>
-                                            <h6>Belum ada data buku</h6>
-                                            <p class="small mb-3">Silakan tambah buku baru</p>
-                                            <a href="{{ route('books.create') }}" class="btn btn-sm" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000;">
-                                                <i class="fas fa-plus-circle me-1"></i> Tambah Buku
+                                            <i class="fas fa-users fa-4x mb-3" style="color: #dfe6e9;"></i>
+                                            <h6>Belum ada data anggota</h6>
+                                            <p class="small mb-3">Silakan tambah anggota baru</p>
+                                            <a href="{{ route('anggotas.create') }}" class="btn btn-sm" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000;">
+                                                <i class="fas fa-user-plus me-1"></i> Tambah Anggota
                                             </a>
                                         </div>
                                     </td>
@@ -253,33 +247,115 @@
                         </table>
                     </div>
                 </div>
-
-                @if(method_exists($books, 'links') && $books->hasPages())
-                <div class="card-footer bg-white border-0 py-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="text-muted small">
-                            Menampilkan {{ $books->firstItem() }} - {{ $books->lastItem() }} dari {{ $books->total() }} buku
-                        </div>
-                        <div>
-                            {{ $books->links() }}
-                        </div>
-                    </div>
-                </div>
-                @endif
             </div>
         </div>
     </div>
 </div>
+
+<form id="deleteForm" action="" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
 @endsection
+
+@push('styles')
+<style>
+    /* Custom scroll untuk list buku */
+    td::-webkit-scrollbar {
+        width: 4px;
+    }
+    td::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    td::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #f7c0ec, #a7bdea);
+        border-radius: 10px;
+    }
+    td::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, #ec4899, #8b5cf6);
+    }
+    
+    /* Button hover effects */
+    .btn {
+        transition: all 0.3s ease;
+    }
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+</style>
+@endpush
 
 @push('scripts')
 <script>
-    // Tooltip initialization
-    document.addEventListener('DOMContentLoaded', function() {
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
+    // Fungsi untuk konfirmasi hapus individu
+    function confirmDelete(id, nama, pinjamanAktif) {
+        let message = `⚠️ HAPUS ANGGOTA\n\n`;
+        message += `Nama: ${nama}\n`;
+        message += `ID: ${id}\n\n`;
+        
+        if (pinjamanAktif > 0) {
+            message += `PERHATIAN! Anggota ini memiliki ${pinjamanAktif} buku yang belum dikembalikan!\n`;
+            message += `Stok buku akan dikembalikan otomatis.\n\n`;
+        }
+        
+        message += `Menghapus anggota akan:\n`;
+        message += `- Menghapus semua data peminjaman\n`;
+        message += `- Mengembalikan stok buku\n`;
+        message += `- Tidak dapat dikembalikan\n\n`;
+        message += `Lanjutkan?`;
+        
+        if (confirm(message)) {
+            // Set form action
+            document.getElementById('deleteForm').action = `{{ url('anggotas') }}/${id}`;
+            // Submit form
+            document.getElementById('deleteForm').submit();
+        }
+    }
+
+    // Fungsi untuk konfirmasi hapus semua
+    function confirmDeleteAll(jumlah) {
+        let message = `⚠️ HAPUS SEMUA ANGGOTA\n\n`;
+        message += `Anda akan menghapus ${jumlah} anggota.\n\n`;
+        message += `KONSEKUENSI:\n`;
+        message += `- Semua data peminjaman akan dihapus\n`;
+        message += `- Stok buku akan dikembalikan otomatis\n`;
+        message += `- Data TIDAK DAPAT dikembalikan\n\n`;
+        message += `KETIK 'HAPUS' untuk melanjutkan:`;
+        
+        let konfirmasi = prompt(message);
+        
+        if (konfirmasi === 'HAPUS') {
+            document.getElementById('deleteAllForm').submit();
+        } else if (konfirmasi !== null) {
+            alert('Penghapusan dibatalkan - Kode salah');
+        }
+    }
+
+    // Search functionality
+    document.getElementById('searchButton').addEventListener('click', function() {
+        filterTable();
     });
+
+    document.getElementById('searchInput').addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') {
+            filterTable();
+        }
+    });
+
+    function filterTable() {
+        let searchValue = document.getElementById('searchInput').value.toLowerCase();
+        let tableRows = document.querySelectorAll('#anggotaTable tbody tr');
+        
+        tableRows.forEach(function(row) {
+            if (row.querySelector('td[colspan="7"]')) return; // Skip empty state row
+            let text = row.textContent.toLowerCase();
+            if (text.indexOf(searchValue) > -1) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
 </script>
 @endpush
