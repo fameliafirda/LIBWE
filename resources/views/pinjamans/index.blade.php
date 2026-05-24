@@ -214,6 +214,7 @@
                                 <tr>
                                     <th class="text-center" style="width: 50px;">No</th>
                                     <th style="width: 150px;">Nama</th>
+                                    <th style="width: 120px;">NISN</th>
                                     <th class="text-center" style="width: 80px;">Kelas</th>
                                     <th style="width: 250px;">Judul Buku</th>
                                     <th style="width: 120px;" class="text-center">Tgl Pinjam</th>
@@ -245,6 +246,9 @@
                                                 </div>
                                                 <span class="fw-semibold">{{ $pinjaman->anggota->nama ?? $pinjaman->nama }}</span>
                                             </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary px-2 py-1">{{ $pinjaman->anggota->nisn ?? '-' }}</span>
                                         </td>
                                         <td class="text-center">
                                             <span class="badge bg-light text-dark px-3 py-2">{{ $pinjaman->anggota->kelas ?? $pinjaman->kelas }}</span>
@@ -342,8 +346,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="9" class="text-center py-5 text-muted">
-                                            <i class="fas fa-book-open fa-4x mb-3"></i>
+                                        <td colspan="10" class="text-center py-5 text-muted"> <i class="fas fa-book-open fa-4x mb-3"></i>
                                             <h6>Belum ada data peminjaman</h6>
                                         </td>
                                     </tr>
