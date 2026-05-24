@@ -136,31 +136,29 @@
                             <table class="table table-hover mb-0 text-nowrap" style="min-width: 1200px;" id="anggotaTable">
                                 <thead style="background: linear-gradient(45deg, #f7c0ec, #a7bdea);">
                                     <tr>
-                                        <th class="text-center" style="width: 40px;">
-                                            <input type="checkbox" id="checkAll" class="form-check-input shadow-sm" style="cursor: pointer; transform: scale(1.2);">
+                                        <th class="text-center" style="width: 60px; vertical-align: middle;">
+                                            <input type="checkbox" id="checkAll" class="form-check-input shadow-sm" style="cursor: pointer; transform: scale(1.2); margin: 0 auto;">
                                         </th>
-                                        <th class="text-center" style="width: 50px;">No</th>
-                                        <th style="width: 100px;">NISN</th>
-                                        <th style="width: 150px;">Nama</th>
-                                        <th style="width: 100px;">Kelas</th>
-                                        <th style="width: 120px;">Jenis Kelamin</th>
-                                        <th>Buku yang Dipinjam</th>
-                                        <th style="width: 120px;" class="text-center">Total Denda</th>
-                                        <th style="width: 150px;" class="text-center">Aksi</th>
+                                        <th class="text-center" style="width: 60px; vertical-align: middle;">No</th>
+                                        <th style="width: 120px; vertical-align: middle;">NISN</th>
+                                        <th style="width: 200px; vertical-align: middle;">Nama</th>
+                                        <th style="width: 100px; vertical-align: middle;">Kelas</th>
+                                        <th style="width: 150px; vertical-align: middle;">Jenis Kelamin</th>
+                                        <th style="vertical-align: middle;">Buku yang Dipinjam</th>
+                                        <th style="width: 150px; vertical-align: middle;" class="text-center">Total Denda</th>
+                                        <th style="width: 180px; vertical-align: middle;" class="text-center">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse ($anggotas as $item)
                                     <tr style="vertical-align: middle;" id="row-{{ $item->id }}">
                                         <td class="text-center">
-                                            <input type="checkbox" name="ids[]" value="{{ $item->id }}" class="form-check-input anggota-checkbox shadow-sm" style="cursor: pointer; transform: scale(1.2);">
+                                            <input type="checkbox" name="ids[]" value="{{ $item->id }}" class="form-check-input anggota-checkbox shadow-sm" style="cursor: pointer; transform: scale(1.2); margin: 0 auto;">
                                         </td>
                                         <td class="text-center fw-bold">{{ $loop->iteration }}</td>
-                                        
                                         <td>
-                                            <span class="badge bg-secondary px-2 py-1">{{ $item->nisn ?? '-' }}</span>
+                                            <span class="badge bg-secondary px-2 py-1" style="font-size: 0.9rem;">{{ $item->nisn ?? '-' }}</span>
                                         </td>
-
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-2" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
@@ -170,15 +168,15 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <span class="badge bg-light text-dark px-3 py-2">{{ $item->kelas }}</span>
+                                            <span class="badge bg-light text-dark px-3 py-2" style="font-size: 0.85rem;">{{ $item->kelas }}</span>
                                         </td>
                                         <td>
                                             @if($item->jenis_kelamin == 'Laki-laki')
-                                                <span class="badge bg-info text-white px-3 py-2">
+                                                <span class="badge bg-info text-white px-3 py-2" style="font-size: 0.85rem;">
                                                     <i class="fas fa-mars me-1"></i> Laki-laki
                                                 </span>
                                             @else
-                                                <span class="badge bg-danger text-white px-3 py-2">
+                                                <span class="badge bg-danger text-white px-3 py-2" style="font-size: 0.85rem;">
                                                     <i class="fas fa-venus me-1"></i> Perempuan
                                                 </span>
                                             @endif
@@ -223,11 +221,11 @@
                                         </td>
                                         <td class="text-center">
                                             @if($item->pinjamans->sum('denda') > 0)
-                                                <span class="fw-bold" style="color: #e74c3c;">
+                                                <span class="fw-bold text-danger">
                                                     Rp {{ number_format($item->pinjamans->sum('denda'), 0, ',', '.') }}
                                                 </span>
                                             @else
-                                                <span class="badge bg-success px-3 py-2">Rp 0</span>
+                                                <span class="badge bg-success px-3 py-2" style="font-size: 0.85rem;">Rp 0</span>
                                             @endif
                                         </td>
                                         <td class="text-center">
@@ -303,7 +301,6 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Logika Untuk Fitur Checkbox dan Hapus Massal
         const checkAll = document.getElementById('checkAll');
         const checkboxes = document.querySelectorAll('.anggota-checkbox');
         const btnBulkDelete = document.getElementById('btnBulkDelete');
@@ -343,13 +340,12 @@
             });
         });
 
-        // Konfirmasi SweetAlert Saat Klik Hapus Terpilih
         if (btnBulkDelete) {
             btnBulkDelete.addEventListener('click', function() {
                 const checkedBoxes = document.querySelectorAll('.anggota-checkbox:checked');
                 const selectedIds = Array.from(checkedBoxes).map(cb => cb.value);
                 
-                inputSelectedIds.value = JSON.stringify(selectedIds); // Masukkan id ke input hidden JSON
+                inputSelectedIds.value = JSON.stringify(selectedIds);
 
                 Swal.fire({
                     title: 'Anda yakin?',
@@ -368,7 +364,6 @@
             });
         }
 
-        // Live Search Tabel
         document.getElementById('searchButton').addEventListener('click', filterTable);
         document.getElementById('searchInput').addEventListener('keyup', (e) => { 
             if(e.key === 'Enter') filterTable(); 
@@ -377,13 +372,12 @@
         function filterTable() {
             let searchValue = document.getElementById('searchInput').value.toLowerCase();
             document.querySelectorAll('#anggotaTable tbody tr').forEach(row => {
-                if (row.querySelector('td[colspan="9"]')) return; // Mengabaikan baris pesan kosong
+                if (row.querySelector('td[colspan="9"]')) return;
                 row.style.display = row.textContent.toLowerCase().includes(searchValue) ? '' : 'none';
             });
         }
     });
 
-    // Konfirmasi Hapus Data Satuan menggunakan SweetAlert
     function confirmDeleteSingle(id, nama, pinjamanAktif) {
         let textWarning = `Data anggota atas nama ${nama} akan dihapus permanen.`;
         if (pinjamanAktif > 0) {
@@ -407,7 +401,6 @@
         });
     }
 
-    // Konfirmasi Hapus Semua Data
     function confirmDeleteAll(jumlah) {
         Swal.fire({
             title: `Hapus SEMUA (${jumlah}) Anggota?`,
