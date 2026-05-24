@@ -15,7 +15,7 @@ class PengembalianController extends Controller
     public function index()
     {
         // Ambil semua pengembalian dengan relasi pinjaman
-        $pengembalians = Pengembalian::with('pinjaman')->latest()->get();
+        $pengembalians = Pengembalian::with('pinjaman.anggota')->latest()->get();
 
         // Data untuk statistik di view
         $pinjamans = Pinjaman::paginate(10);
@@ -29,7 +29,7 @@ class PengembalianController extends Controller
     // Tampilkan form tambah pengembalian
     public function create()
     {
-        $pinjamans = Pinjaman::where('status', 'belum dikembalikan')->get();
+        $pinjamans = Pinjaman::with('anggota')->where('status', 'belum dikembalikan')->get();
         return view('pengembalians.create', compact('pinjamans'));
     }
 
@@ -41,7 +41,8 @@ class PengembalianController extends Controller
             'tanggal_pengembalian' => 'required|date'
         ]);
 
-        $pinjaman = Pinjaman::findOrFail($validated['pinjaman_id']);
+        // Mengambil pinjaman lengkap dengan relasi anggota untuk ditarik NISN-nya
+        $pinjaman = Pinjaman::with('anggota')->findOrFail($validated['pinjaman_id']);
 
         // Cek jika sudah pernah dikembalikan
         if (Pengembalian::where('pinjaman_id', $pinjaman->id)->exists()) {
@@ -63,6 +64,7 @@ class PengembalianController extends Controller
 
         Pengembalian::create([
             'pinjaman_id' => $pinjaman->id,
+            'nisn' => optional($pinjaman->anggota)->nisn, // Menyimpan data NISN
             'nama' => $pinjaman->nama,
             'kelas' => $pinjaman->kelas,
             'judul_buku' => $pinjaman->judul_buku,

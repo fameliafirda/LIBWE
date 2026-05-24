@@ -9,6 +9,7 @@ use App\Models\Anggota;
 use App\Models\Book;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class PinjamanController extends Controller
 {
@@ -139,7 +140,7 @@ class PinjamanController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nisn'            => 'required|string', // Validasi menggunakan NISN
+            'nisn'            => 'required|string', 
             'judul_buku'      => 'required|array|min:1', 
             'judul_buku.*'    => 'required|string|max:255', 
             'tanggal_pinjam'  => 'required|date',
@@ -150,7 +151,6 @@ class PinjamanController extends Controller
         DB::beginTransaction();
 
         try {
-            // 1. Ambil data Anggota berdasarkan NISN
             $anggota = Anggota::where('nisn', $request->nisn)->first();
 
             if (!$anggota) {
@@ -160,7 +160,6 @@ class PinjamanController extends Controller
             $berhasil = 0;
             $gagal = [];
 
-            // 2. Looping (Perulangan) untuk setiap judul buku yang di-input
             foreach ($request->judul_buku as $judul) {
                 if (trim($judul) == '') continue;
 
@@ -176,7 +175,6 @@ class PinjamanController extends Controller
                     continue; 
                 }
 
-                // 3. Simpan data pinjaman
                 $pinjaman = Pinjaman::create([
                     'anggota_id'      => $anggota->id,
                     'buku_id'         => $buku->id,
@@ -190,7 +188,6 @@ class PinjamanController extends Controller
                     'denda'           => 0,
                 ]);
 
-                // 4. Update stok buku atau proses pengembalian langsung
                 if ($pinjaman->status === 'sudah dikembalikan') {
                     $this->processPengembalian($pinjaman, $request->tanggal_kembali);
                 } else {
@@ -202,7 +199,6 @@ class PinjamanController extends Controller
 
             DB::commit();
 
-            // 5. Feedback Berdasarkan Hasil Looping
             if (count($gagal) > 0 && $berhasil > 0) {
                 $pesanGagal = implode(', ', $gagal);
                 return redirect()->route('pinjamans.index')->with('warning', "$berhasil buku berhasil dipinjam. Namun buku berikut gagal diproses: $pesanGagal");
@@ -246,7 +242,7 @@ class PinjamanController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nisn'            => 'required|string', // Validasi menggunakan NISN
+            'nisn'            => 'required|string',
             'judul_buku'      => 'required|string|max:255',
             'tanggal_pinjam'  => 'required|date',
             'status'          => 'required|in:belum dikembalikan,sudah dikembalikan',
@@ -265,7 +261,6 @@ class PinjamanController extends Controller
                 return redirect()->back()->with('error', 'Buku tidak ditemukan!')->withInput();
             }
             
-            // Cari data Anggota berdasarkan NISN
             $anggota = Anggota::where('nisn', $request->nisn)->first();
 
             if (!$anggota) {
@@ -336,10 +331,10 @@ class PinjamanController extends Controller
 
     /**
      * Process book return and calculate fine.
+     * Mengabaikan hari Minggu dan Hari Libur Nasional dari perhitungan denda.
      */
     private function processPengembalian(Pinjaman $pinjaman, $tanggalKembali = null)
     {
-        // Set timezone ke Asia/Jakarta
         $tanggalPengembalian = $tanggalKembali 
             ? Carbon::parse($tanggalKembali)->timezone('Asia/Jakarta')->startOfDay() 
             : Carbon::now('Asia/Jakarta')->startOfDay();
@@ -350,7 +345,21 @@ class PinjamanController extends Controller
         $keterlambatan = 0;
         
         if ($tanggalPengembalian->gt($tanggalJatuhTempo)) {
-            $keterlambatan = $tanggalJatuhTempo->diffInDays($tanggalPengembalian);
+            $tahun = $tanggalJatuhTempo->format('Y');
+            $daftarTanggalMerah = $this->getDaftarLiburNasional($tahun);
+
+            $currentDate = $tanggalJatuhTempo->copy()->addDay();
+            
+            while ($currentDate->lte($tanggalPengembalian)) {
+                $isMinggu = $currentDate->isSunday();
+                $isTanggalMerah = in_array($currentDate->toDateString(), $daftarTanggalMerah);
+
+                if (!$isMinggu && !$isTanggalMerah) {
+                    $keterlambatan++;
+                }
+
+                $currentDate->addDay();
+            }
         }
         
         $denda = $keterlambatan * 500;
@@ -372,6 +381,35 @@ class PinjamanController extends Controller
                 'denda'                => $denda,
             ]
         );
+    }
+
+    /**
+     * Helper: Mendapatkan API Hari Libur Nasional (Disimpan di Cache 24 jam)
+     */
+    private function getDaftarLiburNasional($tahun)
+    {
+        return Cache::remember("libur_nasional_{$tahun}", 86400, function () use ($tahun) {
+            try {
+                $url = "https://dayoffapi.vercel.app/api?year=" . $tahun;
+                $response = @file_get_contents($url);
+                
+                if (!$response) return [];
+
+                $data = json_decode($response, true);
+                $tanggalMerah = [];
+
+                if (is_array($data)) {
+                    foreach ($data as $row) {
+                        if (isset($row['tanggal'])) {
+                            $tanggalMerah[] = $row['tanggal'];
+                        }
+                    }
+                }
+                return $tanggalMerah;
+            } catch (\Exception $e) {
+                return [];
+            }
+        });
     }
 
     /**
