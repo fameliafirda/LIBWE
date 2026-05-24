@@ -17,8 +17,8 @@
         --color-3: #ffafcc;     /* Hot Pink */
         --color-4: #8ecae6;     /* Biru Langit */
         --color-5: #b5179e;     /* Magenta / Ungu cerah */
-        --glass: rgba(255, 255, 255, 0.55);
-        --glass-border: rgba(255, 255, 255, 0.6);
+        --glass: rgba(255, 255, 255, 0.65);
+        --glass-border: rgba(255, 255, 255, 0.8);
         --text-main: #2b2d42;   /* Navy gelap agar kontras */
         --text-muted: #6c757d;  /* Abu-abu gelap */
     }
@@ -40,12 +40,12 @@
        2. AMBIENT BACKGROUND GLOW (INTERAKTIF & AESTHETIC)
        =========================================================== */
     .ambient-glow-1, .ambient-glow-2, .ambient-glow-3 {
-        position: fixed; border-radius: 50%; filter: blur(120px); z-index: 0; pointer-events: none; opacity: 0.4;
+        position: fixed; border-radius: 50%; filter: blur(120px); z-index: 0; pointer-events: none; opacity: 0.5;
         animation: floatOrb 15s ease-in-out infinite alternate;
     }
     .ambient-glow-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--color-1); }
     .ambient-glow-2 { bottom: -10%; right: -5%; width: 40vw; height: 40vw; background: var(--color-4); animation-delay: -5s; }
-    .ambient-glow-3 { top: 40%; left: 40%; width: 30vw; height: 30vw; background: var(--color-3); filter: blur(150px); opacity: 0.2; animation-delay: -10s; }
+    .ambient-glow-3 { top: 40%; left: 40%; width: 30vw; height: 30vw; background: var(--color-3); filter: blur(150px); opacity: 0.3; animation-delay: -10s; }
 
     @keyframes floatOrb {
         0% { transform: translate(0, 0) scale(1); }
@@ -60,19 +60,20 @@
         position: fixed; top: 0; left: 0; width: 100%;
         padding: 15px 50px; display: flex; justify-content: space-between; align-items: center;
         background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border);
-        z-index: 1000;
+        z-index: 1000; box-shadow: 0 4px 30px rgba(0,0,0,0.03);
     }
-    .brand-logo { font-family: 'Unbounded', sans-serif; font-size: 1.8rem; font-weight: 900; color: var(--text-main); text-decoration: none; letter-spacing: 1px; }
+    .brand-logo { font-family: 'Unbounded', sans-serif; font-size: 1.8rem; font-weight: 900; color: var(--text-main); text-decoration: none; letter-spacing: 1px; display: flex; align-items: center;}
+    .brand-logo i { color: var(--color-5); transform: rotate(-10deg); transition: 0.3s; }
+    .brand-logo:hover i { transform: rotate(10deg) scale(1.2); }
     .brand-logo span { background: linear-gradient(45deg, var(--color-3), var(--color-4)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    
     .nav-links a { 
-        text-decoration: none; color: var(--text-muted); font-weight: 700; font-size: 0.95rem;
+        text-decoration: none; color: var(--text-muted); font-weight: 800; font-size: 0.95rem;
         margin-left: 35px; transition: 0.3s; position: relative;
+        padding: 8px 16px; border-radius: 20px;
     }
-    .nav-links a:hover, .nav-links a.active { color: var(--color-5); }
-    .nav-links a.active::after {
-        content: ''; position: absolute; bottom: -5px; left: 0; width: 100%; height: 2px;
-        background: var(--color-3); border-radius: 2px; box-shadow: 0 0 10px var(--color-3);
-    }
+    .nav-links a:hover { background: rgba(255, 255, 255, 0.9); color: var(--color-5); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    .nav-links a.active { background: var(--color-5); color: #fff; box-shadow: 0 5px 15px rgba(181, 23, 158, 0.3); }
 
     /* ============================================================
        4. HERO SECTION (ANIMATED TEXT)
@@ -82,175 +83,181 @@
         display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
     .animated-title {
-        font-family: 'Unbounded', sans-serif; font-size: clamp(3rem, 6vw, 4.5rem); font-weight: 900; line-height: 1.1; margin-bottom: 15px;
+        font-family: 'Unbounded', sans-serif; font-size: clamp(3rem, 6vw, 5rem); font-weight: 900; line-height: 1.2; margin-bottom: 15px;
         background: linear-gradient(to right, var(--color-4), var(--color-5), var(--color-3), var(--color-4)); background-size: 200% auto;
         -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientText 5s linear infinite;
-        display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
+        display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap; text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
     }
+    .animated-title img { animation: bounceIcon 2s infinite ease-in-out; }
     @keyframes gradientText { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
-    .hero-subtitle { color: var(--text-muted); font-size: 1.1rem; font-weight: 600; max-width: 600px; margin: 0 auto; letter-spacing: 0.5px; }
+    @keyframes bounceIcon { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-15px) rotate(15deg); } }
+    
+    .hero-subtitle { 
+        color: var(--text-main); font-size: 1.2rem; font-weight: 600; max-width: 650px; margin: 0 auto; 
+        letter-spacing: 0.5px; background: rgba(255,255,255,0.6); padding: 10px 25px; border-radius: 50px;
+        border: 1px dashed var(--color-4);
+    }
 
     /* ============================================================
        5. SEARCH BAR (NEON GLOW)
        =========================================================== */
     .search-wrapper { max-width: 850px; margin: 0 auto 60px; position: relative; z-index: 10; padding: 0 20px; width: 100%; }
     .search-glass {
-        background: var(--glass); backdrop-filter: blur(15px); border-radius: 50px; padding: 8px 12px;
-        display: flex; gap: 10px; align-items: center; border: 1px solid var(--glass-border);
-        transition: 0.4s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        background: var(--glass); backdrop-filter: blur(20px); border-radius: 50px; padding: 10px 12px;
+        display: flex; gap: 10px; align-items: center; border: 2px solid #fff;
+        transition: 0.4s ease; box-shadow: 0 15px 35px rgba(0,0,0,0.08);
     }
-    .search-glass:focus-within { border-color: var(--color-4); box-shadow: 0 0 25px rgba(142, 202, 230, 0.4); transform: translateY(-2px); }
+    .search-glass:focus-within { border-color: var(--color-3); box-shadow: 0 0 30px rgba(255, 175, 204, 0.6); transform: translateY(-5px); }
     
     .search-glass input, .search-glass select {
-        border: none; background: transparent; padding: 15px 20px; font-size: 1rem; color: var(--text-main);
-        font-family: 'Plus Jakarta Sans'; font-weight: 600; outline: none; width: 100%;
+        border: none; background: transparent; padding: 15px 20px; font-size: 1.05rem; color: var(--text-main);
+        font-family: 'Plus Jakarta Sans'; font-weight: 700; outline: none; width: 100%;
     }
-    .search-glass input::placeholder { color: #888; }
+    .search-glass input::placeholder { color: #999; font-weight: 500; }
     .search-glass input { flex: 2; }
-    .search-glass select { flex: 1; border-left: 1px solid var(--glass-border); color: var(--text-main); cursor: pointer; }
+    .search-glass select { flex: 1; border-left: 2px dashed var(--color-1); color: var(--text-main); cursor: pointer; }
     .search-glass select option { background: var(--color-black); color: var(--text-main); }
     
     .btn-search {
-        background: linear-gradient(135deg, var(--color-4), var(--color-5)); color: #fff; border: none; padding: 15px 40px; border-radius: 40px;
-        font-weight: 800; cursor: pointer; transition: 0.3s; font-family: 'Unbounded', sans-serif; letter-spacing: 1px; white-space: nowrap;
+        background: linear-gradient(135deg, var(--color-3), var(--color-5)); color: #fff; border: none; padding: 15px 45px; border-radius: 40px;
+        font-weight: 900; cursor: pointer; transition: 0.3s; font-family: 'Unbounded', sans-serif; letter-spacing: 1.5px; white-space: nowrap;
+        box-shadow: 0 5px 15px rgba(181, 23, 158, 0.4);
     }
-    .btn-search:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(181, 23, 158, 0.3); background: linear-gradient(135deg, var(--color-5), var(--color-4)); }
+    .btn-search:hover { transform: scale(1.05) translateY(-2px); box-shadow: 0 10px 25px rgba(181, 23, 158, 0.6); }
 
     /* ============================================================
        6. SECTION TITLES
        =========================================================== */
     .section-container { padding: 0 50px 80px; max-width: 1400px; margin: 0 auto; position: relative; z-index: 10; }
     .section-title { 
-        font-family: 'Unbounded', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--text-main); 
-        margin-bottom: 30px; display: flex; align-items: center; gap: 12px; letter-spacing: 0.5px;
+        font-family: 'Unbounded', sans-serif; font-size: 2rem; font-weight: 900; color: var(--text-main); 
+        margin-bottom: 35px; display: flex; align-items: center; gap: 15px; letter-spacing: 0.5px;
+        text-shadow: 2px 2px 0px #fff;
     }
-    .section-title i { background: linear-gradient(45deg, var(--color-3), var(--color-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
     /* ============================================================
        7. TOP 10 REKOMENDASI (RAMAH ANAK SD)
        =========================================================== */
     .recommendation-bg {
-        background: var(--glass); backdrop-filter: blur(15px);
-        border-radius: 30px; padding: 40px; border: 1px solid var(--glass-border); margin-bottom: 60px;
-        position: relative; overflow: hidden;
+        background: rgba(255,255,255,0.4); backdrop-filter: blur(20px);
+        border-radius: 40px; padding: 40px; border: 2px solid #fff; margin-bottom: 70px;
+        position: relative; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.04);
     }
 
-    .slider-container { display: flex; gap: 25px; overflow-x: auto; padding: 20px 10px; scroll-behavior: smooth; scrollbar-width: none; }
+    .slider-container { display: flex; gap: 30px; overflow-x: auto; padding: 25px 10px; scroll-behavior: smooth; scrollbar-width: none; }
     .slider-container::-webkit-scrollbar { display: none; }
 
     .book-card-top {
-        min-width: 200px; max-width: 200px; background: rgba(255, 255, 255, 0.6); border-radius: 24px; padding: 15px;
-        border: 1px solid var(--glass-border); position: relative; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer;
+        min-width: 220px; max-width: 220px; background: rgba(255, 255, 255, 0.9); border-radius: 28px; padding: 18px;
+        border: 2px solid #fff; position: relative; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
     }
     .book-card-top:hover { 
-        transform: translateY(-12px); border-color: var(--color-3); 
-        box-shadow: 0 10px 30px rgba(255, 175, 204, 0.4); 
+        transform: translateY(-15px) rotate(-2deg); border-color: var(--color-2); 
+        box-shadow: 0 15px 35px rgba(255, 183, 3, 0.4); 
     }
 
     .rank-badge {
-        position: absolute; top: -15px; left: -10px; background: var(--color-3); color: #fff;
-        width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        font-family: 'Unbounded'; font-weight: 900; font-size: 1.1rem; z-index: 2; box-shadow: 0 4px 15px rgba(255, 175, 204, 0.5);
-        border: 3px solid #fff;
+        position: absolute; top: -15px; left: -15px; background: linear-gradient(135deg, var(--color-2), #ff9f1c); color: #fff;
+        width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-family: 'Unbounded'; font-weight: 900; font-size: 1.3rem; z-index: 2; box-shadow: 0 5px 15px rgba(255, 183, 3, 0.5);
+        border: 4px solid #fff; transform: rotate(-10deg);
     }
     
-    /* PERBAIKAN TAMPILAN DIPINJAM UNTUK ANAK SD */
     .borrow-badge {
-        position: absolute; top: 10px; right: 10px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(5px);
-        color: var(--color-5); padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; z-index: 2; 
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 2px solid var(--color-3);
+        position: absolute; top: 12px; right: 12px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(5px);
+        color: var(--color-5); padding: 8px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; z-index: 2; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 2px dashed var(--color-3);
     }
 
-    .book-cover { width: 100%; height: 260px; object-fit: cover; border-radius: 16px; margin-bottom: 15px; background: #f0f0f0; transition: 0.4s; border: 1px solid var(--glass-border); }
-    .book-card-top:hover .book-cover { transform: scale(1.03); }
-    .book-title { font-family: 'Unbounded', sans-serif; font-size: 0.95rem; font-weight: 700; line-height: 1.3; color: var(--text-main); margin-bottom: 5px; transition: 0.3s;}
+    .book-cover { width: 100%; height: 280px; object-fit: cover; border-radius: 18px; margin-bottom: 18px; background: #f0f0f0; transition: 0.5s; border: 1px solid var(--glass-border); }
+    .book-card-top:hover .book-cover { transform: scale(1.05); }
+    .book-title { font-family: 'Unbounded', sans-serif; font-size: 1.05rem; font-weight: 800; line-height: 1.3; color: var(--text-main); margin-bottom: 8px; transition: 0.3s;}
     .book-card-top:hover .book-title { color: var(--color-5); }
     
-    /* PERBAIKAN TAMPILAN PENULIS */
-    .book-author { color: var(--text-muted); font-size: 0.8rem; font-weight: 500; }
-    .book-author span { color: var(--color-5); font-weight: 700; }
+    .book-author { color: var(--text-muted); font-size: 0.85rem; font-weight: 600; }
+    .book-author span { color: var(--color-4); font-weight: 800; }
 
     /* ============================================================
        8. KOLEKSI BUKU (GLASS GRID & RAMAH ANAK SD)
        =========================================================== */
-    .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 30px; transition: opacity 0.3s; }
+    .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 35px; transition: opacity 0.3s; }
 
     .book-card {
-        background: var(--glass); border-radius: 24px; overflow: hidden; transition: all 0.4s ease;
-        border: 1px solid var(--glass-border); display: flex; flex-direction: column; height: 100%;
-        backdrop-filter: blur(10px);
+        background: rgba(255,255,255,0.7); border-radius: 28px; overflow: hidden; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 2px solid #fff; display: flex; flex-direction: column; height: 100%;
+        backdrop-filter: blur(15px); box-shadow: 0 10px 25px rgba(0,0,0,0.05);
     }
     .book-card:hover { 
-        transform: translateY(-8px); border-color: var(--color-4); 
-        box-shadow: 0 15px 35px rgba(142, 202, 230, 0.3); 
+        transform: translateY(-10px); border-color: var(--color-3); 
+        box-shadow: 0 20px 40px rgba(255, 175, 204, 0.4); 
     }
 
-    .card-img-wrapper { position: relative; height: 300px; width: 100%; overflow: hidden; background: #f0f0f0; border-bottom: 1px solid var(--glass-border); filter: brightness(0.95); }
+    .card-img-wrapper { position: relative; height: 320px; width: 100%; overflow: hidden; background: #f0f0f0; border-bottom: 2px dashed #fff; }
     .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
-    .book-card:hover .card-img-wrapper { filter: brightness(1.05); }
-    .book-card:hover .card-img-wrapper img { transform: scale(1.08); }
+    .book-card:hover .card-img-wrapper img { transform: scale(1.1) rotate(2deg); }
 
     .cat-pill {
-        position: absolute; bottom: 10px; left: 10px; background: rgba(255,255,255,0.9); backdrop-filter: blur(4px); color: var(--color-5);
-        padding: 6px 14px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.5px; z-index: 2; border: 1px solid rgba(181,23,158,0.2);
+        position: absolute; bottom: 12px; left: 12px; background: linear-gradient(135deg, var(--color-4), #48cae4); color: #fff;
+        padding: 8px 16px; border-radius: 25px; font-size: 0.75rem; font-weight: 900; letter-spacing: 0.5px; z-index: 2; border: 2px solid #fff;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 
-    .card-info { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
-    .c-title { font-family: 'Unbounded', sans-serif; font-size: 1rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; line-height: 1.4; transition: 0.3s; }
+    .card-info { padding: 22px; display: flex; flex-direction: column; flex-grow: 1; }
+    .c-title { font-family: 'Unbounded', sans-serif; font-size: 1.1rem; font-weight: 800; color: var(--text-main); margin-bottom: 12px; line-height: 1.4; transition: 0.3s; }
     .book-card:hover .c-title { color: var(--color-5); }
     
-    /* PERBAIKAN DETAIL UNTUK ANAK SD */
-    .c-details-wrapper { background: rgba(255,255,255,0.5); padding: 12px; border-radius: 12px; margin-top: auto; border: 1px solid var(--glass-border); }
+    .c-details-wrapper { background: rgba(255,255,255,0.8); padding: 15px; border-radius: 16px; margin-top: auto; border: 1px solid #fff; box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);}
     
-    .c-author-sd { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 500;}
-    .c-author-sd strong { color: var(--color-5); }
+    .c-author-sd { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 600;}
+    .c-author-sd strong { color: var(--color-5); font-weight: 800;}
     
-    .c-year-sd { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 500;}
-    .c-year-sd strong { color: var(--color-3); }
+    .c-year-sd { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px; font-weight: 600;}
+    .c-year-sd strong { color: var(--color-2); font-weight: 800;}
 
-    .c-stock-wrapper { display: flex; align-items: center; justify-content: center; padding: 8px; border-radius: 12px; font-weight: 800; font-size: 0.85rem; }
-    .stock-in { background: rgba(142, 202, 230, 0.2); color: #0277bd; border: 1px solid rgba(142, 202, 230, 0.5); }
-    .stock-out { background: rgba(255, 175, 204, 0.3); color: #c1121f; border: 1px solid rgba(255, 175, 204, 0.6); }
+    .c-stock-wrapper { display: flex; align-items: center; justify-content: center; padding: 10px; border-radius: 14px; font-weight: 900; font-size: 0.9rem; text-align: center; }
+    .stock-in { background: #e0fbfc; color: #0277bd; border: 2px dashed #90e0ef; }
+    .stock-out { background: #ffe5ec; color: #c1121f; border: 2px dashed #ffb3c6; }
 
     /* Navigasi Slider */
     .slider-nav-btn {
-        position: absolute; top: 50%; transform: translateY(-50%); width: 45px; height: 45px; border-radius: 50%;
-        background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(5px); color: var(--color-5); border: 1px solid var(--glass-border);
-        z-index: 10; display: flex; align-items: center; justify-content: center; transition: 0.3s; font-size: 1.2rem; cursor: pointer;
+        position: absolute; top: 50%; transform: translateY(-50%); width: 55px; height: 55px; border-radius: 50%;
+        background: #fff; color: var(--color-5); border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        z-index: 10; display: flex; align-items: center; justify-content: center; transition: 0.3s; font-size: 1.5rem; cursor: pointer;
     }
-    .slider-nav-btn:hover { background: var(--color-3); border-color: var(--color-3); color: #fff; transform: translateY(-50%) scale(1.1); box-shadow: 0 0 15px var(--color-3); }
-    .btn-prev { left: -15px; }
-    .btn-next { right: -15px; }
+    .slider-nav-btn:hover { background: var(--color-3); color: #fff; transform: translateY(-50%) scale(1.15); box-shadow: 0 10px 25px rgba(255, 175, 204, 0.6); }
+    .btn-prev { left: -25px; }
+    .btn-next { right: -25px; }
     .slider-wrapper-rel { position: relative; }
 
     /* Float Button */
     .btn-float-back {
-        position: fixed; bottom: 30px; right: 30px; background: var(--glass); backdrop-filter: blur(10px); color: var(--text-main);
-        padding: 12px 25px; border-radius: 50px; text-decoration: none; font-weight: 800; font-family: 'Unbounded'; border: 1px solid var(--glass-border);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1); transition: 0.3s; display: flex; align-items: center; gap: 10px; z-index: 1000;
+        position: fixed; bottom: 30px; right: 30px; background: linear-gradient(135deg, var(--color-5), var(--color-3)); color: #fff;
+        padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: 900; font-family: 'Unbounded'; border: 2px solid #fff;
+        box-shadow: 0 10px 30px rgba(181, 23, 158, 0.4); transition: 0.4s; display: flex; align-items: center; gap: 12px; z-index: 1000;
     }
-    .btn-float-back:hover { background: var(--color-4); border-color: var(--color-4); transform: translateY(-5px); color: #fff; box-shadow: 0 0 20px rgba(142, 202, 230, 0.5); }
+    .btn-float-back:hover { transform: translateY(-8px) scale(1.05); color: #fff; box-shadow: 0 15px 35px rgba(181, 23, 158, 0.6); }
 
     /* Pagination */
-    .pagination { justify-content: center; margin-top: 60px; gap: 8px; }
-    .page-item .page-link { background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-muted); font-weight: 700; border-radius: 12px !important; padding: 10px 18px; transition: 0.3s; }
-    .page-item .page-link:hover { background: rgba(255,255,255,0.8); color: var(--color-5); border-color: var(--color-5); }
-    .page-item.active .page-link { background: var(--color-4); border-color: var(--color-4); color: #fff; box-shadow: 0 0 15px rgba(142, 202, 230, 0.4); }
+    .pagination { justify-content: center; margin-top: 60px; gap: 10px; }
+    .page-item .page-link { background: rgba(255,255,255,0.8); border: 2px solid transparent; color: var(--text-muted); font-weight: 800; border-radius: 14px !important; padding: 12px 20px; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.05);}
+    .page-item .page-link:hover { background: #fff; color: var(--color-5); border-color: var(--color-3); transform: translateY(-3px);}
+    .page-item.active .page-link { background: var(--color-4); border-color: var(--color-4); color: #fff; box-shadow: 0 5px 20px rgba(142, 202, 230, 0.5); transform: scale(1.1);}
 
     /* Responsive */
     @media (max-width: 768px) {
         .catalog-nav { padding: 15px 20px; }
-        .hero-section { padding-top: 120px; }
-        .animated-title { font-size: 2rem; }
-        .search-glass { flex-direction: column; border-radius: 25px; padding: 15px; }
-        .search-glass select { border-left: none; border-top: 1px solid var(--glass-border); }
-        .btn-search { width: 100%; }
+        .hero-section { padding-top: 130px; }
+        .animated-title { font-size: 2.2rem; }
+        .search-glass { flex-direction: column; border-radius: 30px; padding: 15px; }
+        .search-glass select { border-left: none; border-top: 2px dashed var(--color-1); margin-top: 10px; padding-top: 15px;}
+        .btn-search { width: 100%; margin-top: 10px;}
         .section-container { padding: 0 20px 40px; }
-        .recommendation-bg { padding: 25px 15px; }
+        .recommendation-bg { padding: 30px 15px; border-radius: 30px;}
         .slider-nav-btn { display: none; }
-        .book-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-        .card-img-wrapper { height: 220px; }
-        .btn-float-back { bottom: 20px; right: 20px; padding: 10px 20px; font-size: 0.85rem; }
+        .book-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
+        .card-img-wrapper { height: 250px; }
+        .btn-float-back { bottom: 20px; right: 20px; padding: 12px 20px; font-size: 0.9rem; }
     }
 </style>
 
@@ -263,31 +270,31 @@
     <div class="nav-links d-none d-md-flex">
         <a href="{{ url('/') }}">Beranda</a>
         @if($popularBooks->count() > 0)
-        <a href="#rekomendasi">Buku Favorit</a>
+        <a href="#rekomendasi">⭐ Buku Favorit</a>
         @endif
-        <a href="#koleksi" class="active">Koleksi Buku</a>
+        <a href="#koleksi" class="active">📚 Koleksi Buku</a>
     </div>
 </nav>
 
 <section class="hero-section">
     <h1 class="animated-title">
         KATALOG BUKU 
-        <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/2728/512.gif" alt="Bintang" width="50" style="vertical-align: top; margin-top: -10px;">
+        <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/2728/512.gif" alt="Bintang" width="60" style="vertical-align: top; margin-top: -15px;">
     </h1>
     <p class="hero-subtitle">Ada banyak sekali cerita seru dan ilmu baru di Perpustakaan SDN Berat Wetan 1. Yuk cari bukunya di bawah ini!</p>
 </section>
 
 <div class="search-wrapper">
     <div class="search-glass">
-        <i class="fas fa-search ms-3 d-none d-md-block" style="color: var(--color-5); font-size: 1.2rem;"></i>
+        <i class="fas fa-search ms-3 d-none d-md-block" style="color: var(--color-5); font-size: 1.4rem;"></i>
         <input type="text" id="keyword" placeholder="Ketik judul buku yang mau kamu baca..." value="{{ request('search') }}">
         <select id="kat_id">
-            <option value="">Kategori Buku</option>
+            <option value="">Semua Kategori</option>
             @foreach($kategoris as $k)
                 <option value="{{ $k->id }}" {{ request('kategori') == $k->id ? 'selected' : '' }}>{{ $k->nama }}</option>
             @endforeach
         </select>
-        <button class="btn-search" onclick="filterBuku()"><i class="fas fa-magic me-2 d-md-none"></i>CARI</button>
+        <button class="btn-search" onclick="filterBuku()"><i class="fas fa-magic me-2 d-md-none"></i>CARI SEKARANG</button>
     </div>
 </div>
 
@@ -295,12 +302,12 @@
     @if($popularBooks->count() > 0)
     <div class="recommendation-bg" id="rekomendasi">
         <h2 class="section-title">
-            <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f31f/512.gif" alt="Bintang" width="35" class="me-2"> 
-            Rekomendasi Buku
+            <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f31f/512.gif" alt="Bintang" width="45" class="me-2"> 
+            Paling Sering Dipinjam!
         </h2>
         <div class="slider-wrapper-rel">
-            <button class="slider-nav-btn btn-prev" onclick="moveSlide(-250)"><i class="fas fa-chevron-left"></i></button>
-            <button class="slider-nav-btn btn-next" onclick="moveSlide(250)"><i class="fas fa-chevron-right"></i></button>
+            <button class="slider-nav-btn btn-prev" onclick="moveSlide(-280)"><i class="fas fa-chevron-left"></i></button>
+            <button class="slider-nav-btn btn-next" onclick="moveSlide(280)"><i class="fas fa-chevron-right"></i></button>
             
             <div class="slider-container" id="mainSlider">
                 @foreach($popularBooks as $index => $pb)
@@ -313,7 +320,7 @@
                         <img src="{{ asset($pb->gambar) }}" alt="{{ $pb->judul }}" class="book-cover">
                     @else
                         <div class="book-cover d-flex flex-column align-items-center justify-content-center" style="background: rgba(255,255,255,0.7);">
-                            <i class="fas fa-book-open fa-3x mb-2" style="color: #ccc;"></i>
+                            <i class="fas fa-book-open fa-4x mb-2" style="color: #ccc;"></i>
                         </div>
                     @endif
                     
@@ -328,21 +335,21 @@
 
     <div id="koleksi">
         <h2 class="section-title">
-            <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4da/512.gif" alt="Buku" width="35" class="me-2"> 
-            Daftar Semua Buku
+            <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4da/512.gif" alt="Buku" width="45" class="me-2"> 
+            Jelajahi Semua Koleksi
         </h2>
         
         <div class="book-grid" id="containerKoleksi">
             @forelse($books as $b)
             <div class="book-card">
                 <div class="card-img-wrapper">
-                    <span class="cat-pill">{{ $b->kategori->nama ?? 'Umum' }}</span>
+                    <span class="cat-pill"><i class="fas fa-tag me-1"></i> {{ $b->kategori->nama ?? 'Umum' }}</span>
                     @if($b->gambar)
                         <img src="{{ asset($b->gambar) }}" alt="{{ $b->judul }}">
                     @else
                         <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center" style="background: rgba(255,255,255,0.7);">
-                            <i class="fas fa-book-open fa-3x mb-2" style="color: #ccc;"></i>
-                            <span style="color: #888; font-size: 0.8rem; font-weight: 700; font-family:'Unbounded';">BELUM ADA FOTO</span>
+                            <i class="fas fa-book-open fa-4x mb-2" style="color: #ccc;"></i>
+                            <span style="color: #888; font-size: 0.9rem; font-weight: 800; font-family:'Unbounded';">FOTO MENYUSUL</span>
                         </div>
                     @endif
                 </div>
@@ -359,21 +366,21 @@
                         
                         @if($b->stok > 0)
                             <div class="c-stock-wrapper stock-in">
-                                <i class="fas fa-check-circle me-2"></i>      Stok Buku: {{ $b->stok }}
+                                <i class="fas fa-check-circle me-2"></i> BISA DIPINJAM (Stok: {{ $b->stok }})
                             </div>
                         @else
                             <div class="c-stock-wrapper stock-out">
-                                <i class="fas fa-times-circle me-2"></i> Wah, Bukunya Sedang Dipinjam
+                                <i class="fas fa-clock me-2"></i> YAH, SEDANG DIPINJAM
                             </div>
                         @endif
                     </div>
                 </div>
             </div>
             @empty
-            <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px; background: var(--glass); border-radius: 30px; border: 1px dashed var(--glass-border); backdrop-filter: blur(10px);">
-                <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f50d/512.gif" alt="Cari" width="100" class="mb-3" style="opacity: 0.8;">
-                <h3 style="font-family: 'Unbounded'; color: var(--text-main);">Yah, Bukunya Tidak Ketemu</h3>
-                <p style="color: var(--text-muted);">Coba ketik nama buku yang lain ya!</p>
+            <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px; background: rgba(255,255,255,0.7); border-radius: 40px; border: 3px dashed #fff; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f50d/512.gif" alt="Cari" width="120" class="mb-4" style="opacity: 0.9;">
+                <h3 style="font-family: 'Unbounded'; color: var(--text-main); font-weight: 900; font-size: 2rem;">Yah, Bukunya Tidak Ketemu</h3>
+                <p style="color: var(--text-muted); font-size: 1.2rem; font-weight: 600;">Coba ketik judul atau pilih kategori buku yang lain ya!</p>
             </div>
             @endforelse
         </div>
@@ -387,7 +394,7 @@
 </div>
 
 <a href="{{ url('/') }}" class="btn-float-back">
-    <i class="fas fa-home"></i> Kembali ke Beranda
+    <i class="fas fa-rocket"></i> Kembali Ke Beranda
 </a>
 
 <script>
@@ -405,8 +412,8 @@
         if(!container) return;
         
         // Animasi loading transisi
-        container.style.opacity = '0.2';
-        container.style.transform = 'translateY(15px)';
+        container.style.opacity = '0.3';
+        container.style.transform = 'translateY(20px) scale(0.98)';
         
         fetch(`{{ route('katalog.filter') }}?search=${encodeURIComponent(keyword)}&kategori=${encodeURIComponent(kategori)}`)
             .then(res => res.json())
@@ -419,16 +426,16 @@
                         
                         let imgHtml = hasCover 
                             ? `<img src="${imgPath}" alt="${escapeHtml(b.judul)}">` 
-                            : `<div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center" style="background: rgba(255,255,255,0.7);"><i class="fas fa-book-open fa-3x mb-2" style="color: #ccc;"></i><span style="color: #888; font-size: 0.8rem; font-weight: 700; font-family:'Unbounded';">BELUM ADA FOTO</span></div>`;
+                            : `<div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center" style="background: rgba(255,255,255,0.7);"><i class="fas fa-book-open fa-4x mb-2" style="color: #ccc;"></i><span style="color: #888; font-size: 0.9rem; font-weight: 800; font-family:'Unbounded';">FOTO MENYUSUL</span></div>`;
                         
                         let stockClass = b.stok > 0 ? 'stock-in' : 'stock-out';
-                        let stockIcon = b.stok > 0 ? '<i class="fas fa-check-circle me-2"></i> Bisa Dipinjam: ' : '<i class="fas fa-times-circle me-2"></i> Wah, Bukunya Sedang Dipinjam';
-                        let stockText = b.stok > 0 ? b.stok + ' Buku' : '';
+                        let stockIcon = b.stok > 0 ? '<i class="fas fa-check-circle me-2"></i> BISA DIPINJAM (Stok: ' : '<i class="fas fa-clock me-2"></i> YAH, SEDANG DIPINJAM';
+                        let stockText = b.stok > 0 ? b.stok + ')' : '';
 
                         html += `
                         <div class="book-card">
                             <div class="card-img-wrapper">
-                                <span class="cat-pill">${escapeHtml(b.kategori?.nama || 'Umum')}</span>
+                                <span class="cat-pill"><i class="fas fa-tag me-1"></i> ${escapeHtml(b.kategori?.nama || 'Umum')}</span>
                                 ${imgHtml}
                             </div>
                             <div class="card-info">
@@ -449,19 +456,19 @@
                     });
                 } else {
                     html = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px; background: var(--glass); border-radius: 30px; border: 1px dashed var(--glass-border); backdrop-filter: blur(10px);">
-                        <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f50d/512.gif" alt="Cari" width="100" class="mb-3" style="opacity: 0.8;">
-                        <h3 style="font-family: 'Unbounded'; color: var(--text-main);">Yah, Bukunya Tidak Ketemu</h3>
-                        <p style="color: var(--text-muted);">Coba ketik nama buku yang lain ya!</p>
+                    <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px; background: rgba(255,255,255,0.7); border-radius: 40px; border: 3px dashed #fff; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                        <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f50d/512.gif" alt="Cari" width="120" class="mb-4" style="opacity: 0.9;">
+                        <h3 style="font-family: 'Unbounded'; color: var(--text-main); font-weight: 900; font-size: 2rem;">Yah, Bukunya Tidak Ketemu</h3>
+                        <p style="color: var(--text-muted); font-size: 1.2rem; font-weight: 600;">Coba ketik judul atau pilih kategori buku yang lain ya!</p>
                     </div>`;
                 }
                 
                 // Menunggu sedikit agar transisi interaktif terlihat
                 setTimeout(() => {
                     container.innerHTML = html;
-                    container.style.transform = 'translateY(0)';
+                    container.style.transform = 'translateY(0) scale(1)';
                     container.style.opacity = '1';
-                }, 200);
+                }, 250);
                 
                 // Update URL Parameter diam-diam
                 const url = new URL(window.location);
@@ -471,9 +478,9 @@
             })
             .catch(err => {
                 console.error('Error:', err);
-                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px; background: var(--glass); border-radius: 20px;"><h3 style="color: var(--color-5);">Koneksi terputus, coba lagi yuk!</h3></div>';
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px; background: rgba(255,255,255,0.9); border-radius: 30px;"><h3 style="color: var(--color-5); font-family: Unbounded;">Ups! Internet terputus. Coba lagi yuk!</h3></div>';
                 container.style.opacity = '1';
-                container.style.transform = 'translateY(0)';
+                container.style.transform = 'translateY(0) scale(1)';
             });
     }
 
