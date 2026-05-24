@@ -9,17 +9,13 @@
             <div class="card border-0 shadow-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 0 20px 20px 0;">
                 <div class="card-body p-4">
                     <div class="row align-items-center">
-                        <div class="col-md-7">
+                        <div class="col-md-8">
                             <h3 class="text-white mb-2" style="font-weight: 600;">
                                 <i class="fas fa-users me-2"></i> Data Anggota Perpustakaan
                             </h3>
                             <p class="text-white opacity-75 mb-0">Kelola data anggota perpustakaan SDN Berat Wetan 1</p>
                         </div>
-                        <div class="col-md-5 text-md-end mt-3 mt-md-0">
-                            <button type="button" id="btnBulkDelete" class="btn btn-danger me-2 d-none" style="border-radius: 50px; padding: 10px 20px; font-weight: 600; box-shadow: 0 5px 15px rgba(214, 48, 49, 0.4);">
-                                <i class="fas fa-trash-alt me-2"></i> Hapus Terpilih (<span id="checkCount">0</span>)
-                            </button>
-
+                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
                             <a href="{{ route('anggotas.create') }}" class="btn btn-light" style="border-radius: 50px; padding: 10px 25px; font-weight: 500; color: #667eea; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
                                 <i class="fas fa-user-plus me-2"></i> Tambah Anggota
                             </a>
@@ -89,19 +85,25 @@
                             @endif
                         </div>
 
-                        @if(count($anggotas) > 0)
-                        <button type="button" 
-                                class="btn btn-danger" 
-                                style="border-radius: 50px; padding: 8px 25px; background: linear-gradient(135deg, #ff4757, #ff6b81); border: none;"
-                                onclick="confirmDeleteAll({{ count($anggotas) }})">
-                            <i class="fas fa-user-slash me-2"></i> Hapus Semua Anggota ({{ count($anggotas) }})
-                        </button>
-                        
-                        <form id="deleteAllForm" action="{{ route('anggotas.delete-all') }}" method="POST" style="display: none;">
-                            @csrf
-                            @method('DELETE')
-                        </form>
-                        @endif
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" id="btnBulkDelete" class="btn btn-outline-danger d-none" style="border-radius: 50px; padding: 8px 25px; font-weight: 600; border-width: 2px;">
+                                <i class="fas fa-check-square me-2"></i>Hapus Terpilih (<span id="checkCount">0</span>)
+                            </button>
+
+                            @if(count($anggotas) > 0)
+                            <button type="button" 
+                                    class="btn btn-danger" 
+                                    style="border-radius: 50px; padding: 8px 25px; background: linear-gradient(135deg, #ff4757, #ff6b81); border: none; font-weight: 500;"
+                                    onclick="confirmDeleteAll({{ count($anggotas) }})">
+                                <i class="fas fa-user-slash me-2"></i>Hapus Semua Anggota ({{ count($anggotas) }})
+                            </button>
+                            
+                            <form id="deleteAllForm" action="{{ route('anggotas.delete-all') }}" method="POST" style="display: none;">
+                                @csrf
+                                @method('DELETE')
+                            </form>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
@@ -136,7 +138,7 @@
                             <table class="table table-hover mb-0 text-nowrap" style="min-width: 1200px;" id="anggotaTable">
                                 <thead style="background: linear-gradient(45deg, #f7c0ec, #a7bdea);">
                                     <tr>
-                                        <th class="text-center" style="width: 60px; vertical-align: middle;">
+                                        <th class="text-center" style="width: 40px; vertical-align: middle;">
                                             <input type="checkbox" id="checkAll" class="form-check-input shadow-sm" style="cursor: pointer; transform: scale(1.2); margin: 0 auto;">
                                         </th>
                                         <th class="text-center" style="width: 60px; vertical-align: middle;">No</th>
@@ -369,6 +371,7 @@
             if(e.key === 'Enter') filterTable(); 
         });
 
+        // Diperbaiki agar live-search lokal mengabaikan data kolom checkbox yang tersembunyi
         function filterTable() {
             let searchValue = document.getElementById('searchInput').value.toLowerCase();
             document.querySelectorAll('#anggotaTable tbody tr').forEach(row => {
