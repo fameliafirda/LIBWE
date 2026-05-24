@@ -86,9 +86,15 @@
                         </div>
 
                         <div>
-                            <button type="button" id="btnBulkDelete" class="btn btn-danger d-none shadow-sm" style="border-radius: 50px; padding: 8px 25px; background: linear-gradient(135deg, #ff4757, #ff6b81); border: none; font-weight: 500;">
+                            @if(count($anggotas) > 0)
+                            <button type="button" 
+                                    id="btnBulkDelete" 
+                                    class="btn btn-danger shadow-sm" 
+                                    disabled 
+                                    style="border-radius: 50px; padding: 8px 25px; background: linear-gradient(135deg, #ff4757, #ff6b81); border: none; font-weight: 500; opacity: 0.6; cursor: not-allowed; transition: all 0.3s ease;">
                                 <i class="fas fa-trash-alt me-2"></i>Hapus Yang Terpilih (<span id="checkCount">0</span>)
                             </button>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -124,7 +130,7 @@
                             <table class="table table-hover mb-0 text-nowrap" style="min-width: 1200px;" id="anggotaTable">
                                 <thead style="background: linear-gradient(45deg, #f7c0ec, #a7bdea);">
                                     <tr>
-                                        <th class="text-center" style="width: 40px; vertical-align: middle;">
+                                        <th class="text-center" style="width: 60px; vertical-align: middle;">
                                             <input type="checkbox" id="checkAll" class="form-check-input shadow-sm" style="cursor: pointer; transform: scale(1.2); margin: 0 auto;">
                                         </th>
                                         <th class="text-center" style="width: 60px; vertical-align: middle;">No</th>
@@ -274,7 +280,7 @@
 @endsection
 
 @push('styles')
-<link class="main-stylesheet" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <style>
     td::-webkit-scrollbar { width: 4px; }
     td::-webkit-scrollbar-track { background: #f1f1f1; }
@@ -296,16 +302,23 @@
         const formBulkDelete = document.getElementById('formBulkDelete');
         const inputSelectedIds = document.getElementById('selected_ids');
 
-        // Mengatur kemunculan dinamis tombol Hapus Terpilih
+        // Fungsi mengatur tombol agar menyala/redup
         function updateBulkDeleteButton() {
             const checkedBoxes = document.querySelectorAll('.anggota-checkbox:checked');
             const count = checkedBoxes.length;
-            checkCount.innerText = count;
+            
+            if (checkCount) checkCount.innerText = count;
 
-            if (count > 0) {
-                btnBulkDelete.classList.remove('d-none');
-            } else {
-                btnBulkDelete.classList.add('d-none');
+            if (btnBulkDelete) {
+                if (count > 0) {
+                    btnBulkDelete.removeAttribute('disabled');
+                    btnBulkDelete.style.opacity = '1';
+                    btnBulkDelete.style.cursor = 'pointer';
+                } else {
+                    btnBulkDelete.setAttribute('disabled', 'disabled');
+                    btnBulkDelete.style.opacity = '0.6';
+                    btnBulkDelete.style.cursor = 'not-allowed';
+                }
             }
         }
 
