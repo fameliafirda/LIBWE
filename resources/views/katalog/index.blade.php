@@ -294,7 +294,7 @@
                 <option value="{{ $k->id }}" {{ request('kategori') == $k->id ? 'selected' : '' }}>{{ $k->nama }}</option>
             @endforeach
         </select>
-        <button class="btn-search" onclick="filterBuku()"><i class="fas fa-magic me-2 d-md-none"></i>CARI SEKARANG</button>
+        <button class="btn-search" onclick="filterBuku()"><i class="fas fa-magic me-2 d-md-none"></i>CARI</button>
     </div>
 </div>
 
@@ -361,12 +361,12 @@
                             Penulis: <strong>{{ Str::limit($b->penulis ?? 'Anonim', 25) }}</strong>
                         </div>
                         <div class="c-year-sd">
-                            Tahun Buku: <strong>{{ $b->tahun_terbit ?? '-' }}</strong>
+                            Tahun Terbit: <strong>{{ $b->tahun_terbit ?? '-' }}</strong>
                         </div>
                         
                         @if($b->stok > 0)
                             <div class="c-stock-wrapper stock-in">
-                                <i class="fas fa-check-circle me-2"></i> BISA DIPINJAM (Stok: {{ $b->stok }})
+                                <i class="fas fa-check-circle me-2"></i> Sisa Stok : (Stok: {{ $b->stok }})
                             </div>
                         @else
                             <div class="c-stock-wrapper stock-out">
