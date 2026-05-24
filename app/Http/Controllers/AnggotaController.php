@@ -22,17 +22,21 @@ class AnggotaController extends Controller
             $query->where('kelas', $request->kelas);
         }
 
-        // Ambil data dan tambahkan informasi peminjaman tanpa merusak instansiasi objek Model
+        // Ambil data dan bentuk array untuk view agar tetap konsisten dengan struktur Blade kamu
         $anggotas = $query->latest()->get()->map(function ($anggota) {
             $pinjamans = $anggota->pinjamans;
 
             // Hitung total denda dari semua pinjaman
             $totalDenda = $pinjamans->sum('denda');
 
-            // Format denda langsung ditempel ke properti objek modelnya
-            $anggota->total_denda = $totalDenda > 0 ? 'Rp ' . number_format($totalDenda, 0, ',', '.') : 'Rp 0';
+            // Format denda
+            $formattedDenda = $totalDenda > 0 ? 'Rp ' . number_format($totalDenda, 0, ',', '.') : 'Rp 0';
 
-            return $anggota;
+            return [
+                'anggota' => $anggota,
+                'pinjamans' => $pinjamans,
+                'total_denda' => $formattedDenda
+            ];
         });
 
         // Ambil daftar kelas unik
@@ -54,7 +58,7 @@ class AnggotaController extends Controller
      */
     public function store(Request $request)
     {
-        // Validasi untuk NISN (Harus unik di tabel anggotas)
+        // Menambahkan validasi untuk NISN (Harus unik di tabel anggotas)
         $validated = $request->validate([
             'nisn' => 'required|string|max:20|unique:anggotas,nisn',
             'nama' => 'required|string|max:255',
@@ -124,17 +128,14 @@ class AnggotaController extends Controller
 
     /**
      * Hapus multiple anggota sekaligus (Bulk Delete)
-     * Mampu menangani input Array Form biasa (ids[]) maupun JSON String (selected_ids)
      */
     public function bulkDelete(Request $request)
     {
         $ids = [];
 
         if ($request->has('ids')) {
-            // Menerima input array langsung dari form submit checkbox HTML
             $ids = $request->input('ids');
         } elseif ($request->has('selected_ids')) {
-            // Menerima input JSON string
             $request->validate(['selected_ids' => 'required|json']);
             $ids = json_decode($request->selected_ids, true);
         }
@@ -151,7 +152,6 @@ class AnggotaController extends Controller
             foreach ($ids as $id) {
                 $anggota = Anggota::find($id);
                 if ($anggota) {
-                    // Cek apakah anggota memiliki pinjaman aktif yang belum dikembalikan
                     $pinjamanAktif = $anggota->pinjamans()->where('status', 'belum dikembalikan')->count();
                     
                     if ($pinjamanAktif > 0) {
@@ -159,9 +159,7 @@ class AnggotaController extends Controller
                         continue;
                     }
                     
-                    // Hapus data riwayat pinjaman terkait
                     $anggota->pinjamans()->delete();
-                    // Hapus anggota
                     $anggota->delete();
                     $count++;
                 }
@@ -183,7 +181,7 @@ class AnggotaController extends Controller
     }
 
     /**
-     * Hapus semua data anggota secara total (Pembersihan Tahun Ajaran Baru)
+     * Hapus semua data anggota secara total
      */
     public function deleteAll()
     {
@@ -193,7 +191,6 @@ class AnggotaController extends Controller
             return redirect()->route('anggotas.index')->with('error', 'Tidak ada data anggota untuk dihapus.');
         }
 
-        // Cek apakah masih ada anggota dengan pinjaman aktif di sistem
         $anggotaDenganPinjamanAktif = Anggota::whereHas('pinjamans', function($query) {
             $query->where('status', 'belum dikembalikan');
         })->count();
@@ -204,7 +201,6 @@ class AnggotaController extends Controller
         }
         
         try {
-            // Gunakan metode delete() alih-alih truncate() untuk menghindari error Foreign Key Constraint database
             Pinjaman::query()->delete();
             Anggota::query()->delete();
             

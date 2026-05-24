@@ -150,25 +150,25 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($anggotas as $item)
-                                    <tr style="vertical-align: middle;" id="row-{{ $item['anggota']->id }}">
-                                        <td class="text-center">
-                                            <input type="checkbox" name="ids[]" value="{{ $item['anggota']->id }}" class="form-check-input anggota-checkbox shadow-sm" style="cursor: pointer; transform: scale(1.2);">
-                                        </td>
-                                        <td class="text-center fw-bold">{{ $loop->iteration }}</td>
-                                        
-                                        <td>
-                                            <span class="badge bg-secondary px-2 py-1">{{ $item['anggota']->nisn ?? '-' }}</span>
-                                        </td>
+    @forelse ($anggotas as $item)
+    <tr style="vertical-align: middle;" id="row-{{ $item->id }}">
+        <td class="text-center">
+            <input type="checkbox" name="ids[]" value="{{ $item->id }}" class="form-check-input anggota-checkbox shadow-sm" style="cursor: pointer; transform: scale(1.2);">
+        </td>
+        <td class="text-center fw-bold">{{ $loop->iteration }}</td>
+        
+        <td>
+            <span class="badge bg-secondary px-2 py-1">{{ $item->nisn ?? '-' }}</span>
+        </td>
 
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-2" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                                                    <i class="fas fa-user" style="color: #8b5cf6;"></i>
-                                                </div>
-                                                <span class="fw-semibold">{{ $item['anggota']->nama }}</span>
-                                            </div>
-                                        </td>
+        <td>
+            <div class="d-flex align-items-center">
+                <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-2" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-user" style="color: #8b5cf6;"></i>
+                </div>
+                <span class="fw-semibold">{{ $item->nama }}</span>
+            </div>
+        </td>
                                         <td>
                                             <span class="badge bg-light text-dark px-3 py-2">{{ $item['anggota']->kelas }}</span>
                                         </td>
