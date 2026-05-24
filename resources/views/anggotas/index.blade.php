@@ -85,24 +85,10 @@
                             @endif
                         </div>
 
-                        <div class="d-flex align-items-center gap-2">
-                            <button type="button" id="btnBulkDelete" class="btn btn-outline-danger d-none" style="border-radius: 50px; padding: 8px 25px; font-weight: 600; border-width: 2px;">
-                                <i class="fas fa-check-square me-2"></i>Hapus Terpilih (<span id="checkCount">0</span>)
+                        <div>
+                            <button type="button" id="btnBulkDelete" class="btn btn-danger d-none shadow-sm" style="border-radius: 50px; padding: 8px 25px; background: linear-gradient(135deg, #ff4757, #ff6b81); border: none; font-weight: 500;">
+                                <i class="fas fa-trash-alt me-2"></i>Hapus Yang Terpilih (<span id="checkCount">0</span>)
                             </button>
-
-                            @if(count($anggotas) > 0)
-                            <button type="button" 
-                                    class="btn btn-danger" 
-                                    style="border-radius: 50px; padding: 8px 25px; background: linear-gradient(135deg, #ff4757, #ff6b81); border: none; font-weight: 500;"
-                                    onclick="confirmDeleteAll({{ count($anggotas) }})">
-                                <i class="fas fa-user-slash me-2"></i>Hapus Semua Anggota ({{ count($anggotas) }})
-                            </button>
-                            
-                            <form id="deleteAllForm" action="{{ route('anggotas.delete-all') }}" method="POST" style="display: none;">
-                                @csrf
-                                @method('DELETE')
-                            </form>
-                            @endif
                         </div>
                     </div>
                 </div>
@@ -288,7 +274,7 @@
 @endsection
 
 @push('styles')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<link class="main-stylesheet" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <style>
     td::-webkit-scrollbar { width: 4px; }
     td::-webkit-scrollbar-track { background: #f1f1f1; }
@@ -310,6 +296,7 @@
         const formBulkDelete = document.getElementById('formBulkDelete');
         const inputSelectedIds = document.getElementById('selected_ids');
 
+        // Mengatur kemunculan dinamis tombol Hapus Terpilih
         function updateBulkDeleteButton() {
             const checkedBoxes = document.querySelectorAll('.anggota-checkbox:checked');
             const count = checkedBoxes.length;
@@ -342,6 +329,7 @@
             });
         });
 
+        // Proses Submit Hapus Terpilih via Checkbox
         if (btnBulkDelete) {
             btnBulkDelete.addEventListener('click', function() {
                 const checkedBoxes = document.querySelectorAll('.anggota-checkbox:checked');
@@ -350,14 +338,14 @@
                 inputSelectedIds.value = JSON.stringify(selectedIds);
 
                 Swal.fire({
-                    title: 'Anda yakin?',
-                    text: `Anda akan menghapus ${selectedIds.length} anggota sekaligus!`,
+                    title: 'Apakah anda yakin?',
+                    text: `Anda akan menghapus ${selectedIds.length} data anggota terpilih secara permanen!`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#ef4444',
                     cancelButtonColor: '#6c757d',
                     confirmButtonText: 'Ya, Hapus Terpilih!',
-                    cancelButtonText: 'Tidak, Batal'
+                    cancelButtonText: 'Tidak, Batalkan'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         formBulkDelete.submit();
@@ -366,12 +354,12 @@
             });
         }
 
+        // Live Search Handler
         document.getElementById('searchButton').addEventListener('click', filterTable);
         document.getElementById('searchInput').addEventListener('keyup', (e) => { 
             if(e.key === 'Enter') filterTable(); 
         });
 
-        // Diperbaiki agar live-search lokal mengabaikan data kolom checkbox yang tersembunyi
         function filterTable() {
             let searchValue = document.getElementById('searchInput').value.toLowerCase();
             document.querySelectorAll('#anggotaTable tbody tr').forEach(row => {
@@ -381,10 +369,11 @@
         }
     });
 
+    // Peringatan Hapus Data Individu/Single Row
     function confirmDeleteSingle(id, nama, pinjamanAktif) {
         let textWarning = `Data anggota atas nama ${nama} akan dihapus permanen.`;
         if (pinjamanAktif > 0) {
-            textWarning = `PERHATIAN! Anggota ini masih meminjam ${pinjamanAktif} buku yang belum dikembalikan. Yakin ingin menghapus?`;
+            textWarning = `PERHATIAN! Anggota ini masih meminjam ${pinjamanAktif} buku yang belum dikembalikan. Yakin tetap ingin menghapus data anggota?`;
         }
 
         Swal.fire({
@@ -400,29 +389,6 @@
             if (result.isConfirmed) {
                 document.getElementById('deleteForm').action = `{{ url('anggotas') }}/${id}`;
                 document.getElementById('deleteForm').submit();
-            }
-        });
-    }
-
-    function confirmDeleteAll(jumlah) {
-        Swal.fire({
-            title: `Hapus SEMUA (${jumlah}) Anggota?`,
-            text: "Ketik 'HAPUS' di bawah ini untuk melanjutkan:",
-            input: 'text',
-            icon: 'error',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Eksekusi',
-            cancelButtonText: 'Batal',
-            preConfirm: (inputValue) => {
-                if (inputValue !== 'HAPUS') {
-                    Swal.showValidationMessage('Ketik HAPUS dengan huruf kapital untuk konfirmasi!');
-                }
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('deleteAllForm').submit();
             }
         });
     }
