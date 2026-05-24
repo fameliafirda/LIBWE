@@ -378,7 +378,6 @@
             </div>
             @empty
             <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px; background: rgba(255,255,255,0.7); border-radius: 40px; border: 3px dashed #fff; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-                <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f50d/512.gif" alt="Cari" width="120" class="mb-4" style="opacity: 0.9;">
                 <h3 style="font-family: 'Unbounded'; color: var(--text-main); font-weight: 900; font-size: 2rem;">Yah, Bukunya Tidak Ketemu</h3>
                 <p style="color: var(--text-muted); font-size: 1.2rem; font-weight: 600;">Coba ketik judul atau pilih kategori buku yang lain ya!</p>
             </div>
