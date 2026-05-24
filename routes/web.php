@@ -84,10 +84,15 @@ Route::middleware([PustakawanMiddleware::class])->group(function () {
     Route::resource('categories', CategoryController::class);
 
     // ==================== MANAJEMEN ANGGOTA ====================
-    Route::resource('anggotas', AnggotaController::class);
-    Route::get('/anggotas/{anggota}/peminjaman', [AnggotaController::class, 'peminjaman'])->name('anggotas.peminjaman');
+    // 1. Taruh Route Kustom Statis di Atas
+    Route::delete('/anggotas/bulk-delete', [AnggotaController::class, 'bulkDelete'])->name('anggotas.bulkDelete');
     Route::delete('/anggotas/delete-all', [AnggotaController::class, 'deleteAll'])->name('anggotas.delete-all');
+    Route::get('/anggotas/{anggota}/peminjaman', [AnggotaController::class, 'peminjaman'])->name('anggotas.peminjaman');
 
+    // 2. Taruh Route Resource di Paling Bawah agar Tidak Bentrok dengan URL di Atas
+    Route::resource('anggotas', AnggotaController::class);
+
+    
     // ==================== MANAJEMEN PEMINJAMAN ====================
     Route::resource('pinjamans', PinjamanController::class);
     Route::get('/pinjamans/get-anggota/{nisn}', [App\Http\Controllers\PinjamanController::class, 'getAnggotaByNisn'])->name('pinjamans.get-anggota');

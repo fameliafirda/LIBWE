@@ -9,13 +9,17 @@
             <div class="card border-0 shadow-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 0 20px 20px 0;">
                 <div class="card-body p-4">
                     <div class="row align-items-center">
-                        <div class="col-md-8">
+                        <div class="col-md-7">
                             <h3 class="text-white mb-2" style="font-weight: 600;">
                                 <i class="fas fa-users me-2"></i> Data Anggota Perpustakaan
                             </h3>
                             <p class="text-white opacity-75 mb-0">Kelola data anggota perpustakaan SDN Berat Wetan 1</p>
                         </div>
-                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                        <div class="col-md-5 text-md-end mt-3 mt-md-0">
+                            <button type="button" id="btnBulkDelete" class="btn btn-danger me-2 d-none" style="border-radius: 50px; padding: 10px 20px; font-weight: 600; box-shadow: 0 5px 15px rgba(214, 48, 49, 0.4);">
+                                <i class="fas fa-trash-alt me-2"></i> Hapus Terpilih (<span id="checkCount">0</span>)
+                            </button>
+
                             <a href="{{ route('anggotas.create') }}" class="btn btn-light" style="border-radius: 50px; padding: 10px 25px; font-weight: 500; color: #667eea; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
                                 <i class="fas fa-user-plus me-2"></i> Tambah Anggota
                             </a>
@@ -42,6 +46,17 @@
         <div class="col-12">
             <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 15px; border-left: 5px solid #dc3545;">
                 <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    @if(session('warning'))
+    <div class="row g-0 mb-4">
+        <div class="col-12">
+            <div class="alert alert-warning alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 15px; border-left: 5px solid #f39c12;">
+                <i class="fas fa-exclamation-triangle me-2"></i> {{ session('warning') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         </div>
@@ -93,166 +108,177 @@
         </div>
     </div>
 
-    <div class="row g-0">
-        <div class="col-12">
-            <div class="card border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
-                <div class="card-header bg-white border-0 py-3 px-4">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-                        <h5 class="mb-0" style="color: #2d3436; font-weight: 600;">
-                            <i class="fas fa-list me-2" style="color: #8b5cf6;"></i> Daftar Anggota
-                            <span class="badge ms-2" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000;">{{ count($anggotas) }} anggota</span>
-                        </h5>
-                        
-                        <div class="input-group" style="width: 100%; max-width: 300px;">
-                            <input type="text" class="form-control form-control-sm" placeholder="Cari anggota..." id="searchInput" style="border-radius: 50px 0 0 50px; border: 1px solid #e0e0e0;">
-                            <button class="btn btn-sm" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); border-radius: 0 50px 50px 0; color: #000;" type="button" id="searchButton">
-                                <i class="fas fa-search"></i>
-                            </button>
+    <form id="formBulkDelete" action="{{ route('anggotas.bulkDelete') }}" method="POST">
+        @csrf
+        <input type="hidden" name="selected_ids" id="selected_ids" value="">
+
+        <div class="row g-0">
+            <div class="col-12">
+                <div class="card border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                    <div class="card-header bg-white border-0 py-3 px-4">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                            <h5 class="mb-0" style="color: #2d3436; font-weight: 600;">
+                                <i class="fas fa-list me-2" style="color: #8b5cf6;"></i> Daftar Anggota
+                                <span class="badge ms-2" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000;">{{ count($anggotas) }} anggota</span>
+                            </h5>
+                            
+                            <div class="input-group" style="width: 100%; max-width: 300px;">
+                                <input type="text" class="form-control form-control-sm" placeholder="Cari anggota..." id="searchInput" style="border-radius: 50px 0 0 50px; border: 1px solid #e0e0e0;">
+                                <button class="btn btn-sm" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); border-radius: 0 50px 50px 0; color: #000;" type="button" id="searchButton">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0 text-nowrap" style="min-width: 1200px;" id="anggotaTable">
-                            <thead style="background: linear-gradient(45deg, #f7c0ec, #a7bdea);">
-                                <tr>
-                                    <th class="text-center" style="width: 50px;">No</th>
-                                    <th style="width: 100px;">NISN</th>
-                                    <th style="width: 150px;">Nama</th>
-                                    <th style="width: 100px;">Kelas</th>
-                                    <th style="width: 120px;">Jenis Kelamin</th>
-                                    <th>Buku yang Dipinjam</th>
-                                    <th style="width: 120px;" class="text-center">Total Denda</th>
-                                    <th style="width: 150px;" class="text-center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($anggotas as $item)
-                                <tr style="vertical-align: middle;" id="row-{{ $item['anggota']->id }}">
-                                    <td class="text-center fw-bold">{{ $loop->iteration }}</td>
-                                    
-                                    <td>
-                                        <span class="badge bg-secondary px-2 py-1">{{ $item['anggota']->nisn ?? '-' }}</span>
-                                    </td>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0 text-nowrap" style="min-width: 1200px;" id="anggotaTable">
+                                <thead style="background: linear-gradient(45deg, #f7c0ec, #a7bdea);">
+                                    <tr>
+                                        <th class="text-center" style="width: 40px;">
+                                            <input type="checkbox" id="checkAll" class="form-check-input shadow-sm" style="cursor: pointer; transform: scale(1.2);">
+                                        </th>
+                                        <th class="text-center" style="width: 50px;">No</th>
+                                        <th style="width: 100px;">NISN</th>
+                                        <th style="width: 150px;">Nama</th>
+                                        <th style="width: 100px;">Kelas</th>
+                                        <th style="width: 120px;">Jenis Kelamin</th>
+                                        <th>Buku yang Dipinjam</th>
+                                        <th style="width: 120px;" class="text-center">Total Denda</th>
+                                        <th style="width: 150px;" class="text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($anggotas as $item)
+                                    <tr style="vertical-align: middle;" id="row-{{ $item['anggota']->id }}">
+                                        <td class="text-center">
+                                            <input type="checkbox" name="ids[]" value="{{ $item['anggota']->id }}" class="form-check-input anggota-checkbox shadow-sm" style="cursor: pointer; transform: scale(1.2);">
+                                        </td>
+                                        <td class="text-center fw-bold">{{ $loop->iteration }}</td>
+                                        
+                                        <td>
+                                            <span class="badge bg-secondary px-2 py-1">{{ $item['anggota']->nisn ?? '-' }}</span>
+                                        </td>
 
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-2" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                                                <i class="fas fa-user" style="color: #8b5cf6;"></i>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-2" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fas fa-user" style="color: #8b5cf6;"></i>
+                                                </div>
+                                                <span class="fw-semibold">{{ $item['anggota']->nama }}</span>
                                             </div>
-                                            <span class="fw-semibold">{{ $item['anggota']->nama }}</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-light text-dark px-3 py-2">{{ $item['anggota']->kelas }}</span>
-                                    </td>
-                                    <td>
-                                        @if($item['anggota']->jenis_kelamin == 'Laki-laki')
-                                            <span class="badge bg-info text-white px-3 py-2">
-                                                <i class="fas fa-mars me-1"></i> Laki-laki
-                                            </span>
-                                        @else
-                                            <span class="badge bg-danger text-white px-3 py-2">
-                                                <i class="fas fa-venus me-1"></i> Perempuan
-                                            </span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if($item['pinjamans']->count() > 0)
-                                            <div style="max-height: 100px; overflow-y: auto; padding-right: 5px;">
-                                                <ul class="list-unstyled mb-0">
-                                                    @foreach($item['pinjamans'] as $peminjaman)
-                                                        <li class="mb-2 pb-2 border-bottom">
-                                                            <div class="d-flex align-items-start gap-2">
-                                                                <i class="fas fa-book mt-1" style="color: #8b5cf6; font-size: 12px;"></i>
-                                                                <div>
-                                                                    <span class="fw-semibold">{{ $peminjaman->judul_buku ?? 'Buku tidak tersedia' }}</span>
-                                                                    <br>
-                                                                    <small class="text-muted">
-                                                                        <i class="fas fa-calendar-alt me-1"></i>
-                                                                        {{ \Carbon\Carbon::parse($peminjaman->tanggal_pinjam)->format('d/m/Y') }}
-                                                                        @if($peminjaman->tanggal_kembali)
-                                                                            - {{ \Carbon\Carbon::parse($peminjaman->tanggal_kembali)->format('d/m/Y') }}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark px-3 py-2">{{ $item['anggota']->kelas }}</span>
+                                        </td>
+                                        <td>
+                                            @if($item['anggota']->jenis_kelamin == 'Laki-laki')
+                                                <span class="badge bg-info text-white px-3 py-2">
+                                                    <i class="fas fa-mars me-1"></i> Laki-laki
+                                                </span>
+                                            @else
+                                                <span class="badge bg-danger text-white px-3 py-2">
+                                                    <i class="fas fa-venus me-1"></i> Perempuan
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($item['pinjamans']->count() > 0)
+                                                <div style="max-height: 100px; overflow-y: auto; padding-right: 5px;">
+                                                    <ul class="list-unstyled mb-0">
+                                                        @foreach($item['pinjamans'] as $peminjaman)
+                                                            <li class="mb-2 pb-2 border-bottom">
+                                                                <div class="d-flex align-items-start gap-2">
+                                                                    <i class="fas fa-book mt-1" style="color: #8b5cf6; font-size: 12px;"></i>
+                                                                    <div>
+                                                                        <span class="fw-semibold">{{ $peminjaman->judul_buku ?? 'Buku tidak tersedia' }}</span>
+                                                                        <br>
+                                                                        <small class="text-muted">
+                                                                            <i class="fas fa-calendar-alt me-1"></i>
+                                                                            {{ \Carbon\Carbon::parse($peminjaman->tanggal_pinjam)->format('d/m/Y') }}
+                                                                            @if($peminjaman->tanggal_kembali)
+                                                                                - {{ \Carbon\Carbon::parse($peminjaman->tanggal_kembali)->format('d/m/Y') }}
+                                                                            @else
+                                                                                (Belum dikembalikan)
+                                                                            @endif
+                                                                        </small>
+                                                                        <br>
+                                                                        @if($peminjaman->status == 'belum dikembalikan')
+                                                                            <span class="badge bg-warning text-dark mt-1">Dipinjam</span>
                                                                         @else
-                                                                            (Belum dikembalikan)
+                                                                            <span class="badge bg-success mt-1">Dikembalikan</span>
                                                                         @endif
-                                                                    </small>
-                                                                    <br>
-                                                                    @if($peminjaman->status == 'belum dikembalikan')
-                                                                        <span class="badge bg-warning text-dark mt-1">Dipinjam</span>
-                                                                    @else
-                                                                        <span class="badge bg-success mt-1">Dikembalikan</span>
-                                                                    @endif
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        </li>
-                                                    @endforeach
-                                                </ul>
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            @else
+                                                <span class="text-muted fst-italic">
+                                                    <i class="fas fa-info-circle me-1"></i>Belum ada peminjaman
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td class="text-center">
+                                            @if($item['pinjamans']->sum('denda') > 0)
+                                                <span class="fw-bold" style="color: #e74c3c;">
+                                                    Rp {{ number_format($item['pinjamans']->sum('denda'), 0, ',', '.') }}
+                                                </span>
+                                            @else
+                                                <span class="badge bg-success px-3 py-2">Rp 0</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="d-flex justify-content-center align-items-center" style="gap: 25px;">
+                                                <a href="{{ route('anggotas.edit', $item['anggota']->id) }}" 
+                                                   style="color: #f59e0b; font-size: 1.4rem; transition: 0.2s; text-decoration: none;"
+                                                   onmouseover="this.style.transform='scale(1.2)'"
+                                                   onmouseout="this.style.transform='scale(1)'"
+                                                   title="Edit anggota">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{{ route('anggotas.peminjaman', $item['anggota']->id) }}" 
+                                                   style="color: #10b981; font-size: 1.4rem; transition: 0.2s; text-decoration: none;"
+                                                   onmouseover="this.style.transform='scale(1.2)'"
+                                                   onmouseout="this.style.transform='scale(1)'"
+                                                   title="Riwayat peminjaman">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <button type="button" 
+                                                        style="background: transparent; border: none; color: #ef4444; font-size: 1.4rem; transition: 0.2s; cursor: pointer; padding: 0;"
+                                                        onmouseover="this.style.transform='scale(1.2)'"
+                                                        onmouseout="this.style.transform='scale(1)'"
+                                                        onclick="confirmDeleteSingle({{ $item['anggota']->id }}, '{{ addslashes($item['anggota']->nama) }}', {{ $item['pinjamans']->where('status', 'belum dikembalikan')->count() }})"
+                                                        title="Hapus anggota">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
                                             </div>
-                                        @else
-                                            <span class="text-muted fst-italic">
-                                                <i class="fas fa-info-circle me-1"></i>Belum ada peminjaman
-                                            </span>
-                                        @endif
-                                    </td>
-                                    <td class="text-center">
-                                        @if($item['pinjamans']->sum('denda') > 0)
-                                            <span class="fw-bold" style="color: #e74c3c;">
-                                                Rp {{ number_format($item['pinjamans']->sum('denda'), 0, ',', '.') }}
-                                            </span>
-                                        @else
-                                            <span class="badge bg-success px-3 py-2">Rp 0</span>
-                                        @endif
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="d-flex justify-content-center align-items-center" style="gap: 25px;">
-                                            <a href="{{ route('anggotas.edit', $item['anggota']->id) }}" 
-                                               style="color: #f59e0b; font-size: 1.4rem; transition: 0.2s; text-decoration: none;"
-                                               onmouseover="this.style.transform='scale(1.2)'"
-                                               onmouseout="this.style.transform='scale(1)'"
-                                               title="Edit anggota">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <a href="{{ route('anggotas.peminjaman', $item['anggota']->id) }}" 
-                                               style="color: #10b981; font-size: 1.4rem; transition: 0.2s; text-decoration: none;"
-                                               onmouseover="this.style.transform='scale(1.2)'"
-                                               onmouseout="this.style.transform='scale(1)'"
-                                               title="Riwayat peminjaman">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <button type="button" 
-                                                    style="background: transparent; border: none; color: #ef4444; font-size: 1.4rem; transition: 0.2s; cursor: pointer; padding: 0;"
-                                                    onmouseover="this.style.transform='scale(1.2)'"
-                                                    onmouseout="this.style.transform='scale(1)'"
-                                                    onclick="confirmDelete({{ $item['anggota']->id }}, '{{ addslashes($item['anggota']->nama) }}', {{ $item['pinjamans']->where('status', 'belum dikembalikan')->count() }})"
-                                                    title="Hapus anggota">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="8" class="text-center py-5">
-                                        <div class="text-muted">
-                                            <i class="fas fa-users fa-4x mb-3" style="color: #dfe6e9;"></i>
-                                            <h6>Belum ada data anggota</h6>
-                                            <p class="small mb-3">Silakan tambah anggota baru</p>
-                                            <a href="{{ route('anggotas.create') }}" class="btn btn-sm" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000;">
-                                                <i class="fas fa-user-plus me-1"></i> Tambah Anggota
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="9" class="text-center py-5">
+                                            <div class="text-muted">
+                                                <i class="fas fa-users fa-4x mb-3" style="color: #dfe6e9;"></i>
+                                                <h6>Belum ada data anggota</h6>
+                                                <p class="small mb-3">Silakan tambah anggota baru</p>
+                                                <a href="{{ route('anggotas.create') }}" class="btn btn-sm" style="background: linear-gradient(45deg, #f7c0ec, #a7bdea); color: #000;">
+                                                    <i class="fas fa-user-plus me-1"></i> Tambah Anggota
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </form>
 </div>
 
 <form id="deleteForm" action="" method="POST" style="display: none;">
@@ -262,6 +288,7 @@
 @endsection
 
 @push('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <style>
     td::-webkit-scrollbar { width: 4px; }
     td::-webkit-scrollbar-track { background: #f1f1f1; }
@@ -273,33 +300,134 @@
 @endpush
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    function confirmDelete(id, nama, pinjamanAktif) {
-        let message = `⚠️ HAPUS ANGGOTA\n\nNama: ${nama}\n\n`;
-        if (pinjamanAktif > 0) message += `PERHATIAN! Memiliki ${pinjamanAktif} buku belum dikembalikan!\n\n`;
-        message += `Lanjutkan?`;
-        if (confirm(message)) {
-            document.getElementById('deleteForm').action = `{{ url('anggotas') }}/${id}`;
-            document.getElementById('deleteForm').submit();
+    document.addEventListener('DOMContentLoaded', function() {
+        // Logika Untuk Fitur Checkbox dan Hapus Massal
+        const checkAll = document.getElementById('checkAll');
+        const checkboxes = document.querySelectorAll('.anggota-checkbox');
+        const btnBulkDelete = document.getElementById('btnBulkDelete');
+        const checkCount = document.getElementById('checkCount');
+        const formBulkDelete = document.getElementById('formBulkDelete');
+        const inputSelectedIds = document.getElementById('selected_ids');
+
+        function updateBulkDeleteButton() {
+            const checkedBoxes = document.querySelectorAll('.anggota-checkbox:checked');
+            const count = checkedBoxes.length;
+            checkCount.innerText = count;
+
+            if (count > 0) {
+                btnBulkDelete.classList.remove('d-none');
+            } else {
+                btnBulkDelete.classList.add('d-none');
+            }
         }
+
+        if (checkAll) {
+            checkAll.addEventListener('change', function() {
+                checkboxes.forEach(cb => {
+                    cb.checked = this.checked;
+                });
+                updateBulkDeleteButton();
+            });
+        }
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', function() {
+                if (!this.checked) {
+                    checkAll.checked = false;
+                } else if (document.querySelectorAll('.anggota-checkbox:checked').length === checkboxes.length) {
+                    checkAll.checked = true;
+                }
+                updateBulkDeleteButton();
+            });
+        });
+
+        // Konfirmasi SweetAlert Saat Klik Hapus Terpilih
+        if (btnBulkDelete) {
+            btnBulkDelete.addEventListener('click', function() {
+                const checkedBoxes = document.querySelectorAll('.anggota-checkbox:checked');
+                const selectedIds = Array.from(checkedBoxes).map(cb => cb.value);
+                
+                inputSelectedIds.value = JSON.stringify(selectedIds); // Masukkan id ke input hidden JSON
+
+                Swal.fire({
+                    title: 'Anda yakin?',
+                    text: `Anda akan menghapus ${selectedIds.length} anggota sekaligus!`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, Hapus Terpilih!',
+                    cancelButtonText: 'Tidak, Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        formBulkDelete.submit();
+                    }
+                });
+            });
+        }
+
+        // Live Search Tabel
+        document.getElementById('searchButton').addEventListener('click', filterTable);
+        document.getElementById('searchInput').addEventListener('keyup', (e) => { 
+            if(e.key === 'Enter') filterTable(); 
+        });
+
+        function filterTable() {
+            let searchValue = document.getElementById('searchInput').value.toLowerCase();
+            document.querySelectorAll('#anggotaTable tbody tr').forEach(row => {
+                if (row.querySelector('td[colspan="9"]')) return; // Mengabaikan baris pesan kosong
+                row.style.display = row.textContent.toLowerCase().includes(searchValue) ? '' : 'none';
+            });
+        }
+    });
+
+    // Konfirmasi Hapus Data Satuan menggunakan SweetAlert
+    function confirmDeleteSingle(id, nama, pinjamanAktif) {
+        let textWarning = `Data anggota atas nama ${nama} akan dihapus permanen.`;
+        if (pinjamanAktif > 0) {
+            textWarning = `PERHATIAN! Anggota ini masih meminjam ${pinjamanAktif} buku yang belum dikembalikan. Yakin ingin menghapus?`;
+        }
+
+        Swal.fire({
+            title: 'Hapus Anggota Ini?',
+            text: textWarning,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Tidak'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('deleteForm').action = `{{ url('anggotas') }}/${id}`;
+                document.getElementById('deleteForm').submit();
+            }
+        });
     }
 
+    // Konfirmasi Hapus Semua Data
     function confirmDeleteAll(jumlah) {
-        let message = `⚠️ HAPUS SEMUA ANGGOTA (${jumlah})\n\nKetik 'HAPUS' untuk melanjutkan:`;
-        let konfirmasi = prompt(message);
-        if (konfirmasi === 'HAPUS') {
-            document.getElementById('deleteAllForm').submit();
-        }
-    }
-
-    document.getElementById('searchButton').addEventListener('click', filterTable);
-    document.getElementById('searchInput').addEventListener('keyup', (e) => { if(e.key === 'Enter') filterTable(); });
-
-    function filterTable() {
-        let searchValue = document.getElementById('searchInput').value.toLowerCase();
-        document.querySelectorAll('#anggotaTable tbody tr').forEach(row => {
-            if (row.querySelector('td[colspan="8"]')) return; // Update colspan karena tambah kolom
-            row.style.display = row.textContent.toLowerCase().includes(searchValue) ? '' : 'none';
+        Swal.fire({
+            title: `Hapus SEMUA (${jumlah}) Anggota?`,
+            text: "Ketik 'HAPUS' di bawah ini untuk melanjutkan:",
+            input: 'text',
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Eksekusi',
+            cancelButtonText: 'Batal',
+            preConfirm: (inputValue) => {
+                if (inputValue !== 'HAPUS') {
+                    Swal.showValidationMessage('Ketik HAPUS dengan huruf kapital untuk konfirmasi!');
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('deleteAllForm').submit();
+            }
         });
     }
 </script>
