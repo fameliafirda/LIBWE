@@ -54,29 +54,38 @@
             </div>
             <div class="card-body p-4">
                 <div class="row g-4">
+                    
+                    <div class="col-12 mb-2">
+                        <label class="form-label fw-semibold text-muted">Cari Data Siswa (NISN) <span class="text-danger">*</span></label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-light border-end-0"><i class="fas fa-id-card text-muted"></i></span>
+                            <input type="text" name="nisn" id="nisnInput" class="form-control border-start-0 ps-0 custom-input-group" placeholder="Masukkan NISN siswa lalu tekan Enter..." value="{{ old('nisn') }}" required>
+                            <button class="btn px-4 fw-bold" type="button" id="btnCekNisn" style="border-radius: 0 10px 10px 0; background: linear-gradient(45deg, #6c5ce7, #a29bfe); color: white; border: none;">
+                                <i class="fas fa-search me-1"></i> Cek Siswa
+                            </button>
+                        </div>
+                        <small class="text-muted ms-1 mt-1 d-block" id="nisnStatusMsg">Ketik NISN lalu klik tombol cek untuk mengisi data otomatis.</small>
+                    </div>
+
                     <div class="col-md-4">
-                        <label for="nama" class="form-label fw-semibold text-muted">Nama Peminjam <span class="text-danger">*</span></label>
+                        <label for="nama" class="form-label fw-semibold text-muted">Nama Peminjam</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0"><i class="fas fa-user text-muted"></i></span>
-                            <input type="text" name="nama" id="nama" class="form-control form-control-lg custom-input border-start-0 ps-0" value="{{ old('nama') }}" placeholder="Ketik nama lengkap..." required>
+                            <input type="text" name="nama" id="nama" class="form-control form-control-lg custom-input border-start-0 ps-0 bg-light" value="{{ old('nama') }}" placeholder="Otomatis terisi..." readonly required>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <label for="kelas" class="form-label fw-semibold text-muted">Kelas <span class="text-danger">*</span></label>
+                        <label for="kelas" class="form-label fw-semibold text-muted">Kelas</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0"><i class="fas fa-graduation-cap text-muted"></i></span>
-                            <input type="text" name="kelas" id="kelas" class="form-control form-control-lg custom-input border-start-0 ps-0" value="{{ old('kelas') }}" placeholder="Contoh: 2A, 3B..." required>
+                            <input type="text" name="kelas" id="kelas" class="form-control form-control-lg custom-input border-start-0 ps-0 bg-light" value="{{ old('kelas') }}" placeholder="Otomatis terisi..." readonly required>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <label for="jenis_kelamin" class="form-label fw-semibold text-muted">Jenis Kelamin <span class="text-danger">*</span></label>
+                        <label for="jenis_kelamin" class="form-label fw-semibold text-muted">Jenis Kelamin</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0"><i class="fas fa-venus-mars text-muted"></i></span>
-                            <select name="jenis_kelamin" id="jenis_kelamin" class="form-select form-select-lg custom-input border-start-0 ps-0" required>
-                                <option value="">-- Pilih Jenis Kelamin --</option>
-                                <option value="Laki-laki" {{ old('jenis_kelamin') == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
-                                <option value="Perempuan" {{ old('jenis_kelamin') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
-                            </select>
+                            <input type="text" name="jenis_kelamin" id="jenis_kelamin" class="form-control form-control-lg custom-input border-start-0 ps-0 bg-light" value="{{ old('jenis_kelamin') }}" placeholder="Otomatis terisi..." readonly required>
                         </div>
                     </div>
 
@@ -187,11 +196,75 @@
     }
     .status-buku { font-size: 0.9rem; }
     .saran-buku { font-size: 0.85rem; }
+    input[readonly] { cursor: not-allowed; }
 </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // --- FITUR 1: AUTO-FILL JATUH TEMPO (+7 HARI) ---
+        
+        // --- FITUR AUTO-FILL NISN SISWA (BARU) ---
+        const btnCekNisn = document.getElementById('btnCekNisn');
+        const inputNisn = document.getElementById('nisnInput');
+        const inputNama = document.getElementById('nama');
+        const inputKelas = document.getElementById('kelas');
+        const inputJk = document.getElementById('jenis_kelamin');
+        const nisnMsg = document.getElementById('nisnStatusMsg');
+
+        function cekDataSiswa() {
+            let nisnVal = inputNisn.value.trim();
+            if (!nisnVal) {
+                Swal.fire({ icon: 'warning', title: 'Data Kosong', text: 'Silakan isi NISN terlebih dahulu!', confirmButtonColor: '#6c5ce7' });
+                return;
+            }
+
+            btnCekNisn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Mencari...';
+            btnCekNisn.disabled = true;
+            
+            // Panggil endpoint API AJAX ke controller
+            fetch(`{{ url('/pinjamans/get-anggota') }}/${nisnVal}`)
+                .then(response => response.json())
+                .then(data => {
+                    btnCekNisn.innerHTML = '<i class="fas fa-search me-1"></i> Cek Siswa';
+                    btnCekNisn.disabled = false;
+
+                    if (data.success) {
+                        // Isi data otomatis ke input form
+                        inputNama.value = data.data.nama;
+                        inputKelas.value = data.data.kelas;
+                        inputJk.value = data.data.jenis_kelamin;
+                        
+                        // Efek flash hijau
+                        inputNisn.classList.add('is-valid');
+                        inputNisn.classList.remove('is-invalid');
+                        nisnMsg.innerHTML = '<span class="text-success"><i class="fas fa-check-circle"></i> Siswa ditemukan! Data otomatis diisi.</span>';
+                    } else {
+                        // Reset form
+                        inputNama.value = '';
+                        inputKelas.value = '';
+                        inputJk.value = '';
+                        
+                        inputNisn.classList.add('is-invalid');
+                        inputNisn.classList.remove('is-valid');
+                        nisnMsg.innerHTML = `<span class="text-danger"><i class="fas fa-times-circle"></i> ${data.message}</span>`;
+                        Swal.fire({ icon: 'error', title: 'Tidak Ditemukan', text: data.message, confirmButtonColor: '#d63031' });
+                    }
+                })
+                .catch(error => {
+                    btnCekNisn.innerHTML = '<i class="fas fa-search me-1"></i> Cek Siswa';
+                    btnCekNisn.disabled = false;
+                    Swal.fire({ icon: 'error', title: 'Error Koneksi', text: 'Gagal terhubung ke sistem. Coba lagi.', confirmButtonColor: '#d63031' });
+                });
+        }
+
+        btnCekNisn.addEventListener('click', cekDataSiswa);
+        inputNisn.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                cekDataSiswa();
+            }
+        });
+
+        // --- FITUR AUTO-FILL JATUH TEMPO (+7 HARI) ---
         const inputTglPinjam = document.getElementById('tanggal_pinjam');
         const inputTglKembali = document.getElementById('tanggal_kembali');
 
@@ -210,7 +283,7 @@
             });
         }
 
-        // --- FITUR 2: DINAMIS MULTIPLE BOOKS ---
+        // --- FITUR DINAMIS MULTIPLE BOOKS ---
         const container = document.getElementById('buku-container');
         const btnTambah = document.getElementById('btnTambahBuku');
         const availableBooks = @json($bookTitles ?? []);

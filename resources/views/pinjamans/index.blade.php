@@ -151,6 +151,7 @@
             <div class="card border-0 shadow-sm" style="border-radius: 20px;">
                 <div class="card-body p-3">
                     <form method="GET" action="{{ route('pinjamans.index') }}" class="d-flex flex-wrap align-items-center gap-3">
+                        
                         <div class="d-flex align-items-center">
                             <label class="fw-semibold text-muted mb-0 me-2">
                                 <i class="fas fa-filter me-1" style="color: #8b5cf6;"></i>Kelas:
@@ -178,7 +179,7 @@
                             <i class="fas fa-search me-1"></i> Terapkan
                         </button>
                         
-                        @if(request('kelas') || (request('status') && request('status') != 'semua'))
+                        @if(request('kelas') || request('status') && request('status') != 'semua')
                             <a href="{{ route('pinjamans.index') }}" class="btn btn-sm" style="background-color: #ff6b6b; color: white; border-radius: 50px; padding: 6px 20px;">
                                 <i class="fas fa-times me-1"></i> Reset
                             </a>
@@ -313,6 +314,7 @@
                                                         </button>
                                                     </form>
                                                 @endif
+                                                
                                                 <a href="{{ route('pinjamans.edit', $pinjaman->id) }}" 
                                                    style="background: transparent; border: none; color: #f59e0b; transition: 0.2s; cursor: pointer; padding: 0; text-decoration: none;"
                                                    onmouseover="this.style.transform='scale(1.2)'" 
@@ -320,10 +322,11 @@
                                                    title="Edit Peminjaman">
                                                     <i class="fas fa-edit" style="font-size: 1.3rem;"></i>
                                                 </a>
+                                                
                                                 <form action="{{ route('pinjamans.destroy', $pinjaman->id) }}" 
                                                       method="POST" 
                                                       class="m-0 p-0"
-                                                      onsubmit="return confirm('Yakin ingin menghapus data peminjaman ini?')">
+                                                      onsubmit="return confirm('Yakin ingin menghapus data peminjaman ini? Stok buku akan dikembalikan.')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" 

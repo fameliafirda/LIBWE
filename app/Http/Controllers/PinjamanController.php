@@ -55,6 +55,26 @@ class PinjamanController extends Controller
     }
 
     /**
+     * Fitur Baru: API untuk mengambil data anggota berdasarkan NISN secara otomatis (AJAX)
+     */
+    public function getAnggotaByNisn($nisn)
+    {
+        $anggota = Anggota::where('nisn', $nisn)->first();
+
+        if ($anggota) {
+            return response()->json([
+                'success' => true,
+                'data' => $anggota
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Siswa dengan NISN tersebut tidak terdaftar sebagai anggota!'
+        ]);
+    }
+
+    /**
      * Check if book exists in database (AJAX)
      */
     public function checkBook(Request $request)
@@ -115,16 +135,13 @@ class PinjamanController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     * 🔥 PERBAIKAN: Diperbarui untuk menangani array judul_buku (Banyak buku sekaligus)
      */
     public function store(Request $request)
     {
         $request->validate([
-            'nama'            => 'required|string|max:255',
-            'kelas'           => 'required|string|max:100',
-            'jenis_kelamin'   => 'required|in:Laki-laki,Perempuan',
-            'judul_buku'      => 'required|array|min:1', // Berubah menjadi array karena bisa pinjam lebih dari 1
-            'judul_buku.*'    => 'required|string|max:255', // Validasi isi array
+            'nisn'            => 'required|string', // Validasi menggunakan NISN
+            'judul_buku'      => 'required|array|min:1', 
+            'judul_buku.*'    => 'required|string|max:255', 
             'tanggal_pinjam'  => 'required|date',
             'status'          => 'required|in:belum dikembalikan,sudah dikembalikan',
             'tanggal_kembali' => 'nullable|date|after_or_equal:tanggal_pinjam',
@@ -133,36 +150,33 @@ class PinjamanController extends Controller
         DB::beginTransaction();
 
         try {
-            // 1. Simpan atau ambil data Anggota
-            $anggota = Anggota::firstOrCreate([
-                'nama'          => $request->nama,
-                'kelas'         => $request->kelas,
-                'jenis_kelamin' => $request->jenis_kelamin,
-            ]);
+            // 1. Ambil data Anggota berdasarkan NISN
+            $anggota = Anggota::where('nisn', $request->nisn)->first();
+
+            if (!$anggota) {
+                return redirect()->back()->with('error', 'Siswa dengan NISN tersebut tidak terdaftar di data Anggota!')->withInput();
+            }
 
             $berhasil = 0;
             $gagal = [];
 
             // 2. Looping (Perulangan) untuk setiap judul buku yang di-input
             foreach ($request->judul_buku as $judul) {
-                // Lewati jika judul kosong
                 if (trim($judul) == '') continue;
 
                 $buku = Book::where('judul', 'LIKE', '%' . trim($judul) . '%')->first();
                 
-                // Jika buku tidak ada di database
                 if (!$buku) {
                     $gagal[] = $judul . " (Tidak ditemukan)";
-                    continue; // Lanjut ke buku berikutnya
+                    continue; 
                 }
                 
-                // Jika stok habis tapi statusnya ingin meminjam
                 if ($buku->stok <= 0 && $request->status == 'belum dikembalikan') {
                     $gagal[] = $buku->judul . " (Stok habis)";
-                    continue; // Lanjut ke buku berikutnya
+                    continue; 
                 }
 
-                // 3. Simpan data pinjaman (masing-masing buku akan jadi 1 baris di tabel pinjaman)
+                // 3. Simpan data pinjaman
                 $pinjaman = Pinjaman::create([
                     'anggota_id'      => $anggota->id,
                     'buku_id'         => $buku->id,
@@ -228,14 +242,11 @@ class PinjamanController extends Controller
 
     /**
      * Update the specified resource in storage.
-     * (Tetap menggunakan string biasa, karena proses edit dilakukan satu per satu per peminjaman buku)
      */
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nama'            => 'required|string|max:255',
-            'kelas'           => 'required|string|max:100',
-            'jenis_kelamin'   => 'required|in:Laki-laki,Perempuan',
+            'nisn'            => 'required|string', // Validasi menggunakan NISN
             'judul_buku'      => 'required|string|max:255',
             'tanggal_pinjam'  => 'required|date',
             'status'          => 'required|in:belum dikembalikan,sudah dikembalikan',
@@ -254,11 +265,12 @@ class PinjamanController extends Controller
                 return redirect()->back()->with('error', 'Buku tidak ditemukan!')->withInput();
             }
             
-            $anggota = Anggota::firstOrCreate([
-                'nama'          => $request->nama,
-                'kelas'         => $request->kelas,
-                'jenis_kelamin' => $request->jenis_kelamin,
-            ]);
+            // Cari data Anggota berdasarkan NISN
+            $anggota = Anggota::where('nisn', $request->nisn)->first();
+
+            if (!$anggota) {
+                return redirect()->back()->with('error', 'Siswa dengan NISN tersebut tidak terdaftar di data Anggota!')->withInput();
+            }
 
             $pinjaman->update([
                 'anggota_id'      => $anggota->id,
@@ -324,21 +336,19 @@ class PinjamanController extends Controller
 
     /**
      * Process book return and calculate fine.
-     * 🔥 PERBAIKAN: Penyesuaian Zona Waktu dan Akurasi Hitungan Hari
      */
     private function processPengembalian(Pinjaman $pinjaman, $tanggalKembali = null)
     {
-        // Set timezone ke Asia/Jakarta dan reset jam ke 00:00:00 (startOfDay)
+        // Set timezone ke Asia/Jakarta
         $tanggalPengembalian = $tanggalKembali 
             ? Carbon::parse($tanggalKembali)->timezone('Asia/Jakarta')->startOfDay() 
             : Carbon::now('Asia/Jakarta')->startOfDay();
             
         $tanggalPinjam = Carbon::parse($pinjaman->tanggal_pinjam)->timezone('Asia/Jakarta')->startOfDay();
-        $tanggalJatuhTempo = $tanggalPinjam->copy()->addDays(7); // Asumsi jatuh tempo 7 hari
+        $tanggalJatuhTempo = $tanggalPinjam->copy()->addDays(7); 
         
         $keterlambatan = 0;
         
-        // Bandingkan murni harinya saja, jika lebih maka hitung selisihnya
         if ($tanggalPengembalian->gt($tanggalJatuhTempo)) {
             $keterlambatan = $tanggalJatuhTempo->diffInDays($tanggalPengembalian);
         }

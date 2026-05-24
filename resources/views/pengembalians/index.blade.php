@@ -242,7 +242,10 @@
                                                 <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-2" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
                                                     <i class="fas fa-user" style="color: #8b5cf6;"></i>
                                                 </div>
-                                                <span class="fw-semibold">{{ $pinjaman->anggota->nama ?? $pinjaman->nama }}</span>
+                                                <div>
+                                                    <span class="fw-semibold d-block">{{ $pinjaman->anggota->nama ?? $pinjaman->nama }}</span>
+                                                    <small class="text-muted" style="font-size: 0.75rem;">NISN: {{ $pinjaman->anggota->nisn ?? '-' }}</small>
+                                                </div>
                                             </div>
                                         </td>
                                         <td class="text-center">
@@ -305,8 +308,7 @@
                                                     <form action="{{ route('pinjamans.mark-returned', $pinjaman->id) }}" method="POST" class="m-0 p-0" onsubmit="return confirm('Tandai buku ini sudah dikembalikan HARI INI?')">
                                                         @csrf
                                                         <button type="submit" 
-                                                                class="bg-transparent border-0 p-0 m-0" 
-                                                                style="color: #28a745; transition: 0.2s; cursor: pointer;" 
+                                                                style="background: transparent; border: none; color: #28a745; transition: 0.2s; cursor: pointer; padding: 0;" 
                                                                 onmouseover="this.style.transform='scale(1.2)'" 
                                                                 onmouseout="this.style.transform='scale(1)'" 
                                                                 title="Tandai Sudah Dikembalikan">
@@ -315,8 +317,7 @@
                                                     </form>
                                                 @endif
                                                 <a href="{{ route('pinjamans.edit', $pinjaman->id) }}" 
-                                                   class="bg-transparent border-0 p-0 m-0" 
-                                                   style="color: #f59e0b; transition: 0.2s; cursor: pointer;" 
+                                                   style="background: transparent; border: none; color: #f59e0b; transition: 0.2s; cursor: pointer; padding: 0; text-decoration: none;"
                                                    onmouseover="this.style.transform='scale(1.2)'" 
                                                    onmouseout="this.style.transform='scale(1)'" 
                                                    title="Edit Peminjaman">
@@ -325,12 +326,11 @@
                                                 <form action="{{ route('pinjamans.destroy', $pinjaman->id) }}" 
                                                       method="POST" 
                                                       class="m-0 p-0"
-                                                      onsubmit="return confirm('Yakin ingin menghapus data peminjaman ini?')">
+                                                      onsubmit="return confirm('Yakin ingin menghapus data peminjaman ini? Stok buku akan dikembalikan.')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" 
-                                                            class="bg-transparent border-0 p-0 m-0" 
-                                                            style="color: #ef4444; transition: 0.2s; cursor: pointer;" 
+                                                            style="background: transparent; border: none; color: #ef4444; transition: 0.2s; cursor: pointer; padding: 0;"
                                                             onmouseover="this.style.transform='scale(1.2)'" 
                                                             onmouseout="this.style.transform='scale(1)'" 
                                                             title="Hapus Peminjaman">

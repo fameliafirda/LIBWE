@@ -90,6 +90,7 @@ Route::middleware([PustakawanMiddleware::class])->group(function () {
 
     // ==================== MANAJEMEN PEMINJAMAN ====================
     Route::resource('pinjamans', PinjamanController::class);
+    Route::get('/pinjamans/get-anggota/{nisn}', [App\Http\Controllers\PinjamanController::class, 'getAnggotaByNisn'])->name('pinjamans.get-anggota');
     Route::post('/pinjamans/{id}/mark-returned', [PinjamanController::class, 'markAsReturned'])->name('pinjamans.mark-returned');
 
     // ==================== MANAJEMEN PENGEMBALIAN ====================
