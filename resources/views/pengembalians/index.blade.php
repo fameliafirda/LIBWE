@@ -110,7 +110,8 @@
                         <tr>
                             <th class="text-center" style="width: 50px;">No</th>
                             <th>Nama</th>
-                            <th>NISN</th> <th class="text-center">Kelas</th>
+                            <th>NISN</th>
+                            <th class="text-center">Kelas</th>
                             <th>Judul Buku</th>
                             <th class="text-center">Tanggal Pinjam</th>
                             <th class="text-center">Harus Kembali</th>
@@ -132,7 +133,11 @@
                                     <span class="fw-semibold">{{ $pengembalian->nama }}</span>
                                 </div>
                             </td>
-                            <td><span class="badge bg-secondary px-2 py-1">{{ $pengembalian->nisn ?? '-' }}</span></td>
+                            <td>
+                                <span class="badge bg-secondary px-2 py-1">
+                                    {{ $pengembalian->nisn ?? ($pengembalian->pinjaman->anggota->nisn ?? '-') }}
+                                </span>
+                            </td>
                             <td class="text-center"><span class="badge bg-light text-dark px-3 py-2">{{ $pengembalian->kelas }}</span></td>
                             <td>
                                 <div class="d-flex align-items-center">
