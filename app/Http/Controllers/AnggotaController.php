@@ -22,21 +22,13 @@ class AnggotaController extends Controller
             $query->where('kelas', $request->kelas);
         }
 
-        // Ambil data dan bentuk array untuk view agar tetap konsisten dengan struktur Blade kamu
-        $anggotas = $query->latest()->get()->map(function ($anggota) {
-            $pinjamans = $anggota->pinjamans;
-
+        // Ambil data dan gunakan each() agar data tetap menjadi Objek Model (bukan Array)
+        $anggotas = $query->latest()->get()->each(function ($anggota) {
             // Hitung total denda dari semua pinjaman
-            $totalDenda = $pinjamans->sum('denda');
+            $totalDenda = $anggota->pinjamans->sum('denda');
 
-            // Format denda
-            $formattedDenda = $totalDenda > 0 ? 'Rp ' . number_format($totalDenda, 0, ',', '.') : 'Rp 0';
-
-            return [
-                'anggota' => $anggota,
-                'pinjamans' => $pinjamans,
-                'total_denda' => $formattedDenda
-            ];
+            // Format denda dan tempelkan langsung sebagai properti baru di objek model
+            $anggota->total_denda = $totalDenda > 0 ? 'Rp ' . number_format($totalDenda, 0, ',', '.') : 'Rp 0';
         });
 
         // Ambil daftar kelas unik

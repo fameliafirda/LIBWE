@@ -150,30 +150,30 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-    @forelse ($anggotas as $item)
-    <tr style="vertical-align: middle;" id="row-{{ $item->id }}">
-        <td class="text-center">
-            <input type="checkbox" name="ids[]" value="{{ $item->id }}" class="form-check-input anggota-checkbox shadow-sm" style="cursor: pointer; transform: scale(1.2);">
-        </td>
-        <td class="text-center fw-bold">{{ $loop->iteration }}</td>
-        
-        <td>
-            <span class="badge bg-secondary px-2 py-1">{{ $item->nisn ?? '-' }}</span>
-        </td>
-
-        <td>
-            <div class="d-flex align-items-center">
-                <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-2" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-user" style="color: #8b5cf6;"></i>
-                </div>
-                <span class="fw-semibold">{{ $item->nama }}</span>
-            </div>
-        </td>
+                                    @forelse ($anggotas as $item)
+                                    <tr style="vertical-align: middle;" id="row-{{ $item->id }}">
+                                        <td class="text-center">
+                                            <input type="checkbox" name="ids[]" value="{{ $item->id }}" class="form-check-input anggota-checkbox shadow-sm" style="cursor: pointer; transform: scale(1.2);">
+                                        </td>
+                                        <td class="text-center fw-bold">{{ $loop->iteration }}</td>
+                                        
                                         <td>
-                                            <span class="badge bg-light text-dark px-3 py-2">{{ $item['anggota']->kelas }}</span>
+                                            <span class="badge bg-secondary px-2 py-1">{{ $item->nisn ?? '-' }}</span>
+                                        </td>
+
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-2" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fas fa-user" style="color: #8b5cf6;"></i>
+                                                </div>
+                                                <span class="fw-semibold">{{ $item->nama }}</span>
+                                            </div>
                                         </td>
                                         <td>
-                                            @if($item['anggota']->jenis_kelamin == 'Laki-laki')
+                                            <span class="badge bg-light text-dark px-3 py-2">{{ $item->kelas }}</span>
+                                        </td>
+                                        <td>
+                                            @if($item->jenis_kelamin == 'Laki-laki')
                                                 <span class="badge bg-info text-white px-3 py-2">
                                                     <i class="fas fa-mars me-1"></i> Laki-laki
                                                 </span>
@@ -184,10 +184,10 @@
                                             @endif
                                         </td>
                                         <td>
-                                            @if($item['pinjamans']->count() > 0)
+                                            @if($item->pinjamans->count() > 0)
                                                 <div style="max-height: 100px; overflow-y: auto; padding-right: 5px;">
                                                     <ul class="list-unstyled mb-0">
-                                                        @foreach($item['pinjamans'] as $peminjaman)
+                                                        @foreach($item->pinjamans as $peminjaman)
                                                             <li class="mb-2 pb-2 border-bottom">
                                                                 <div class="d-flex align-items-start gap-2">
                                                                     <i class="fas fa-book mt-1" style="color: #8b5cf6; font-size: 12px;"></i>
@@ -222,9 +222,9 @@
                                             @endif
                                         </td>
                                         <td class="text-center">
-                                            @if($item['pinjamans']->sum('denda') > 0)
+                                            @if($item->pinjamans->sum('denda') > 0)
                                                 <span class="fw-bold" style="color: #e74c3c;">
-                                                    Rp {{ number_format($item['pinjamans']->sum('denda'), 0, ',', '.') }}
+                                                    Rp {{ number_format($item->pinjamans->sum('denda'), 0, ',', '.') }}
                                                 </span>
                                             @else
                                                 <span class="badge bg-success px-3 py-2">Rp 0</span>
@@ -232,14 +232,14 @@
                                         </td>
                                         <td class="text-center">
                                             <div class="d-flex justify-content-center align-items-center" style="gap: 25px;">
-                                                <a href="{{ route('anggotas.edit', $item['anggota']->id) }}" 
+                                                <a href="{{ route('anggotas.edit', $item->id) }}" 
                                                    style="color: #f59e0b; font-size: 1.4rem; transition: 0.2s; text-decoration: none;"
                                                    onmouseover="this.style.transform='scale(1.2)'"
                                                    onmouseout="this.style.transform='scale(1)'"
                                                    title="Edit anggota">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
-                                                <a href="{{ route('anggotas.peminjaman', $item['anggota']->id) }}" 
+                                                <a href="{{ route('anggotas.peminjaman', $item->id) }}" 
                                                    style="color: #10b981; font-size: 1.4rem; transition: 0.2s; text-decoration: none;"
                                                    onmouseover="this.style.transform='scale(1.2)'"
                                                    onmouseout="this.style.transform='scale(1)'"
@@ -250,7 +250,7 @@
                                                         style="background: transparent; border: none; color: #ef4444; font-size: 1.4rem; transition: 0.2s; cursor: pointer; padding: 0;"
                                                         onmouseover="this.style.transform='scale(1.2)'"
                                                         onmouseout="this.style.transform='scale(1)'"
-                                                        onclick="confirmDeleteSingle({{ $item['anggota']->id }}, '{{ addslashes($item['anggota']->nama) }}', {{ $item['pinjamans']->where('status', 'belum dikembalikan')->count() }})"
+                                                        onclick="confirmDeleteSingle({{ $item->id }}, '{{ addslashes($item->nama) }}', {{ $item->pinjamans->where('status', 'belum dikembalikan')->count() }})"
                                                         title="Hapus anggota">
                                                     <i class="fas fa-trash-alt"></i>
                                                 </button>
