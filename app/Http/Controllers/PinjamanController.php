@@ -56,7 +56,7 @@ class PinjamanController extends Controller
     }
 
     /**
-     * Fitur Baru: API untuk mengambil data anggota berdasarkan NISN secara otomatis (AJAX)
+     * API untuk mengambil data anggota berdasarkan NISN secara otomatis (AJAX)
      */
     public function getAnggotaByNisn($nisn)
     {
@@ -331,7 +331,7 @@ class PinjamanController extends Controller
 
     /**
      * Process book return and calculate fine.
-     * Mengabaikan hari Minggu dan Hari Libur Nasional dari perhitungan denda.
+     * Sabtu TETAP MASUK (Denda), Minggu LIBUR, Tanggal Merah & Cuti Bersama LIBUR.
      */
     private function processPengembalian(Pinjaman $pinjaman, $tanggalKembali = null)
     {
@@ -351,9 +351,10 @@ class PinjamanController extends Controller
             $currentDate = $tanggalJatuhTempo->copy()->addDay();
             
             while ($currentDate->lte($tanggalPengembalian)) {
-                $isMinggu = $currentDate->isSunday();
+                $isMinggu = $currentDate->isSunday(); 
                 $isTanggalMerah = in_array($currentDate->toDateString(), $daftarTanggalMerah);
 
+                // Denda hanya bertambah jika bukan hari Minggu dan bukan tanggal merah nasional/cuti bersama
                 if (!$isMinggu && !$isTanggalMerah) {
                     $keterlambatan++;
                 }
@@ -384,31 +385,51 @@ class PinjamanController extends Controller
     }
 
     /**
-     * Helper: Mendapatkan API Hari Libur Nasional (Disimpan di Cache 24 jam)
+     * Helper Master Kalender Libur Nasional & Cuti Bersama Indonesia Resmi 2026
      */
     private function getDaftarLiburNasional($tahun)
     {
-        return Cache::remember("libur_nasional_{$tahun}", 86400, function () use ($tahun) {
+        return Cache::remember("libur_indonesia_murni_{$tahun}", 86400, function () use ($tahun) {
+            $tanggalMerah = [];
+
+            if ($tahun == 2026) {
+                $tanggalMerah = [
+                    '2026-01-01', // Tahun Baru 2026 Masehi
+                    '2026-01-23', // Cuti Bersama Imlek
+                    '2026-01-24', // Tahun Baru Imlek 2577
+                    '2026-02-15', // Isra Mikraj Nabi Muhammad SAW
+                    '2026-03-19', // Hari Suci Nyepi (Tahun Baru Saka 1948)
+                    '2026-03-20', // Cuti Bersama Nyepi
+                    '2026-03-21', // Cuti Bersama Nyepi
+                    '2026-04-03', // Wafat Isa Almasih (Jumat Agung)
+                    '2026-04-05', // Hari Paskah
+                    '2026-05-01', // Hari Buruh Internasional
+                    '2026-05-14', // Kenaikan Isa Almasih
+                    '2026-05-15', // Cuti Bersama Kenaikan Isa Almasih (Jumat)
+                    '2026-05-24', // Hari Raya Waisak 2570
+                    '2026-05-25', // Cuti Bersama Waisak (Senin)
+                    '2026-06-01', // Hari Lahir Pancasila
+                    '2026-11-27', // Idul Adha 1447 H
+                    '2026-12-25', // Hari Raya Natal
+                ];
+            }
+
             try {
                 $url = "https://dayoffapi.vercel.app/api?year=" . $tahun;
                 $response = @file_get_contents($url);
-                
-                if (!$response) return [];
-
-                $data = json_decode($response, true);
-                $tanggalMerah = [];
-
-                if (is_array($data)) {
-                    foreach ($data as $row) {
-                        if (isset($row['tanggal'])) {
-                            $tanggalMerah[] = $row['tanggal'];
+                if ($response) {
+                    $data = json_decode($response, true);
+                    if (is_array($data)) {
+                        foreach ($data as $row) {
+                            if (isset($row['tanggal'])) {
+                                $tanggalMerah[] = $row['tanggal'];
+                            }
                         }
                     }
                 }
-                return $tanggalMerah;
-            } catch (\Exception $e) {
-                return [];
-            }
+            } catch (\Exception $e) { }
+
+            return array_unique($tanggalMerah);
         });
     }
 
