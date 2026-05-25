@@ -230,14 +230,36 @@
                                         $tglPinjam = \Carbon\Carbon::parse($pinjaman->tanggal_pinjam)->timezone('Asia/Jakarta')->startOfDay();
                                         $jatuhTempo = $tglPinjam->copy()->addDays(7);
                                         $terlambat = 0;
+                                        
+                                        // LOGIKA BARU: Sinkronisasi libur nasional ke UI View agar cocok dengan controller!
                                         if($pinjaman->status == 'belum dikembalikan') {
                                             $hariIni = \Carbon\Carbon::now('Asia/Jakarta')->startOfDay();
                                             if($hariIni->gt($jatuhTempo)) {
-                                                $terlambat = (int) round($jatuhTempo->diffInDays($hariIni));
+                                                
+                                                $daftarTanggalMerah = [
+                                                    '2026-01-01', '2026-01-23', '2026-01-24', '2026-02-15', 
+                                                    '2026-03-19', '2026-03-20', '2026-03-21', '2026-04-03', 
+                                                    '2026-04-05', '2026-05-01', '2026-05-14', '2026-05-15', 
+                                                    '2026-05-24', '2026-05-25', '2026-06-01', '2026-11-27', 
+                                                    '2026-12-25',
+                                                ];
+
+                                                $currentDate = $jatuhTempo->copy()->addDay();
+                                                
+                                                while ($currentDate->lte($hariIni)) {
+                                                    $isMinggu = $currentDate->isSunday(); 
+                                                    $isTanggalMerah = in_array($currentDate->toDateString(), $daftarTanggalMerah);
+
+                                                    if (!$isMinggu && !$isTanggalMerah) {
+                                                        $terlambat++;
+                                                    }
+                                                    $currentDate->addDay();
+                                                }
                                             }
                                         }
                                     @endphp
-                                    <tr style="vertical-align: middle;" class="{{ $terlambat > 0 ? 'bg-danger bg-opacity-10' : '' }}">
+                                    
+                                    <tr style="vertical-align: middle;" class="{{ ($terlambat > 0 && $pinjaman->status == 'belum dikembalikan') ? 'bg-danger bg-opacity-10' : '' }}">
                                         <td class="text-center fw-bold">{{ $pinjamans->firstItem() + $i }}</td>
                                         <td>
                                             <div class="d-flex align-items-center">
@@ -268,11 +290,11 @@
                                         </td>
                                         
                                         <td class="text-center">
-                                            <span class="badge {{ $terlambat > 0 ? 'bg-danger' : 'bg-secondary' }} px-3 py-2">
+                                            <span class="badge {{ ($terlambat > 0 && $pinjaman->status == 'belum dikembalikan') ? 'bg-danger' : 'bg-secondary' }} px-3 py-2">
                                                 <i class="fas fa-clock me-1"></i>
                                                 {{ $jatuhTempo->format('d/m/Y') }}
                                             </span>
-                                            @if($terlambat > 0)
+                                            @if($terlambat > 0 && $pinjaman->status == 'belum dikembalikan')
                                                 <span class="badge bg-danger d-block mt-1">
                                                     Terlambat {{ $terlambat }} hari
                                                 </span>

@@ -13,9 +13,6 @@ use Illuminate\Support\Facades\Cache;
 
 class PinjamanController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $query = Pinjaman::with(['pengembalian', 'anggota', 'buku'])
@@ -43,9 +40,6 @@ class PinjamanController extends Controller
         return view('pinjamans.index', compact('pinjamans', 'kelasList'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $anggota = Anggota::orderBy('nama')->get();
@@ -55,9 +49,6 @@ class PinjamanController extends Controller
         return view('pinjamans.create', compact('anggota', 'books', 'bookTitles'));
     }
 
-    /**
-     * API untuk mengambil data anggota berdasarkan NISN secara otomatis (AJAX)
-     */
     public function getAnggotaByNisn($nisn)
     {
         $anggota = Anggota::where('nisn', $nisn)->first();
@@ -75,9 +66,6 @@ class PinjamanController extends Controller
         ]);
     }
 
-    /**
-     * Check if book exists in database (AJAX)
-     */
     public function checkBook(Request $request)
     {
         try {
@@ -116,9 +104,6 @@ class PinjamanController extends Controller
         }
     }
 
-    /**
-     * Cek ketersediaan stok buku
-     */
     private function cekStokBuku($judulBuku)
     {
         $buku = Book::where('judul', 'LIKE', '%' . $judulBuku . '%')->first();
@@ -134,9 +119,6 @@ class PinjamanController extends Controller
         return ['status' => true, 'buku' => $buku];
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -215,18 +197,12 @@ class PinjamanController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show($id)
     {
         $pinjaman = Pinjaman::with(['pengembalian', 'anggota', 'buku'])->findOrFail($id);
         return view('pinjamans.show', compact('pinjaman'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit($id)
     {
         $pinjaman = Pinjaman::with('anggota')->findOrFail($id);
@@ -236,9 +212,6 @@ class PinjamanController extends Controller
         return view('pinjamans.edit', compact('pinjaman', 'anggota', 'books'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -303,9 +276,6 @@ class PinjamanController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
         DB::beginTransaction();
@@ -330,17 +300,16 @@ class PinjamanController extends Controller
     }
 
     /**
-     * Process book return and calculate fine.
-     * Sabtu TETAP MASUK (Denda), Minggu LIBUR, Tanggal Merah & Cuti Bersama LIBUR.
+     * SINKRONISASI & PERHITUNGAN TANGGAL KEMBALI AMAN
      */
     private function processPengembalian(Pinjaman $pinjaman, $tanggalKembali = null)
     {
-        $tanggalPengembalian = $tanggalKembali 
-            ? Carbon::parse($tanggalKembali)->timezone('Asia/Jakarta')->startOfDay() 
-            : Carbon::now('Asia/Jakarta')->startOfDay();
-            
-        $tanggalPinjam = Carbon::parse($pinjaman->tanggal_pinjam)->timezone('Asia/Jakarta')->startOfDay();
-        $tanggalJatuhTempo = $tanggalPinjam->copy()->addDays(7); 
+        // Paksa ambil tanggal murninya saja tanpa jam/menit (Y-m-d) menghindari ketidakcocokan timezone Hostinger
+        $stringTanggalKembali = $tanggalKembali ? Carbon::parse($tanggalKembali)->toDateString() : Carbon::now('Asia/Jakarta')->toDateString();
+        
+        $tanggalPengembalian = Carbon::parse($stringTanggalKembali)->startOfDay();
+        $tanggalPinjam = Carbon::parse($pinjaman->tanggal_pinjam)->startOfDay();
+        $tanggalJatuhTempo = $tanggalPinjam->copy()->addDays(7)->startOfDay(); 
         
         $keterlambatan = 0;
         
@@ -354,7 +323,6 @@ class PinjamanController extends Controller
                 $isMinggu = $currentDate->isSunday(); 
                 $isTanggalMerah = in_array($currentDate->toDateString(), $daftarTanggalMerah);
 
-                // Denda hanya bertambah jika bukan hari Minggu dan bukan tanggal merah nasional/cuti bersama
                 if (!$isMinggu && !$isTanggalMerah) {
                     $keterlambatan++;
                 }
@@ -365,19 +333,23 @@ class PinjamanController extends Controller
         
         $denda = $keterlambatan * 500;
         
+        // Update data pinjaman terlebih dahulu
         $pinjaman->update([
+            'status' => 'sudah dikembalikan',
             'denda' => $denda,
             'tanggal_kembali' => $tanggalPengembalian->toDateString()
         ]);
         
+        // Simpan ke tabel pengembalian secara kokoh
         Pengembalian::updateOrCreate(
             ['pinjaman_id' => $pinjaman->id],
             [
+                'nisn'                 => optional($pinjaman->anggota)->nisn ?? '-',
                 'nama'                 => $pinjaman->nama,
                 'kelas'                => $pinjaman->kelas,
                 'judul_buku'           => $pinjaman->judul_buku,
-                'tanggal_kembali'      => $tanggalJatuhTempo->toDateString(),
-                'tanggal_pengembalian' => $tanggalPengembalian->toDateString(),
+                'tanggal_kembali'      => $tanggalJatuhTempo->toDateString(), // Tanggal seharusnya kembali
+                'tanggal_pengembalian' => $tanggalPengembalian->toDateString(), // Tanggal aktual kembali
                 'keterlambatan'        => $keterlambatan,
                 'denda'                => $denda,
             ]
@@ -385,7 +357,7 @@ class PinjamanController extends Controller
     }
 
     /**
-     * Helper Master Kalender Libur Nasional & Cuti Bersama Indonesia Resmi 2026
+     * Master Kalender Libur Nasional Resmi 2026
      */
     private function getDaftarLiburNasional($tahun)
     {
@@ -394,23 +366,11 @@ class PinjamanController extends Controller
 
             if ($tahun == 2026) {
                 $tanggalMerah = [
-                    '2026-01-01', // Tahun Baru 2026 Masehi
-                    '2026-01-23', // Cuti Bersama Imlek
-                    '2026-01-24', // Tahun Baru Imlek 2577
-                    '2026-02-15', // Isra Mikraj Nabi Muhammad SAW
-                    '2026-03-19', // Hari Suci Nyepi (Tahun Baru Saka 1948)
-                    '2026-03-20', // Cuti Bersama Nyepi
-                    '2026-03-21', // Cuti Bersama Nyepi
-                    '2026-04-03', // Wafat Isa Almasih (Jumat Agung)
-                    '2026-04-05', // Hari Paskah
-                    '2026-05-01', // Hari Buruh Internasional
-                    '2026-05-14', // Kenaikan Isa Almasih
-                    '2026-05-15', // Cuti Bersama Kenaikan Isa Almasih (Jumat)
-                    '2026-05-24', // Hari Raya Waisak 2570
-                    '2026-05-25', // Cuti Bersama Waisak (Senin)
-                    '2026-06-01', // Hari Lahir Pancasila
-                    '2026-11-27', // Idul Adha 1447 H
-                    '2026-12-25', // Hari Raya Natal
+                    '2026-01-01', '2026-01-23', '2026-01-24', '2026-02-15', 
+                    '2026-03-19', '2026-03-20', '2026-03-21', '2026-04-03', 
+                    '2026-04-05', '2026-05-01', '2026-05-14', '2026-05-15', 
+                    '2026-05-24', '2026-05-25', '2026-06-01', '2026-11-27', 
+                    '2026-12-25',
                 ];
             }
 
@@ -433,9 +393,6 @@ class PinjamanController extends Controller
         });
     }
 
-    /**
-     * Mark as returned manually
-     */
     public function markAsReturned($id)
     {
         DB::beginTransaction();
@@ -447,13 +404,14 @@ class PinjamanController extends Controller
                 return redirect()->back()->with('warning', 'Buku sudah dikembalikan sebelumnya!');
             }
             
+            // Proses kalkulasi denda & pengembalian tangani di sini
             $this->processPengembalian($pinjaman);
             
-            if ($pinjaman->buku) {
-                $pinjaman->buku->increment('stok');
+            // Cari buku menggunakan LIKE agar lebih toleran terhadap spasi data
+            $buku = Book::where('judul', 'LIKE', '%' . trim($pinjaman->judul_buku) . '%')->first();
+            if ($buku) {
+                $buku->increment('stok');
             }
-            
-            $pinjaman->update(['status' => 'sudah dikembalikan']);
             
             DB::commit();
             return redirect()->route('pinjamans.index')->with('success', 'Buku berhasil dikembalikan! Denda: Rp ' . number_format($pinjaman->denda, 0, ',', '.'));
@@ -464,9 +422,6 @@ class PinjamanController extends Controller
         }
     }
 
-    /**
-     * API: Get book stock info
-     */
     public function getBookStock(Request $request)
     {
         $judul = $request->get('judul');
