@@ -16,10 +16,10 @@
                             <p class="text-white opacity-75 mb-0">Pangkalan data kalender libur & cuti bersama Indonesia untuk basis akurasi denda</p>
                         </div>
                         <div class="col-12 col-md-5 text-md-end mt-3 mt-md-0">
-                            <button type="button" class="btn btn-warning me-2 text-dark fw-bold" data-bs-toggle="modal" data-bs-target="#modalGenerateTahun" style="border-radius: 50px; padding: 10px 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                            <button type="button" class="btn btn-warning me-2 text-dark fw-bold" data-toggle="modal" data-bs-toggle="modal" data-target="#modalGenerateTahun" data-bs-target="#modalGenerateTahun" style="border-radius: 50px; padding: 10px 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
                                 <i class="fas fa-sync-alt me-2"></i> Sinkronisasi Per Tahun
                             </button>
-                            <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#modalTambahManual" style="border-radius: 50px; padding: 10px 20px; font-weight: 500; color: #764ba2; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                            <button type="button" class="btn btn-light" data-toggle="modal" data-bs-toggle="modal" data-target="#modalTambahManual" data-bs-target="#modalTambahManual" style="border-radius: 50px; padding: 10px 20px; font-weight: 500; color: #764ba2; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
                                 <i class="fas fa-plus-circle me-1"></i> Tambah Manual
                             </button>
                         </div>
@@ -32,13 +32,17 @@
     @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show shadow-sm mb-4" role="alert" style="border-radius: 15px; border-left: 5px solid #28a745;">
         <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="close btn-close" data-dismiss="alert" data-bs-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
     @endif
     @if(session('error'))
     <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 15px; border-left: 5px solid #dc3545;">
         <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="close btn-close" data-dismiss="alert" data-bs-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
     @endif
 
@@ -98,7 +102,7 @@
                                     </td>
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center align-items-center" style="gap: 20px;">
-                                            <a href="#" data-bs-toggle="modal" data-bs-target="#modalEditLibur{{ $libur->id }}" style="color: #f59e0b; font-size: 1.2rem; text-decoration: none;" title="Edit Data">
+                                            <a href="#" data-toggle="modal" data-bs-toggle="modal" data-target="#modalEditLibur{{ $libur->id }}" data-bs-target="#modalEditLibur{{ $libur->id }}" style="color: #f59e0b; font-size: 1.2rem; text-decoration: none;" title="Edit Data">
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                             <form action="{{ route('hari-liburs.destroy', $libur->id) }}" method="POST" class="m-0 p-0" onsubmit="return confirm('Hapus tanggal merah ini dari database master?')">
@@ -117,7 +121,7 @@
                                         <div class="modal-content" style="border-radius: 20px; border: none;">
                                             <div class="modal-header border-0 bg-light py-3 px-4" style="border-radius: 20px 20px 0 0;">
                                                 <h5 class="modal-title fw-bold text-dark"><i class="fas fa-edit me-2 text-warning"></i>Ubah Data Master</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                <button type="button" class="close btn-close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">&times;</button>
                                             </div>
                                             <form action="{{ route('hari-liburs.update', $libur->id) }}" method="POST">
                                                 @csrf
@@ -133,14 +137,14 @@
                                                     </div>
                                                     <div class="mb-3">
                                                         <label class="form-label fw-bold small text-muted">Jenis Klasifikasi</label>
-                                                        <select name="jenis" class="form-select" style="border-radius: 10px;" required>
+                                                        <select name="jenis" class="form-select form-control" style="border-radius: 10px;" required>
                                                             <option value="nasional" {{ $libur->jenis == 'nasional' ? 'selected' : '' }}>Libur Nasional</option>
                                                             <option value="cuti_bersama" {{ $libur->jenis == 'cuti_bersama' ? 'selected' : '' }}>Cuti Bersama</option>
                                                         </select>
                                                     </div>
                                                 </div>
                                                 <div class="modal-footer border-0 bg-light py-3 px-4" style="border-radius: 0 0 20px 20px;">
-                                                    <button type="button" class="btn btn-secondary px-4" style="border-radius: 50px;" data-bs-dismiss="modal">Batal</button>
+                                                    <button type="button" class="btn btn-secondary px-4" style="border-radius: 50px;" data-dismiss="modal" data-bs-dismiss="modal">Batal</button>
                                                     <button type="submit" class="btn btn-warning px-4 text-white fw-bold" style="border-radius: 50px;">Simpan Perubahan</button>
                                                 </div>
                                             </form>
@@ -152,7 +156,7 @@
                                     <td colspan="5" class="text-center py-5 text-muted">
                                         <i class="fas fa-calendar-times fa-4x mb-3" style="color: #e0e0e0;"></i>
                                         <h6>Belum ada database master untuk Tahun {{ $tahunDipilih }}</h6>
-                                        <p class="small text-muted mb-3">Silakan klik tombol "Sinkronisasi Per Tahun" untuk mengisi data otomatis lewat internet</p>
+                                        <p class="small text-muted mb-3">Silakan klik tombol "Tambah Manual" atau "Sinkronisasi Per Tahun" untuk mengisi data kalender.</p>
                                     </td>
                                 </tr>
                                 @endforelse
@@ -170,7 +174,7 @@
         <div class="modal-content" style="border-radius: 20px; border: none;">
             <div class="modal-header border-0 bg-light py-3 px-4" style="border-radius: 20px 20px 0 0;">
                 <h5 class="modal-title fw-bold text-dark"><i class="fas fa-plus-circle me-2 text-primary"></i>Tambah Manual Kalender</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="close btn-close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">&times;</button>
             </div>
             <form action="{{ route('hari-liburs.store') }}" method="POST">
                 @csrf
@@ -181,18 +185,18 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold small text-muted">Keterangan Libur</label>
-                        <input type="text" name="keterangan" class="form-control" style="border-radius: 10px;" placeholder="Contoh: Libur Kelulusan Sekolah" required>
+                        <input type="text" name="keterangan" class="form-control" style="border-radius: 10px;" placeholder="Contoh: Cuti Bersama Kenaikan" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold small text-muted">Jenis Libur</label>
-                        <select name="jenis" class="form-select" style="border-radius: 10px;" required>
+                        <select name="jenis" class="form-select form-control" style="border-radius: 10px;" required>
                             <option value="nasional">Libur Nasional</option>
                             <option value="cuti_bersama">Cuti Bersama</option>
                         </select>
                     </div>
                 </div>
                 <div class="modal-footer border-0 bg-light py-3 px-4" style="border-radius: 0 0 20px 20px;">
-                    <button type="button" class="btn btn-secondary px-4" style="border-radius: 50px;" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-secondary px-4" style="border-radius: 50px;" data-dismiss="modal" data-bs-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-primary px-4 fw-bold" style="border-radius: 50px; background: linear-gradient(135deg, #8ecae6 0%, #764ba2 100%); border: none;">Simpan Ke DB</button>
                 </div>
             </form>
@@ -205,7 +209,7 @@
         <div class="modal-content" style="border-radius: 20px; border: none;">
             <div class="modal-header border-0 bg-light py-3 px-4" style="border-radius: 20px 20px 0 0;">
                 <h5 class="modal-title fw-bold text-dark"><i class="fas fa-sync-alt me-2 text-warning"></i>Sinkronisasi Kalender Tahunan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="close btn-close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">&times;</button>
             </div>
             <form action="{{ route('hari-liburs.generate') }}" method="POST">
                 @csrf
@@ -217,7 +221,7 @@
                     <small class="text-danger d-block mt-2"><i class="fas fa-info-circle me-1"></i>Aksi ini otomatis melewati penguncian SSL lokal Laragon.</small>
                 </div>
                 <div class="modal-footer border-0 bg-light py-3 px-4" style="border-radius: 0 0 20px 20px;">
-                    <button type="button" class="btn btn-secondary px-4" style="border-radius: 50px;" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-secondary px-4" style="border-radius: 50px;" data-dismiss="modal" data-bs-dismiss="modal">Tutup</button>
                     <button type="submit" class="btn btn-warning px-4 fw-bold text-dark" style="border-radius: 50px;">Mulai Ambil Data</button>
                 </div>
             </form>
