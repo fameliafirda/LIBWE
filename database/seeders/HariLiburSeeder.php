@@ -38,8 +38,8 @@ class HariLiburSeeder extends Seeder
             if ($response) {
                 $data = json_decode($response, true);
 
-                if (is_wrap($data) || is_array($data)) {
-                    // Repositori ini membungkus datanya langsung dalam bentuk array objek
+                // PERBAIKAN: Cukup gunakan is_array untuk memastikan format JSON valid
+                if (is_array($data) && count($data) > 0) {
                     foreach ($data as $row) {
                         $tanggalString = $row['date'] ?? null;
                         
@@ -50,8 +50,7 @@ class HariLiburSeeder extends Seeder
                             $isCuti = $row['is_cuti'] ?? false;
                             $jenis = $isCuti ? 'cuti_bersama' : 'nasional';
 
-                            // Hari Minggu tidak perlu dimasukkan ke database denda 
-                            // karena sudah otomatis dikunci oleh sistem Controller (\Carbon)
+                            // FILTER: Hari Minggu dikeluarkan dari DB agar dihitung eksklusif oleh Carbon
                             $cekHari = Carbon::parse($tanggalString);
                             if ($cekHari->isSunday()) {
                                 continue; 
