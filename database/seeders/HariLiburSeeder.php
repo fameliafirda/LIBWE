@@ -18,7 +18,7 @@ class HariLiburSeeder extends Seeder
     }
 
     /**
-     * Mengambil data dari REST API GitHub Radyakaze yang dijamin online terus
+     * Mengambil data langsung dari file JSON mentah di GitHub Andi Fahruddin
      */
     private function fetchAndSaveFromApi($year)
     {
@@ -29,8 +29,8 @@ class HariLiburSeeder extends Seeder
             ],
         ];
 
-        // MENGGUNAKAN SERVER DATABASE GITHUB YANG AMAN DAN ABADI
-        $url = "https://raw.githubusercontent.com/radyakaze/api-hari-libur-indonesia/main/data/{$year}.json";
+        // MENEMBAK LINK RAW JSON DARI REPOSITORI PILIHANMU
+        $url = "https://raw.githubusercontent.com/andifahruddinakas/api-hari-libur/main/data/{$year}.json";
 
         try {
             $response = @file_get_contents($url, false, stream_context_create($arrContextOptions));
@@ -38,16 +38,24 @@ class HariLiburSeeder extends Seeder
             if ($response) {
                 $data = json_decode($response, true);
 
-                if (is_array($data) && count($data) > 0) {
+                if (is_wrap($data) || is_array($data)) {
+                    // Repositori ini membungkus datanya langsung dalam bentuk array objek
                     foreach ($data as $row) {
-                        // Struktur database baru: membaca key 'p_tanggal' atau 'tanggal'
-                        $tanggalString = $row['tanggal'] ?? null;
+                        $tanggalString = $row['date'] ?? null;
                         
                         if ($tanggalString) {
-                            $keterangan = $row['keterangan'] ?? 'Hari Libur';
-                            // Cek apakah data ini cuti bersama atau libur nasional murni
-                            $isCuti = $row['is_cuti'] ?? (str_contains(strtolower($keterangan), 'cuti') || str_contains(strtolower($keterangan), 'bersama'));
+                            $keterangan = $row['title'] ?? 'Hari Libur';
+                            
+                            // Cek tipenya: apakah Cuti Bersama atau Libur Nasional murni
+                            $isCuti = $row['is_cuti'] ?? false;
                             $jenis = $isCuti ? 'cuti_bersama' : 'nasional';
+
+                            // Hari Minggu tidak perlu dimasukkan ke database denda 
+                            // karena sudah otomatis dikunci oleh sistem Controller (\Carbon)
+                            $cekHari = Carbon::parse($tanggalString);
+                            if ($cekHari->isSunday()) {
+                                continue; 
+                            }
 
                             HariLibur::updateOrCreate(
                                 ['tanggal' => $tanggalString],
@@ -58,20 +66,20 @@ class HariLiburSeeder extends Seeder
                             );
                         }
                     }
-                    $this->command->info("Berhasil! Database Master Kalender Indonesia tahun {$year} sukses terisi via Server GitHub.");
+                    $this->command->info("Berhasil! Database Master Kalender Indonesia tahun {$year} sukses terisi via GitHub andifahruddinakas.");
                     return;
                 }
             }
         } catch (\Exception $e) {
-            // Lempar ke fallback cadangan jika ada masalah
+            // Lari ke fallback cadangan jika offline
         }
 
-        $this->command->warn("Server API bermasalah. Mengaktifkan sistem pangkalan data cadangan internal.");
+        $this->command->warn("Koneksi gagal. Mengaktifkan data cadangan internal.");
         $this->insertFallbackData($year);
     }
 
     /**
-     * Data master cadangan resmi tahun 2026 SKB 3 Menteri
+     * Data cadangan darurat (Hanya Senin - Sabtu, Minggu dikeluarkan)
      */
     private function insertFallbackData($year)
     {
@@ -80,16 +88,13 @@ class HariLiburSeeder extends Seeder
                 ['tanggal' => '2026-01-01', 'keterangan' => 'Tahun Baru 2026 Masehi', 'jenis' => 'nasional'],
                 ['tanggal' => '2026-01-23', 'keterangan' => 'Cuti Bersama Tahun Baru Imlek', 'jenis' => 'cuti_bersama'],
                 ['tanggal' => '2026-01-24', 'keterangan' => 'Tahun Baru Imlek 2577', 'jenis' => 'nasional'],
-                ['tanggal' => '2026-02-15', 'keterangan' => 'Isra Mikraj Nabi Muhammad SAW', 'jenis' => 'nasional'],
                 ['tanggal' => '2026-03-19', 'keterangan' => 'Hari Suci Nyepi Saka 1948', 'jenis' => 'nasional'],
                 ['tanggal' => '2026-03-20', 'keterangan' => 'Cuti Bersama Nyepi', 'jenis' => 'cuti_bersama'],
                 ['tanggal' => '2026-03-21', 'keterangan' => 'Cuti Bersama Nyepi', 'jenis' => 'cuti_bersama'],
                 ['tanggal' => '2026-04-03', 'keterangan' => 'Wafat Isa Almasih', 'jenis' => 'nasional'],
-                ['tanggal' => '2026-04-05', 'keterangan' => 'Hari Paskah', 'jenis' => 'nasional'],
                 ['tanggal' => '2026-05-01', 'keterangan' => 'Hari Buruh Internasional', 'jenis' => 'nasional'],
                 ['tanggal' => '2026-05-14', 'keterangan' => 'Kenaikan Isa Almasih', 'jenis' => 'nasional'],
                 ['tanggal' => '2026-05-15', 'keterangan' => 'Cuti Bersama Kenaikan Isa Almasih', 'jenis' => 'cuti_bersama'],
-                ['tanggal' => '2026-05-24', 'keterangan' => 'Hari Raya Waisak 2570', 'jenis' => 'nasional'],
                 ['tanggal' => '2026-05-25', 'keterangan' => 'Cuti Bersama Waisak', 'jenis' => 'cuti_bersama'],
                 ['tanggal' => '2026-06-01', 'keterangan' => 'Hari Lahir Pancasila', 'jenis' => 'nasional'],
                 ['tanggal' => '2026-11-27', 'keterangan' => 'Hari Raya Idul Adha 1447 H', 'jenis' => 'nasional'],

@@ -77,7 +77,7 @@ class HariLiburController extends Controller
     }
 
     /**
-     * FITUR REVISI UTAMA: Jalankan Sinkronisasi Tahunan Menggunakan Server Repositori GitHub Baru
+     * FITUR REVISI: Jalankan Sinkronisasi Tahunan Menggunakan Jalur Repositori GitHub Andi Fahruddin
      */
     public function generateTahun(Request $request)
     {
@@ -94,8 +94,8 @@ class HariLiburController extends Controller
             ],
         ];
 
-        // SINKRONISASI MENGGUNAKAN JALUR REPO GITHUB PER TAHUN YANG DIJAMIN SELALU AKTIF
-        $url = "https://raw.githubusercontent.com/radyakaze/api-hari-libur-indonesia/main/data/{$year}.json";
+        // DISINKRONKAN KE REPO GITHUB BARU PILIHANMU
+        $url = "https://raw.githubusercontent.com/andifahruddinakas/api-hari-libur/main/data/{$year}.json";
 
         try {
             $response = @file_get_contents($url, false, stream_context_create($arrContextOptions));
@@ -106,12 +106,18 @@ class HariLiburController extends Controller
                 if (is_array($data) && count($data) > 0) {
                     $inserted = 0;
                     foreach ($data as $row) {
-                        $tanggalString = $row['tanggal'] ?? null;
+                        $tanggalString = $row['date'] ?? null;
 
                         if ($tanggalString) {
-                            $keterangan = $row['keterangan'] ?? 'Hari Libur';
-                            $isCuti = $row['is_cuti'] ?? (str_contains(strtolower($keterangan), 'cuti') || str_contains(strtolower($keterangan), 'bersama'));
+                            $keterangan = $row['title'] ?? 'Hari Libur';
+                            $isCuti = $row['is_cuti'] ?? false;
                             $jenis = $isCuti ? 'cuti_bersama' : 'nasional';
+
+                            // FILTER: Kunci hari Minggu agar tidak masuk database, karena Minggu diurus eksklusif oleh Carbon
+                            $cekHari = Carbon::parse($tanggalString);
+                            if ($cekHari->isSunday()) {
+                                continue; 
+                            }
 
                             HariLibur::updateOrCreate(
                                 ['tanggal' => $tanggalString],
@@ -124,13 +130,13 @@ class HariLiburController extends Controller
                         }
                     }
                     return redirect()->route('hari-liburs.index', ['tahun' => $year])
-                        ->with('success', "Berhasil menarik data resmi SKB 3 Menteri! {$inserted} data hari libur tahun {$year} berhasil dimasukkan ke DB Master.");
+                        ->with('success', "Berhasil menarik data resmi SKB 3 Menteri! {$inserted} data hari libur (Senin-Sabtu) tahun {$year} masuk ke DB Master.");
                 }
             }
         } catch (\Exception $e) {
             // Gagal jika offline
         }
 
-        return redirect()->back()->with('error', "Gagal menghubungi repositori data kalender. Pastikan koneksi internet wifi terhubung!");
+        return redirect()->back()->with('error', "Gagal menghubungi repositori data kalender GitHub. Pastikan koneksi internet wifi terhubung!");
     }
 }
