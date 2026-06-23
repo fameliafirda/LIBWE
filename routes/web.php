@@ -13,13 +13,27 @@ use App\Http\Controllers\KatalogController;
 use App\Http\Controllers\HariLiburController;
 use App\Http\Middleware\PustakawanMiddleware;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Artisan;
 
 /*
 |--------------------------------------------------------------------------
-| UTILITY ROUTE (PERBAIKAN STORAGE UNTUK HOSTING)
-| Akses ini satu kali: perpustakaansdnberatwetan1.online/fix-storage
+| UTILITY ROUTES (PERBAIKAN SERVER UNTUK HOSTING ONLINE)
 |--------------------------------------------------------------------------
 */
+
+// 1. Eksekusi tabel migrasi via web browser (Penyelamat Error 500 Hostinger)
+// Akses sekali ke: https://perpustakaansdnberatwetan1.online/jalankan-migrasi-dong
+Route::get('/jalankan-migrasi-dong', function () {
+    try {
+        Artisan::call('migrate');
+        return "<h1>Sukses Berhasil!</h1><p>Struktur tabel 'hari_liburs' telah sukses dibuat di database MySQL Hostinger kamu.</p>";
+    } catch (\Throwable $e) {
+        return "<h1>Gagal Migrasi!</h1><p>Error: " . $e->getMessage() . "</p>";
+    }
+});
+
+// 2. Perbaikan folder penyimpanan gambar aset buku
+// Akses sekali ke: https://perpustakaansdnberatwetan1.online/fix-storage
 Route::get('/fix-storage', function () {
     // Karena hosting mematikan symlink, kita buat folder langsung di Document Root (public_html)
     $documentRoot = rtrim($_SERVER['DOCUMENT_ROOT'], '/');
@@ -93,23 +107,22 @@ Route::middleware([PustakawanMiddleware::class])->group(function () {
     // 2. Taruh Route Resource di Paling Bawah agar Tidak Bentrok dengan URL di Atas
     Route::resource('anggotas', AnggotaController::class);
 
-    
     // ==================== MANAJEMEN PEMINJAMAN ====================
     Route::resource('pinjamans', PinjamanController::class);
-    Route::get('/pinjamans/get-anggota/{nisn}', [App\Http\Controllers\PinjamanController::class, 'getAnggotaByNisn'])->name('pinjamans.get-anggota');
+    Route::get('/pinjamans/get-anggota/{nisn}', [PinjamanController::class, 'getAnggotaByNisn'])->name('pinjamans.get-anggota');
     Route::post('/pinjamans/{id}/mark-returned', [PinjamanController::class, 'markAsReturned'])->name('pinjamans.mark-returned');
 
     // ==================== MANAJEMEN PENGEMBALIAN ====================
     Route::resource('pengembalians', PengembalianController::class);
 
-    // Route Master Hari Libur Nasional
-Route::get('/hari-liburs', [HariLiburController::class, 'index'])->name('hari-liburs.index');
-Route::post('/hari-liburs', [HariLiburController::class, 'store'])->name('hari-liburs.store');
-Route::put('/hari-liburs/{id}', [HariLiburController::class, 'update'])->name('hari-liburs.update');
-Route::delete('/hari-liburs/{id}', [HariLiburController::class, 'destroy'])->name('hari-liburs.destroy');
-Route::post('/hari-liburs/generate', [HariLiburController::class, 'generateTahun'])->name('hari-liburs.generate');
+    // ==================== DB MASTER HARI LIBUR NASIONAL ====================
+    Route::get('/hari-liburs', [HariLiburController::class, 'index'])->name('hari-liburs.index');
+    Route::post('/hari-liburs', [HariLiburController::class, 'store'])->name('hari-liburs.store');
+    Route::put('/hari-liburs/{id}', [HariLiburController::class, 'update'])->name('hari-liburs.update');
+    Route::delete('/hari-liburs/{id}', [HariLiburController::class, 'destroy'])->name('hari-liburs.destroy');
+    Route::post('/hari-liburs/generate', [HariLiburController::class, 'generateTahun'])->name('hari-liburs.generate');
 
-    // ==================== LAPORAN ====================
+    // ==================== LAPORAN PERPUSTAKAAN ====================
     Route::prefix('laporan')->name('laporan.')->controller(LaporanController::class)->group(function () {
         // Laporan Peminjaman
         Route::get('/peminjaman', 'laporanPeminjaman')->name('peminjaman');
@@ -131,6 +144,6 @@ Route::post('/hari-liburs/generate', [HariLiburController::class, 'generateTahun
 |--------------------------------------------------------------------------
 */
 Route::fallback(function () {
-    // 🔥 FIX: Menggunakan pesan teks biasa karena file view 'errors.404' tidak ditemukan
+    // FIX: Menggunakan pesan teks biasa karena file view 'errors.404' tidak ditemukan
     return response('Halaman atau file gambar tidak ditemukan (404 Not Found).', 404);
 });
