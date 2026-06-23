@@ -32,7 +32,50 @@ Route::get('/jalankan-migrasi-dong', function () {
     }
 });
 
-// 2. Perbaikan folder penyimpanan gambar aset buku
+// 2. Jalur pintas menyuntikkan data kalender master 2026 (Bypass Tombol UI Macet)
+// Akses sekali ke: https://perpustakaansdnberatwetan1.online/isi-libur-darurat
+Route::get('/isi-libur-darurat', function () {
+    try {
+        // Array daftar hari libur nasional resmi tahun 2026 (Senin - Sabtu murni)
+        $tanggalMerah = [
+            '2026-01-01' => 'Tahun Baru 2026 Masehi',
+            '2026-01-23' => 'Cuti Bersama Tahun Baru Imlek',
+            '2026-01-24' => 'Tahun Baru Imlek 2577',
+            '2026-03-19' => 'Hari Suci Nyepi Saka 1948',
+            '2026-03-20' => 'Cuti Bersama Nyepi',
+            '2026-03-21' => 'Cuti Bersama Nyepi',
+            '2026-04-03' => 'Wafat Isa Almasih',
+            '2026-05-01' => 'Hari Buruh Internasional',
+            '2026-05-14' => 'Kenaikan Isa Almasih',
+            '2026-05-15' => 'Cuti Bersama Kenaikan Isa Almasih',
+            '2026-05-25' => 'Cuti Bersama Waisak',
+            '2026-06-01' => 'Hari Lahir Pancasila',
+            '2026-11-27' => 'Hari Raya Idul Adha 1447 H',
+            '2026-12-25' => 'Hari Raya Natal',
+        ];
+
+        $inserted = 0;
+        foreach ($tanggalMerah as $tgl => $ket) {
+            $isCuti = str_contains(strtolower($ket), 'cuti') || str_contains(strtolower($ket), 'bersama');
+            $jenis = $isCuti ? 'cuti_bersama' : 'nasional';
+
+            \App\Models\HariLibur::updateOrCreate(
+                ['tanggal' => $tgl],
+                [
+                    'keterangan' => $ket,
+                    'jenis' => $jenis
+                ]
+            );
+            $inserted++;
+        }
+
+        return "<h1>Berhasil Sukses!</h1><p>{$inserted} data master kalender 2026 berhasil disuntikkan ke database Hostinger Anda.</p>";
+    } catch (\Throwable $e) {
+        return "<h1>Gagal Mengisi Data!</h1><p>Error: " . $e->getMessage() . "</p>";
+    }
+});
+
+// 3. Perbaikan folder penyimpanan gambar aset buku
 // Akses sekali ke: https://perpustakaansdnberatwetan1.online/fix-storage
 Route::get('/fix-storage', function () {
     // Karena hosting mematikan symlink, kita buat folder langsung di Document Root (public_html)
