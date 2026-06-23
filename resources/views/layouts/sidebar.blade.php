@@ -250,6 +250,13 @@
           </a>
         </li>
 
+        <li class="nav-item">
+          <a href="{{ route('hari-liburs.index') }}" class="nav-link {{ request()->is('hari-liburs*') ? 'active' : '' }}" style="color: #fff; margin: 5px 10px; padding: 12px 15px; border-radius: 12px;">
+            <i class="fas fa-calendar-alt" style="margin-right: 10px; color: #00b4d8;"></i>
+            <p style="font-weight: 500;">Master Hari Libur</p>
+          </a>
+        </li>
+
         <li class="nav-item {{ request()->is('laporan*') ? 'menu-open' : '' }}">
           <a href="#" class="nav-link {{ request()->is('laporan*') ? 'active' : '' }}" style="color: #fff; margin: 5px 10px; padding: 12px 15px; border-radius: 12px;">
             <i class="fas fa-chart-bar" style="margin-right: 10px; color: #feca57;"></i>

@@ -6,9 +6,10 @@ use App\Models\Pengembalian;
 use App\Models\Pinjaman;
 use App\Models\Book;
 use App\Models\Anggota;
+use App\Models\HariLibur;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class PengembalianController extends Controller
 {
@@ -34,60 +35,75 @@ class PengembalianController extends Controller
             'tanggal_pengembalian' => 'required|date'
         ]);
 
-        $pinjaman = Pinjaman::with('anggota')->findOrFail($validated['pinjaman_id']);
+        DB::beginTransaction();
 
-        if (Pengembalian::where('pinjaman_id', $pinjaman->id)->exists()) {
-            return redirect()->back()->with('error', 'Pengembalian untuk peminjaman ini sudah dicatat.');
-        }
+        try {
+            $pinjaman = Pinjaman::with('anggota')->findOrFail($validated['pinjaman_id']);
 
-        $tanggalPinjam = Carbon::parse($pinjaman->tanggal_pinjam)->startOfDay();
-        $tanggalHarusKembali = $tanggalPinjam->copy()->addDays(7)->startOfDay();
-        $tanggalPengembalian = Carbon::parse($validated['tanggal_pengembalian'])->startOfDay();
-
-        $lamaTerlambat = 0;
-        if ($tanggalPengembalian->gt($tanggalHarusKembali)) {
-            $tahun = $tanggalHarusKembali->format('Y');
-            $daftarTanggalMerah = $this->getDaftarLiburNasional($tahun);
-
-            $currentDate = $tanggalHarusKembali->copy()->addDay();
-            
-            while ($currentDate->lte($tanggalPengembalian)) {
-                $isMinggu = $currentDate->isSunday();
-                $isTanggalMerah = in_array($currentDate->toDateString(), $daftarTanggalMerah);
-
-                if (!$isMinggu && !$isTanggalMerah) {
-                    $lamaTerlambat++;
-                }
-                $currentDate->addDay();
+            if (Pengembalian::where('pinjaman_id', $pinjaman->id)->exists()) {
+                return redirect()->back()->with('error', 'Pengembalian untuk peminjaman ini sudah dicatat.');
             }
+
+            // Hitung Keterlambatan & Denda (Menggunakan DB Master HariLibur & Cek Hari Minggu)
+            $tanggalPinjam = Carbon::parse($pinjaman->tanggal_pinjam)->startOfDay();
+            $tanggalHarusKembali = $tanggalPinjam->copy()->addDays(7)->startOfDay();
+            $tanggalPengembalian = Carbon::parse($validated['tanggal_pengembalian'])->startOfDay();
+
+            $lamaTerlambat = 0;
+            if ($tanggalPengembalian->gt($tanggalHarusKembali)) {
+                $currentDate = $tanggalHarusKembali->copy()->addDay();
+                
+                $daftarTanggalMerah = HariLibur::whereBetween('tanggal', [
+                    $tanggalHarusKembali->toDateString(), 
+                    $tanggalPengembalian->toDateString()
+                ])->pluck('tanggal')->toArray();
+                
+                while ($currentDate->lte($tanggalPengembalian)) {
+                    $isMinggu = $currentDate->isSunday();
+                    $isTanggalMerah = in_array($currentDate->toDateString(), $daftarTanggalMerah);
+
+                    if (!$isMinggu && !$isTanggalMerah) {
+                        $lamaTerlambat++;
+                    }
+                    $currentDate->addDay();
+                }
+            }
+
+            $denda = $lamaTerlambat * 500;
+
+            // Catat Pengembalian
+            Pengembalian::create([
+                'pinjaman_id' => $pinjaman->id,
+                'nisn' => optional($pinjaman->anggota)->nisn ?? '-',
+                'nama' => $pinjaman->nama,
+                'kelas' => $pinjaman->kelas,
+                'judul_buku' => $pinjaman->judul_buku,
+                'tanggal_kembali' => $tanggalHarusKembali->toDateString(), 
+                'tanggal_pengembalian' => $tanggalPengembalian->toDateString(),
+                'keterlambatan' => $lamaTerlambat,
+                'denda' => $denda
+            ]);
+
+            // Update status Pinjaman
+            $pinjaman->update([
+                'status' => 'sudah dikembalikan', 
+                'denda' => $denda, 
+                'tanggal_kembali' => $tanggalPengembalian->toDateString()
+            ]);
+            
+            // Kembalikan Stok Buku
+            $buku = Book::where('judul', 'LIKE', '%' . trim($pinjaman->judul_buku) . '%')->first();
+            if ($buku) {
+                $buku->increment('stok');
+            }
+
+            DB::commit();
+            return redirect()->route('pengembalians.index')->with('success', 'Pengembalian berhasil dicatat.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-
-        $denda = $lamaTerlambat * 500;
-
-        Pengembalian::create([
-            'pinjaman_id' => $pinjaman->id,
-            'nisn' => optional($pinjaman->anggota)->nisn ?? '-',
-            'nama' => $pinjaman->nama,
-            'kelas' => $pinjaman->kelas,
-            'judul_buku' => $pinjaman->judul_buku,
-            'tanggal_kembali' => $tanggalHarusKembali->toDateString(), 
-            'tanggal_pengembalian' => $tanggalPengembalian->toDateString(),
-            'keterlambatan' => $lamaTerlambat,
-            'denda' => $denda
-        ]);
-
-        $pinjaman->update([
-            'status' => 'sudah dikembalikan', 
-            'denda' => $denda, 
-            'tanggal_kembali' => $tanggalPengembalian->toDateString()
-        ]);
-        
-        $buku = Book::where('judul', 'LIKE', '%' . trim($pinjaman->judul_buku) . '%')->first();
-        if ($buku) {
-            $buku->increment('stok');
-        }
-
-        return redirect()->route('pengembalians.index')->with('success', 'Pengembalian berhasil dicatat.');
     }
 
     public function edit(Pengembalian $pengembalian)
@@ -101,100 +117,90 @@ class PengembalianController extends Controller
             'tanggal_pengembalian' => 'required|date'
         ]);
 
-        $pinjaman = $pengembalian->pinjaman;
-        
-        $tanggalPinjam = Carbon::parse($pinjaman->tanggal_pinjam)->startOfDay();
-        $tanggalHarusKembali = $tanggalPinjam->copy()->addDays(7)->startOfDay();
-        $tanggalPengembalian = Carbon::parse($validated['tanggal_pengembalian'])->startOfDay();
+        DB::beginTransaction();
 
-        $lamaTerlambat = 0;
-        if ($tanggalPengembalian->gt($tanggalHarusKembali)) {
-            $tahun = $tanggalHarusKembali->format('Y');
-            $daftarTanggalMerah = $this->getDaftarLiburNasional($tahun);
-
-            $currentDate = $tanggalHarusKembali->copy()->addDay();
+        try {
+            $pinjaman = $pengembalian->pinjaman;
             
-            while ($currentDate->lte($tanggalPengembalian)) {
-                $isMinggu = $currentDate->isSunday();
-                $isTanggalMerah = in_array($currentDate->toDateString(), $daftarTanggalMerah);
+            $tanggalPinjam = Carbon::parse($pinjaman->tanggal_pinjam)->startOfDay();
+            $tanggalHarusKembali = $tanggalPinjam->copy()->addDays(7)->startOfDay();
+            $tanggalPengembalian = Carbon::parse($validated['tanggal_pengembalian'])->startOfDay();
 
-                if (!$isMinggu && !$isTanggalMerah) {
-                    $lamaTerlambat++;
+            $lamaTerlambat = 0;
+            if ($tanggalPengembalian->gt($tanggalHarusKembali)) {
+                $currentDate = $tanggalHarusKembali->copy()->addDay();
+                
+                $daftarTanggalMerah = HariLibur::whereBetween('tanggal', [
+                    $tanggalHarusKembali->toDateString(), 
+                    $tanggalPengembalian->toDateString()
+                ])->pluck('tanggal')->toArray();
+                
+                while ($currentDate->lte($tanggalPengembalian)) {
+                    $isMinggu = $currentDate->isSunday();
+                    $isTanggalMerah = in_array($currentDate->toDateString(), $daftarTanggalMerah);
+
+                    if (!$isMinggu && !$isTanggalMerah) {
+                        $lamaTerlambat++;
+                    }
+                    $currentDate->addDay();
                 }
-                $currentDate->addDay();
             }
-        }
 
-        $denda = $lamaTerlambat * 500;
+            $denda = $lamaTerlambat * 500;
 
-        $pengembalian->update([
-            'tanggal_pengembalian' => $tanggalPengembalian->toDateString(),
-            'keterlambatan' => $lamaTerlambat,
-            'denda' => $denda
-        ]);
-
-        if ($pinjaman) {
-            $pinjaman->update([
-                'denda' => $denda, 
-                'tanggal_kembali' => $tanggalPengembalian->toDateString()
+            // Perbarui Data Pengembalian
+            $pengembalian->update([
+                'tanggal_pengembalian' => $tanggalPengembalian->toDateString(),
+                'keterlambatan' => $lamaTerlambat,
+                'denda' => $denda
             ]);
-        }
 
-        return redirect()->route('pengembalians.index')->with('success', 'Data pengembalian berhasil diperbarui.');
+            if ($pinjaman) {
+                $pinjaman->update([
+                    'denda' => $denda, 
+                    'tanggal_kembali' => $tanggalPengembalian->toDateString()
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->route('pengembalians.index')->with('success', 'Data pengembalian berhasil diperbarui.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     public function destroy(Pengembalian $pengembalian)
     {
-        $pinjaman = $pengembalian->pinjaman;
-        
-        if ($pinjaman) {
-            $pinjaman->update([
-                'status' => 'belum dikembalikan', 
-                'denda' => 0, 
-                'tanggal_kembali' => null
-            ]);
+        DB::beginTransaction();
+
+        try {
+            $pinjaman = $pengembalian->pinjaman;
             
-            $buku = Book::where('judul', 'LIKE', '%' . trim($pinjaman->judul_buku) . '%')->first();
-            if ($buku && $buku->stok > 0) {
-                $buku->decrement('stok'); 
-            }
-        }
-        
-        $pengembalian->delete();
-        return redirect()->route('pengembalians.index')->with('success', 'Data pengembalian berhasil dihapus.');
-    }
-
-    private function getDaftarLiburNasional($tahun)
-    {
-        return Cache::remember("libur_indonesia_murni_{$tahun}", 86400, function () use ($tahun) {
-            $tanggalMerah = [];
-
-            if ($tahun == 2026) {
-                $tanggalMerah = [
-                    '2026-01-01', '2026-01-23', '2026-01-24', '2026-02-15', 
-                    '2026-03-19', '2026-03-20', '2026-03-21', '2026-04-03', 
-                    '2026-04-05', '2026-05-01', '2026-05-14', '2026-05-15', 
-                    '2026-05-24', '2026-05-25', '2026-06-01', '2026-11-27', 
-                    '2026-12-25',
-                ];
-            }
-
-            try {
-                $url = "https://dayoffapi.vercel.app/api?year=" . $tahun;
-                $response = @file_get_contents($url);
-                if ($response) {
-                    $data = json_decode($response, true);
-                    if (is_array($data)) {
-                        foreach ($data as $row) {
-                            if (isset($row['tanggal'])) {
-                                $tanggalMerah[] = $row['tanggal'];
-                            }
-                        }
-                    }
+            if ($pinjaman) {
+                // Kembalikan status peminjaman menjadi aktif kembali
+                $pinjaman->update([
+                    'status' => 'belum dikembalikan', 
+                    'denda' => 0, 
+                    'tanggal_kembali' => null
+                ]);
+                
+                // Potong stok kembali karena status buku dipinjam lagi
+                $buku = Book::where('judul', 'LIKE', '%' . trim($pinjaman->judul_buku) . '%')->first();
+                if ($buku && $buku->stok > 0) {
+                    $buku->decrement('stok'); 
                 }
-            } catch (\Exception $e) { }
+            }
+            
+            $pengembalian->delete();
 
-            return array_unique($tanggalMerah);
-        });
+            DB::commit();
+            return redirect()->route('pengembalians.index')->with('success', 'Data pengembalian berhasil dihapus.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 }

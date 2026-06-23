@@ -7,9 +7,9 @@ use App\Models\Pinjaman;
 use App\Models\Pengembalian;
 use App\Models\Anggota;
 use App\Models\Book;
+use App\Models\HariLibur;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
 
 class PinjamanController extends Controller
 {
@@ -93,7 +93,7 @@ class PinjamanController extends Controller
             
             return response()->json([
                 'exists' => false,
-                'message' => 'Buku "' . $judul . '" tidak ditemukan di database perpustakaan. Silakan cek judul atau tambahkan buku terlebih dahulu.'
+                'message' => 'Buku "' . $judul . '" tidak ditemukan di database perpustakaan.'
             ]);
             
         } catch (\Exception $e) {
@@ -102,21 +102,6 @@ class PinjamanController extends Controller
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
             ]);
         }
-    }
-
-    private function cekStokBuku($judulBuku)
-    {
-        $buku = Book::where('judul', 'LIKE', '%' . $judulBuku . '%')->first();
-        
-        if (!$buku) {
-            return ['status' => false, 'message' => 'Buku tidak ditemukan di database perpustakaan.'];
-        }
-        
-        if ($buku->stok <= 0) {
-            return ['status' => false, 'message' => 'Stok buku habis!'];
-        }
-        
-        return ['status' => true, 'buku' => $buku];
     }
 
     public function store(Request $request)
@@ -136,26 +121,18 @@ class PinjamanController extends Controller
             $anggota = Anggota::where('nisn', $request->nisn)->first();
 
             if (!$anggota) {
-                return redirect()->back()->with('error', 'Siswa dengan NISN tersebut tidak terdaftar di data Anggota!')->withInput();
+                return redirect()->back()->with('error', 'Siswa dengan NISN tersebut tidak terdaftar!')->withInput();
             }
 
             $berhasil = 0;
-            $gagal = [];
-
             foreach ($request->judul_buku as $judul) {
                 if (trim($judul) == '') continue;
 
                 $buku = Book::where('judul', 'LIKE', '%' . trim($judul) . '%')->first();
                 
-                if (!$buku) {
-                    $gagal[] = $judul . " (Tidak ditemukan)";
-                    continue; 
-                }
+                if (!$buku) continue; 
                 
-                if ($buku->stok <= 0 && $request->status == 'belum dikembalikan') {
-                    $gagal[] = $buku->judul . " (Stok habis)";
-                    continue; 
-                }
+                if ($buku->stok <= 0 && $request->status == 'belum dikembalikan') continue;
 
                 $pinjaman = Pinjaman::create([
                     'anggota_id'      => $anggota->id,
@@ -180,36 +157,12 @@ class PinjamanController extends Controller
             }
 
             DB::commit();
-
-            if (count($gagal) > 0 && $berhasil > 0) {
-                $pesanGagal = implode(', ', $gagal);
-                return redirect()->route('pinjamans.index')->with('warning', "$berhasil buku berhasil dipinjam. Namun buku berikut gagal diproses: $pesanGagal");
-            } elseif (count($gagal) > 0 && $berhasil == 0) {
-                $pesanGagal = implode(', ', $gagal);
-                return redirect()->back()->with('error', "Semua buku gagal dipinjam! Alasan: $pesanGagal")->withInput();
-            }
-
-            return redirect()->route('pinjamans.index')->with('success', 'Semua data pinjaman berhasil disimpan!');
+            return redirect()->route('pinjamans.index')->with('success', 'Data pinjaman berhasil disimpan!');
 
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
         }
-    }
-
-    public function show($id)
-    {
-        $pinjaman = Pinjaman::with(['pengembalian', 'anggota', 'buku'])->findOrFail($id);
-        return view('pinjamans.show', compact('pinjaman'));
-    }
-
-    public function edit($id)
-    {
-        $pinjaman = Pinjaman::with('anggota')->findOrFail($id);
-        $anggota = Anggota::orderBy('nama')->get();
-        $books = Book::orderBy('judul')->get();
-        
-        return view('pinjamans.edit', compact('pinjaman', 'anggota', 'books'));
     }
 
     public function update(Request $request, $id)
@@ -229,15 +182,10 @@ class PinjamanController extends Controller
             $statusLama = $pinjaman->status;
             
             $buku = Book::where('judul', 'LIKE', '%' . $request->judul_buku . '%')->first();
-            
-            if (!$buku && $request->status == 'belum dikembalikan') {
-                return redirect()->back()->with('error', 'Buku tidak ditemukan!')->withInput();
-            }
-            
             $anggota = Anggota::where('nisn', $request->nisn)->first();
 
             if (!$anggota) {
-                return redirect()->back()->with('error', 'Siswa dengan NISN tersebut tidak terdaftar di data Anggota!')->withInput();
+                return redirect()->back()->with('error', 'Anggota tidak ditemukan!')->withInput();
             }
 
             $pinjaman->update([
@@ -246,7 +194,7 @@ class PinjamanController extends Controller
                 'nama'            => $anggota->nama,
                 'kelas'           => $anggota->kelas,
                 'jenis_kelamin'   => $anggota->jenis_kelamin,
-                'judul_buku'      => $request->judul_buku,
+                'judul_buku'      => $buku ? $buku->judul : $request->judul_buku,
                 'tanggal_pinjam'  => $request->tanggal_pinjam,
                 'tanggal_kembali' => $request->status == 'sudah dikembalikan' ? $request->tanggal_kembali : null,
                 'status'          => $request->status,
@@ -257,9 +205,7 @@ class PinjamanController extends Controller
                     $buku->increment('stok');
                     $this->processPengembalian($pinjaman, $request->tanggal_kembali);
                 } else if ($statusLama == 'sudah dikembalikan' && $request->status == 'belum dikembalikan') {
-                    if ($buku->stok > 0) {
-                        $buku->decrement('stok');
-                    }
+                    $buku->decrement('stok');
                     Pengembalian::where('pinjaman_id', $pinjaman->id)->delete();
                     $pinjaman->update(['denda' => 0]);
                 } else if ($request->status == 'sudah dikembalikan') {
@@ -268,7 +214,7 @@ class PinjamanController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('pinjamans.index')->with('success', 'Data pinjaman berhasil diperbarui!');
+            return redirect()->route('pinjamans.index')->with('success', 'Data berhasil diperbarui!');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -276,71 +222,77 @@ class PinjamanController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function markAsReturned($id)
     {
         DB::beginTransaction();
-
         try {
             $pinjaman = Pinjaman::findOrFail($id);
-            
-            if ($pinjaman->status == 'belum dikembalikan' && $pinjaman->buku) {
-                $pinjaman->buku->increment('stok');
+            if ($pinjaman->status == 'sudah dikembalikan') {
+                return redirect()->back()->with('warning', 'Buku sudah dikembalikan!');
             }
             
-            Pengembalian::where('pinjaman_id', $id)->delete();
-            $pinjaman->delete();
-
+            $this->processPengembalian($pinjaman);
+            
+            $buku = Book::where('judul', 'LIKE', '%' . trim($pinjaman->judul_buku) . '%')->first();
+            if ($buku) {
+                $buku->increment('stok');
+            }
+            
             DB::commit();
-            return redirect()->route('pinjamans.index')->with('success', 'Data pinjaman berhasil dihapus!');
-
+            return redirect()->route('pinjamans.index')->with('success', 'Buku berhasil dikembalikan!');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal: ' . $e->getMessage());
         }
     }
 
     /**
-     * SINKRONISASI & PERHITUNGAN TANGGAL KEMBALI AMAN
+     * CORE LOGIC: PROSES PENGEMBALIAN & HITUNG DENDA (MURNI MASTER TABEL & HARI MINGGU)
      */
-    private function processPengembalian(Pinjaman $pinjaman, $tanggalKembali = null)
+    private function processPengembalian(Pinjaman $pinjaman, $tanggalKembaliInput = null)
     {
-        // Paksa ambil tanggal murninya saja tanpa jam/menit (Y-m-d) menghindari ketidakcocokan timezone Hostinger
-        $stringTanggalKembali = $tanggalKembali ? Carbon::parse($tanggalKembali)->toDateString() : Carbon::now('Asia/Jakarta')->toDateString();
+        // 1. Tentukan Tanggal Kembali Aktual
+        $tglKembaliAktual = $tanggalKembaliInput ? Carbon::parse($tanggalKembaliInput) : Carbon::now('Asia/Jakarta');
+        $tglKembaliStr = $tglKembaliAktual->toDateString();
         
-        $tanggalPengembalian = Carbon::parse($stringTanggalKembali)->startOfDay();
-        $tanggalPinjam = Carbon::parse($pinjaman->tanggal_pinjam)->startOfDay();
-        $tanggalJatuhTempo = $tanggalPinjam->copy()->addDays(7)->startOfDay(); 
+        // 2. Tentukan Jatuh Tempo (7 Hari dari Pinjam)
+        $tglPinjam = Carbon::parse($pinjaman->tanggal_pinjam)->startOfDay();
+        $tglJatuhTempo = $tglPinjam->copy()->addDays(7)->startOfDay();
         
         $keterlambatan = 0;
-        
-        if ($tanggalPengembalian->gt($tanggalJatuhTempo)) {
-            $tahun = $tanggalJatuhTempo->format('Y');
-            $daftarTanggalMerah = $this->getDaftarLiburNasional($tahun);
 
-            $currentDate = $tanggalJatuhTempo->copy()->addDay();
+        // 3. Hitung Keterlambatan jika melewati jatuh tempo
+        if ($tglKembaliAktual->startOfDay()->gt($tglJatuhTempo)) {
+            $currentDate = $tglJatuhTempo->copy()->addDay();
             
-            while ($currentDate->lte($tanggalPengembalian)) {
-                $isMinggu = $currentDate->isSunday(); 
+            // AMBIL DATA HARI LIBUR DARI DB MASTER (Tabel hari_liburs)
+            $daftarTanggalMerah = HariLibur::whereBetween('tanggal', [
+                $tglJatuhTempo->toDateString(), 
+                $tglKembaliStr
+            ])->pluck('tanggal')->toArray();
+            
+            while ($currentDate->lte($tglKembaliAktual)) {
+                $isMinggu = $currentDate->isSunday(); // Kunci Hari Minggu otomatis Rp 0
                 $isTanggalMerah = in_array($currentDate->toDateString(), $daftarTanggalMerah);
 
+                // Hanya menambah hari terlambat jika BUKAN Minggu dan BUKAN Tanggal Merah
                 if (!$isMinggu && !$isTanggalMerah) {
                     $keterlambatan++;
                 }
-
                 $currentDate->addDay();
             }
         }
         
         $denda = $keterlambatan * 500;
         
-        // Update data pinjaman terlebih dahulu
+        // 4. Update data Pinjaman
         $pinjaman->update([
             'status' => 'sudah dikembalikan',
             'denda' => $denda,
-            'tanggal_kembali' => $tanggalPengembalian->toDateString()
+            'tanggal_kembali' => $tglKembaliStr
         ]);
         
-        // Simpan ke tabel pengembalian secara kokoh
+        // 5. Simpan/Update ke Tabel Pengembalian
         Pengembalian::updateOrCreate(
             ['pinjaman_id' => $pinjaman->id],
             [
@@ -348,98 +300,55 @@ class PinjamanController extends Controller
                 'nama'                 => $pinjaman->nama,
                 'kelas'                => $pinjaman->kelas,
                 'judul_buku'           => $pinjaman->judul_buku,
-                'tanggal_kembali'      => $tanggalJatuhTempo->toDateString(), // Tanggal seharusnya kembali
-                'tanggal_pengembalian' => $tanggalPengembalian->toDateString(), // Tanggal aktual kembali
+                'tanggal_kembali'      => $tglJatuhTempo->toDateString(), // Seharusnya kembali
+                'tanggal_pengembalian' => $tglKembaliStr,                // Aktual kembali
                 'keterlambatan'        => $keterlambatan,
                 'denda'                => $denda,
             ]
         );
     }
 
-    /**
-     * Master Kalender Libur Nasional Resmi 2026
-     */
-    private function getDaftarLiburNasional($tahun)
-    {
-        return Cache::remember("libur_indonesia_murni_{$tahun}", 86400, function () use ($tahun) {
-            $tanggalMerah = [];
-
-            if ($tahun == 2026) {
-                $tanggalMerah = [
-                    '2026-01-01', '2026-01-23', '2026-01-24', '2026-02-15', 
-                    '2026-03-19', '2026-03-20', '2026-03-21', '2026-04-03', 
-                    '2026-04-05', '2026-05-01', '2026-05-14', '2026-05-15', 
-                    '2026-05-24', '2026-05-25', '2026-06-01', '2026-11-27', 
-                    '2026-12-25',
-                ];
-            }
-
-            try {
-                $url = "https://dayoffapi.vercel.app/api?year=" . $tahun;
-                $response = @file_get_contents($url);
-                if ($response) {
-                    $data = json_decode($response, true);
-                    if (is_array($data)) {
-                        foreach ($data as $row) {
-                            if (isset($row['tanggal'])) {
-                                $tanggalMerah[] = $row['tanggal'];
-                            }
-                        }
-                    }
-                }
-            } catch (\Exception $e) { }
-
-            return array_unique($tanggalMerah);
-        });
-    }
-
-    public function markAsReturned($id)
+    public function destroy($id)
     {
         DB::beginTransaction();
-
         try {
             $pinjaman = Pinjaman::findOrFail($id);
-            
-            if ($pinjaman->status == 'sudah dikembalikan') {
-                return redirect()->back()->with('warning', 'Buku sudah dikembalikan sebelumnya!');
+            if ($pinjaman->status == 'belum dikembalikan' && $pinjaman->buku) {
+                $pinjaman->buku->increment('stok');
             }
-            
-            // Proses kalkulasi denda & pengembalian tangani di sini
-            $this->processPengembalian($pinjaman);
-            
-            // Cari buku menggunakan LIKE agar lebih toleran terhadap spasi data
-            $buku = Book::where('judul', 'LIKE', '%' . trim($pinjaman->judul_buku) . '%')->first();
-            if ($buku) {
-                $buku->increment('stok');
-            }
-            
+            Pengembalian::where('pinjaman_id', $id)->delete();
+            $pinjaman->delete();
             DB::commit();
-            return redirect()->route('pinjamans.index')->with('success', 'Buku berhasil dikembalikan! Denda: Rp ' . number_format($pinjaman->denda, 0, ',', '.'));
-            
+            return redirect()->route('pinjamans.index')->with('success', 'Data berhasil dihapus!');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal: ' . $e->getMessage());
         }
+    }
+
+    public function show($id)
+    {
+        $pinjaman = Pinjaman::with(['pengembalian', 'anggota', 'buku'])->findOrFail($id);
+        return view('pinjamans.show', compact('pinjaman'));
+    }
+
+    public function edit($id)
+    {
+        $pinjaman = Pinjaman::with('anggota')->findOrFail($id);
+        $anggota = Anggota::orderBy('nama')->get();
+        $books = Book::orderBy('judul')->get();
+        return view('pinjamans.edit', compact('pinjaman', 'anggota', 'books'));
     }
 
     public function getBookStock(Request $request)
     {
         $judul = $request->get('judul');
         $buku = Book::where('judul', 'LIKE', '%' . $judul . '%')->first();
-        
-        if ($buku) {
-            return response()->json([
-                'exists'   => true,
-                'stok'     => $buku->stok,
-                'tersedia' => $buku->stok > 0,
-                'id'       => $buku->id
-            ]);
-        }
-        
         return response()->json([
-            'exists'   => false,
-            'stok'     => 0,
-            'tersedia' => false
+            'exists'   => (bool)$buku,
+            'stok'     => $buku->stok ?? 0,
+            'tersedia' => ($buku && $buku->stok > 0),
+            'id'       => $buku->id ?? null
         ]);
     }
 }
