@@ -143,8 +143,7 @@ Route::middleware([PustakawanMiddleware::class])->group(function () {
 
     // ==================== MANAJEMEN ANGGOTA ====================
     // 1. Taruh Route Kustom Statis di Atas
-    Route::delete('/anggotas/bulk-delete', [AnggotaController::class, 'bulkDelete'])->name('anggotas.bulkDelete');
-    Route::delete('/anggotas/delete-all', [AnggotaController::class, 'deleteAll'])->name('anggotas.delete-all');
+Route::post('/anggotas/bulk-delete', [AnggotaController::class, 'bulkDelete'])->name('anggotas.bulkDelete');    Route::delete('/anggotas/delete-all', [AnggotaController::class, 'deleteAll'])->name('anggotas.delete-all');
     Route::get('/anggotas/{anggota}/peminjaman', [AnggotaController::class, 'peminjaman'])->name('anggotas.peminjaman');
 
     // 2. Taruh Route Resource di Paling Bawah agar Tidak Bentrok dengan URL di Atas
