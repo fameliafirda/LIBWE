@@ -10,6 +10,7 @@ use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\KatalogController;
+use App\Http\Controllers\HariLiburController;
 use App\Http\Middleware\PustakawanMiddleware;
 use Illuminate\Support\Facades\File;
 
@@ -100,6 +101,13 @@ Route::middleware([PustakawanMiddleware::class])->group(function () {
 
     // ==================== MANAJEMEN PENGEMBALIAN ====================
     Route::resource('pengembalians', PengembalianController::class);
+
+    // Route Master Hari Libur Nasional
+Route::get('/hari-liburs', [HariLiburController::class, 'index'])->name('hari-liburs.index');
+Route::post('/hari-liburs', [HariLiburController::class, 'store'])->name('hari-liburs.store');
+Route::put('/hari-liburs/{id}', [HariLiburController::class, 'update'])->name('hari-liburs.update');
+Route::delete('/hari-liburs/{id}', [HariLiburController::class, 'destroy'])->name('hari-liburs.destroy');
+Route::post('/hari-liburs/generate', [HariLiburController::class, 'generateTahun'])->name('hari-liburs.generate');
 
     // ==================== LAPORAN ====================
     Route::prefix('laporan')->name('laporan.')->controller(LaporanController::class)->group(function () {

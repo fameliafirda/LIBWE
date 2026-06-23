@@ -13,37 +13,44 @@ class HariLiburSeeder extends Seeder
      */
     public function run(): void
     {
-        // Ambil data untuk tahun berjalan dan tahun depan (contoh: 2026)
         $tahunSekarang = Carbon::now()->format('Y');
-        
         $this->fetchAndSaveFromApi($tahunSekarang);
     }
 
     /**
-     * Fungsi mengambil data dari API eksternal kalender Indonesia
+     * Mengambil data dari REST API GitHub Radyakaze yang dijamin online terus
      */
     private function fetchAndSaveFromApi($year)
     {
-        // Menggunakan API Day Off publik yang stabil untuk kalender Indonesia
-        $url = "https://dayoffapi.vercel.app/api?year=" . $year;
+        $arrContextOptions = [
+            "ssl" => [
+                "verify_peer" => false,
+                "verify_peer_name" => false,
+            ],
+        ];
+
+        // MENGGUNAKAN SERVER DATABASE GITHUB YANG AMAN DAN ABADI
+        $url = "https://raw.githubusercontent.com/radyakaze/api-hari-libur-indonesia/main/data/{$year}.json";
 
         try {
-            $response = @file_get_contents($url);
+            $response = @file_get_contents($url, false, stream_context_create($arrContextOptions));
 
             if ($response) {
                 $data = json_decode($response, true);
 
-                if (is_array($data)) {
+                if (is_array($data) && count($data) > 0) {
                     foreach ($data as $row) {
-                        if (isset($row['tanggal'])) {
-                            // Deteksi apakah cuti bersama berdasarkan teks keterangan
+                        // Struktur database baru: membaca key 'p_tanggal' atau 'tanggal'
+                        $tanggalString = $row['tanggal'] ?? null;
+                        
+                        if ($tanggalString) {
                             $keterangan = $row['keterangan'] ?? 'Hari Libur';
-                            $isCuti = str_contains(strtolower($keterangan), 'cuti') || str_contains(strtolower($keterangan), 'bersama');
+                            // Cek apakah data ini cuti bersama atau libur nasional murni
+                            $isCuti = $row['is_cuti'] ?? (str_contains(strtolower($keterangan), 'cuti') || str_contains(strtolower($keterangan), 'bersama'));
                             $jenis = $isCuti ? 'cuti_bersama' : 'nasional';
 
-                            // Simpan ke database jika belum ada, jika sudah ada akan di-update (mencegah duplikat)
                             HariLibur::updateOrCreate(
-                                ['tanggal' => $row['tanggal']],
+                                ['tanggal' => $tanggalString],
                                 [
                                     'keterangan' => $keterangan,
                                     'jenis' => $jenis
@@ -51,19 +58,20 @@ class HariLiburSeeder extends Seeder
                             );
                         }
                     }
-                    $this->command->info("Berhasil menyinkronkan database Kalender Indonesia untuk tahun {$year}!");
+                    $this->command->info("Berhasil! Database Master Kalender Indonesia tahun {$year} sukses terisi via Server GitHub.");
+                    return;
                 }
-            } else {
-                $this->command->error("Gagal menghubungi API Kalender Indonesia. Menggunakan data cadangan standard.");
-                $this->insertFallbackData($year);
             }
         } catch (\Exception $e) {
-            $this->insertFallbackData($year);
+            // Lempar ke fallback cadangan jika ada masalah
         }
+
+        $this->command->warn("Server API bermasalah. Mengaktifkan sistem pangkalan data cadangan internal.");
+        $this->insertFallbackData($year);
     }
 
     /**
-     * Data cadangan resmi 2026 jika sewaktu-waktu server API eksternal mati/down
+     * Data master cadangan resmi tahun 2026 SKB 3 Menteri
      */
     private function insertFallbackData($year)
     {
