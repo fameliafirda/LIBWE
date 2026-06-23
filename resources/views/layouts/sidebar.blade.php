@@ -253,7 +253,7 @@
         <li class="nav-item">
           <a href="{{ route('hari-liburs.index') }}" class="nav-link {{ request()->is('hari-liburs*') ? 'active' : '' }}" style="color: #fff; margin: 5px 10px; padding: 12px 15px; border-radius: 12px;">
             <i class="fas fa-calendar-alt" style="margin-right: 10px; color: #00b4d8;"></i>
-            <p style="font-weight: 500;">Master Hari Libur</p>
+            <p style="font-weight: 500;">Kalender Hari Libur</p>
           </a>
         </li>
 
