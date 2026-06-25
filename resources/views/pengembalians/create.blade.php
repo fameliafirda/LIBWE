@@ -37,6 +37,8 @@
 
     <form action="{{ route('pengembalians.store') }}" method="POST">
         @csrf
+        
+        <input type="hidden" name="keterlambatan_input" id="keterlambatan_input" value="0">
 
         <div class="card border-0 shadow-sm mb-4" style="border-radius: 20px; overflow: hidden;">
             <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4">
@@ -54,11 +56,46 @@
                             <select name="pinjaman_id" id="pinjaman_id" class="form-select form-select-lg custom-input border-start-0 ps-0" required>
                                 <option value="">-- Cari & Pilih Data Peminjaman --</option>
                                 @foreach($pinjamans as $pinjaman)
-                                    <option value="{{ $pinjaman->id }}">
-                                        {{ $pinjaman->nama }} - {{ $pinjaman->buku->judul ?? $pinjaman->judul_buku ?? '-' }} (Batas Kembali: {{ \Carbon\Carbon::parse($pinjaman->tanggal_kembali)->format('d/m/Y') }})
+                                    @php
+                                        // KLONING LOGIKA HITUNGAN DARI PEMINJAMAN BLADE SECARA LIVE
+                                        $tglPinjam = \Carbon\Carbon::parse($pinjaman->tanggal_pinjam)->timezone('Asia/Jakarta')->startOfDay();
+                                        $jatuhTempo = $tglPinjam->copy()->addDays(7);
+                                        $terlambat = 0;
+                                        $hariIni = \Carbon\Carbon::now('Asia/Jakarta')->startOfDay();
+
+                                        if($hariIni->gt($jatuhTempo)) {
+                                            $daftarTanggalMerah = [
+                                                '2026-01-01', '2026-01-23', '2026-01-24', '2026-02-15', 
+                                                '2026-03-19', '2026-03-20', '2026-03-21', '2026-04-03', 
+                                                '2026-04-05', '2026-05-01', '2026-05-14', '2026-05-15', 
+                                                '2026-05-24', '2026-05-25', '2026-06-01', '2026-11-27', 
+                                                '2026-12-25',
+                                            ];
+
+                                            $currentDate = $jatuhTempo->copy()->addDay();
+                                            while ($currentDate->lte($hariIni)) {
+                                                $isMinggu = $currentDate->isSunday(); 
+                                                $isTanggalMerah = in_array($currentDate->toDateString(), $daftarTanggalMerah);
+
+                                                if (!$isMinggu && !$isTanggalMerah) {
+                                                    $terlambat++;
+                                                }
+                                                $currentDate->addDay();
+                                            }
+                                        }
+                                        $denda = $terlambat * 500;
+                                    @endphp
+                                    <option value="{{ $pinjaman->id }}" data-terlambat="{{ $terlambat }}" data-denda="{{ $denda }}">
+                                        {{ $pinjaman->nama }} - {{ $pinjaman->buku->judul ?? $pinjaman->judul_buku ?? '-' }} (Jatuh Tempo: {{ $jatuhTempo->format('d/m/Y') }}) 
+                                        @if($terlambat > 0)
+                                            -- [ TERLAMBAT {{ $terlambat }} HARI ]
+                                        @endif
                                     </option>
                                 @endforeach
                             </select>
+                        </div>
+                        
+                        <div id="info-box" class="alert mt-3" style="display: none; border-radius: 12px; border-left: 5px solid;">
                         </div>
                     </div>
 
@@ -106,4 +143,37 @@
     .btn { transition: all 0.3s ease; }
     .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 </style>
+
+@push('scripts')
+<script>
+    // JS Sakti untuk mengirim angka kembar ke controller
+    document.getElementById('pinjaman_id').addEventListener('change', function() {
+        var selectedOption = this.options[this.selectedIndex];
+        var terlambat = selectedOption.getAttribute('data-terlambat');
+        var denda = selectedOption.getAttribute('data-denda');
+        var infoBox = document.getElementById('info-box');
+        
+        if (this.value !== "") {
+            // Tembak nilainya ke input tersembunyi
+            document.getElementById('keterlambatan_input').value = terlambat;
+            
+            // Munculkan notifikasi ke admin perpustakaan
+            if(parseInt(terlambat) > 0) {
+                infoBox.className = 'alert alert-danger mt-3 shadow-sm';
+                infoBox.style.borderLeftColor = '#d63031';
+                infoBox.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i><strong>Peringatan Denda!</strong><br>Siswa ini terlambat <strong>' + terlambat + ' hari</strong>. Tagihan Denda: <strong>Rp ' + parseInt(denda).toLocaleString('id-ID') + '</strong>';
+                infoBox.style.display = 'block';
+            } else {
+                infoBox.className = 'alert alert-success mt-3 shadow-sm';
+                infoBox.style.borderLeftColor = '#00b894';
+                infoBox.innerHTML = '<i class="fas fa-check-circle me-2"></i><strong>Aman!</strong><br>Pengembalian tepat waktu. Tidak ada denda.';
+                infoBox.style.display = 'block';
+            }
+        } else {
+            infoBox.style.display = 'none';
+            document.getElementById('keterlambatan_input').value = 0;
+        }
+    });
+</script>
+@endpush
 @endsection
