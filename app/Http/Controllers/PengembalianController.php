@@ -28,6 +28,47 @@ class PengembalianController extends Controller
         return view('pengembalians.create', compact('pinjamans'));
     }
 
+    /**
+     * FUNGSI PUSAT HITUNG DENDA
+     * Dijamin 100% sama dengan logika di PinjamanController (Forward Counting)
+     */
+    private function hitungDendaBersih($tanggalPinjam, $tanggalPengembalian)
+    {
+        $tglPinjam = Carbon::parse($tanggalPinjam)->startOfDay();
+        $tglJatuhTempo = $tglPinjam->copy()->addDays(7)->startOfDay();
+        $tglKembali = Carbon::parse($tanggalPengembalian)->startOfDay();
+
+        $keterlambatan = 0;
+
+        // Hitung Keterlambatan jika melewati jatuh tempo
+        if ($tglKembali->gt($tglJatuhTempo)) {
+            $currentDate = $tglJatuhTempo->copy()->addDay();
+            
+            // Ambil data libur dari DB Master
+            $daftarTanggalMerah = HariLibur::whereBetween('tanggal', [
+                $tglJatuhTempo->toDateString(), 
+                $tglKembali->toDateString()
+            ])->pluck('tanggal')->toArray();
+            
+            while ($currentDate->lte($tglKembali)) {
+                $isMinggu = $currentDate->isSunday();
+                $isTanggalMerah = in_array($currentDate->toDateString(), $daftarTanggalMerah);
+
+                // Hanya tambah hari terlambat jika BUKAN Minggu & BUKAN Tanggal Merah
+                if (!$isMinggu && !$isTanggalMerah) {
+                    $keterlambatan++;
+                }
+                $currentDate->addDay();
+            }
+        }
+
+        return [
+            'keterlambatan' => $keterlambatan,
+            'denda' => $keterlambatan * 500,
+            'tanggal_kembali_seharusnya' => $tglJatuhTempo->toDateString()
+        ];
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -44,32 +85,9 @@ class PengembalianController extends Controller
                 return redirect()->back()->with('error', 'Pengembalian untuk peminjaman ini sudah dicatat.');
             }
 
-            // Hitung Keterlambatan & Denda (Menggunakan DB Master HariLibur & Cek Hari Minggu)
-            $tanggalPinjam = Carbon::parse($pinjaman->tanggal_pinjam)->startOfDay();
-            $tanggalHarusKembali = $tanggalPinjam->copy()->addDays(7)->startOfDay();
-            $tanggalPengembalian = Carbon::parse($validated['tanggal_pengembalian'])->startOfDay();
-
-            $lamaTerlambat = 0;
-            if ($tanggalPengembalian->gt($tanggalHarusKembali)) {
-                $currentDate = $tanggalHarusKembali->copy()->addDay();
-                
-                $daftarTanggalMerah = HariLibur::whereBetween('tanggal', [
-                    $tanggalHarusKembali->toDateString(), 
-                    $tanggalPengembalian->toDateString()
-                ])->pluck('tanggal')->toArray();
-                
-                while ($currentDate->lte($tanggalPengembalian)) {
-                    $isMinggu = $currentDate->isSunday();
-                    $isTanggalMerah = in_array($currentDate->toDateString(), $daftarTanggalMerah);
-
-                    if (!$isMinggu && !$isTanggalMerah) {
-                        $lamaTerlambat++;
-                    }
-                    $currentDate->addDay();
-                }
-            }
-
-            $denda = $lamaTerlambat * 500;
+            // Panggil Fungsi Pusat Hitung Denda
+            $hasilHitung = $this->hitungDendaBersih($pinjaman->tanggal_pinjam, $validated['tanggal_pengembalian']);
+            $tanggalPengembalianStr = Carbon::parse($validated['tanggal_pengembalian'])->toDateString();
 
             // Catat Pengembalian
             Pengembalian::create([
@@ -78,17 +96,17 @@ class PengembalianController extends Controller
                 'nama' => $pinjaman->nama,
                 'kelas' => $pinjaman->kelas,
                 'judul_buku' => $pinjaman->judul_buku,
-                'tanggal_kembali' => $tanggalHarusKembali->toDateString(), 
-                'tanggal_pengembalian' => $tanggalPengembalian->toDateString(),
-                'keterlambatan' => $lamaTerlambat,
-                'denda' => $denda
+                'tanggal_kembali' => $hasilHitung['tanggal_kembali_seharusnya'], 
+                'tanggal_pengembalian' => $tanggalPengembalianStr,
+                'keterlambatan' => $hasilHitung['keterlambatan'],
+                'denda' => $hasilHitung['denda']
             ]);
 
             // Update status Pinjaman
             $pinjaman->update([
                 'status' => 'sudah dikembalikan', 
-                'denda' => $denda, 
-                'tanggal_kembali' => $tanggalPengembalian->toDateString()
+                'denda' => $hasilHitung['denda'], 
+                'tanggal_kembali' => $tanggalPengembalianStr
             ]);
             
             // Kembalikan Stok Buku
@@ -122,43 +140,21 @@ class PengembalianController extends Controller
         try {
             $pinjaman = $pengembalian->pinjaman;
             
-            $tanggalPinjam = Carbon::parse($pinjaman->tanggal_pinjam)->startOfDay();
-            $tanggalHarusKembali = $tanggalPinjam->copy()->addDays(7)->startOfDay();
-            $tanggalPengembalian = Carbon::parse($validated['tanggal_pengembalian'])->startOfDay();
-
-            $lamaTerlambat = 0;
-            if ($tanggalPengembalian->gt($tanggalHarusKembali)) {
-                $currentDate = $tanggalHarusKembali->copy()->addDay();
-                
-                $daftarTanggalMerah = HariLibur::whereBetween('tanggal', [
-                    $tanggalHarusKembali->toDateString(), 
-                    $tanggalPengembalian->toDateString()
-                ])->pluck('tanggal')->toArray();
-                
-                while ($currentDate->lte($tanggalPengembalian)) {
-                    $isMinggu = $currentDate->isSunday();
-                    $isTanggalMerah = in_array($currentDate->toDateString(), $daftarTanggalMerah);
-
-                    if (!$isMinggu && !$isTanggalMerah) {
-                        $lamaTerlambat++;
-                    }
-                    $currentDate->addDay();
-                }
-            }
-
-            $denda = $lamaTerlambat * 500;
+            // Panggil Fungsi Pusat Hitung Denda untuk Update
+            $hasilHitung = $this->hitungDendaBersih($pinjaman->tanggal_pinjam, $validated['tanggal_pengembalian']);
+            $tanggalPengembalianStr = Carbon::parse($validated['tanggal_pengembalian'])->toDateString();
 
             // Perbarui Data Pengembalian
             $pengembalian->update([
-                'tanggal_pengembalian' => $tanggalPengembalian->toDateString(),
-                'keterlambatan' => $lamaTerlambat,
-                'denda' => $denda
+                'tanggal_pengembalian' => $tanggalPengembalianStr,
+                'keterlambatan' => $hasilHitung['keterlambatan'],
+                'denda' => $hasilHitung['denda']
             ]);
 
             if ($pinjaman) {
                 $pinjaman->update([
-                    'denda' => $denda, 
-                    'tanggal_kembali' => $tanggalPengembalian->toDateString()
+                    'denda' => $hasilHitung['denda'], 
+                    'tanggal_kembali' => $tanggalPengembalianStr
                 ]);
             }
 
