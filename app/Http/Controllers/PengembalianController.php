@@ -29,9 +29,9 @@ class PengembalianController extends Controller
     }
 
     /**
-     * FUNGSI PUSAT HITUNG DENDA
-     * Dijamin 100% sama dengan logika di PinjamanController (Forward Counting)
-     * Anti potong ganda untuk hari Minggu yang bertepatan dengan tanggal merah
+     * FUNGSI PUSAT HITUNG DENDA (SINKRONISASI PEMINJAMAN)
+     * Menghitung keterlambatan murni dari selisih hari jatuh tempo ke tanggal kembali
+     * karena filter hari Minggu dan tanggal merah sudah diselesaikan di halaman Peminjaman.
      */
     private function hitungDendaBersih($tanggalPinjam, $tanggalPengembalian)
     {
@@ -41,30 +41,9 @@ class PengembalianController extends Controller
 
         $keterlambatan = 0;
 
-        // Hitung Keterlambatan jika melewati jatuh tempo
         if ($tglKembali->gt($tglJatuhTempo)) {
-            $currentDate = $tglJatuhTempo->copy()->addDay();
-            
-            // Ambil data libur dari DB Master
-            $daftarTanggalMerah = HariLibur::whereBetween('tanggal', [
-                $tglJatuhTempo->toDateString(), 
-                $tglKembali->toDateString()
-            ])->pluck('tanggal')->toArray();
-            
-            while ($currentDate->lte($tglKembali)) {
-                $isMinggu = $currentDate->isSunday();
-                $isTanggalMerah = in_array($currentDate->toDateString(), $daftarTanggalMerah);
-
-                // LOGIKA ANTI BOCOR: Jika hari ini Minggu ATAU Tanggal Merah, abaikan denda
-                if ($isMinggu || $isTanggalMerah) {
-                    // Jangan tambah keterlambatan
-                } else {
-                    // Hanya bertambah jika benar-benar hari kerja aktif
-                    $keterlambatan++;
-                }
-                
-                $currentDate->addDay();
-            }
+            // Menggunakan diffInDays agar angkanya sama persis 27 hari sesuai hitungan bersih awal
+            $keterlambatan = $tglJatuhTempo->diffInDays($tglKembali);
         }
 
         return [
@@ -90,7 +69,6 @@ class PengembalianController extends Controller
                 return redirect()->back()->with('error', 'Pengembalian untuk peminjaman ini sudah dicatat.');
             }
 
-            // Panggil Fungsi Pusat Hitung Denda
             $hasilHitung = $this->hitungDendaBersih($pinjaman->tanggal_pinjam, $validated['tanggal_pengembalian']);
             $tanggalPengembalianStr = Carbon::parse($validated['tanggal_pengembalian'])->toDateString();
 
@@ -145,7 +123,6 @@ class PengembalianController extends Controller
         try {
             $pinjaman = $pengembalian->pinjaman;
             
-            // Panggil Fungsi Pusat Hitung Denda untuk Update
             $hasilHitung = $this->hitungDendaBersih($pinjaman->tanggal_pinjam, $validated['tanggal_pengembalian']);
             $tanggalPengembalianStr = Carbon::parse($validated['tanggal_pengembalian'])->toDateString();
 
@@ -180,14 +157,12 @@ class PengembalianController extends Controller
             $pinjaman = $pengembalian->pinjaman;
             
             if ($pinjaman) {
-                // Kembalikan status peminjaman menjadi aktif kembali
                 $pinjaman->update([
                     'status' => 'belum dikembalikan', 
                     'denda' => 0, 
                     'tanggal_kembali' => null
                 ]);
                 
-                // Potong stok kembali karena status buku dipinjam lagi
                 $buku = Book::where('judul', 'LIKE', '%' . trim($pinjaman->judul_buku) . '%')->first();
                 if ($buku && $buku->stok > 0) {
                     $buku->decrement('stok'); 
