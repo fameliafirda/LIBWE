@@ -231,6 +231,7 @@ class PinjamanController extends Controller
                 return redirect()->back()->with('warning', 'Buku sudah dikembalikan!');
             }
             
+            // FUNGSI INI YANG DIKLIK LEWAT TOMBOL CENTANG HIJAU
             $this->processPengembalian($pinjaman);
             
             $buku = Book::where('judul', 'LIKE', '%' . trim($pinjaman->judul_buku) . '%')->first();
@@ -247,35 +248,36 @@ class PinjamanController extends Controller
     }
 
     /**
-     * CORE LOGIC: PROSES PENGEMBALIAN & HITUNG DENDA (MURNI MASTER TABEL & HARI MINGGU)
+     * CORE LOGIC: PROSES PENGEMBALIAN & HITUNG DENDA
+     * KINI 1000% SINKRON DENGAN ARRAY MANUAL VIEW BLADE PEMINJAMAN
      */
     private function processPengembalian(Pinjaman $pinjaman, $tanggalKembaliInput = null)
     {
-        // 1. Tentukan Tanggal Kembali Aktual
-        $tglKembaliAktual = $tanggalKembaliInput ? Carbon::parse($tanggalKembaliInput) : Carbon::now('Asia/Jakarta');
-        $tglKembaliStr = $tglKembaliAktual->toDateString();
-        
-        // 2. Tentukan Jatuh Tempo (7 Hari dari Pinjam)
-        $tglPinjam = Carbon::parse($pinjaman->tanggal_pinjam)->startOfDay();
+        $tglPinjam = Carbon::parse($pinjaman->tanggal_pinjam)->timezone('Asia/Jakarta')->startOfDay();
         $tglJatuhTempo = $tglPinjam->copy()->addDays(7)->startOfDay();
+        
+        $tglKembaliAktual = $tanggalKembaliInput ? Carbon::parse($tanggalKembaliInput)->timezone('Asia/Jakarta')->startOfDay() : Carbon::now('Asia/Jakarta')->startOfDay();
+        $tglKembaliStr = $tglKembaliAktual->toDateString();
         
         $keterlambatan = 0;
 
-        // 3. Hitung Keterlambatan jika melewati jatuh tempo
-        if ($tglKembaliAktual->startOfDay()->gt($tglJatuhTempo)) {
+        // INILAH SUMBER MASALAHNYA! SEKARANG KITA GANTI PAKAI ARRAY MANUAL DARI VIEW KAMU
+        if ($tglKembaliAktual->gt($tglJatuhTempo)) {
+            $daftarTanggalMerah = [
+                '2026-01-01', '2026-01-23', '2026-01-24', '2026-02-15', 
+                '2026-03-19', '2026-03-20', '2026-03-21', '2026-04-03', 
+                '2026-04-05', '2026-05-01', '2026-05-14', '2026-05-15', 
+                '2026-05-24', '2026-05-25', '2026-06-01', '2026-11-27', 
+                '2026-12-25',
+            ];
+
             $currentDate = $tglJatuhTempo->copy()->addDay();
             
-            // AMBIL DATA HARI LIBUR DARI DB MASTER (Tabel hari_liburs)
-            $daftarTanggalMerah = HariLibur::whereBetween('tanggal', [
-                $tglJatuhTempo->toDateString(), 
-                $tglKembaliStr
-            ])->pluck('tanggal')->toArray();
-            
+            // Perulangan yang sama persis
             while ($currentDate->lte($tglKembaliAktual)) {
-                $isMinggu = $currentDate->isSunday(); // Kunci Hari Minggu otomatis Rp 0
+                $isMinggu = $currentDate->isSunday(); 
                 $isTanggalMerah = in_array($currentDate->toDateString(), $daftarTanggalMerah);
 
-                // Hanya menambah hari terlambat jika BUKAN Minggu dan BUKAN Tanggal Merah
                 if (!$isMinggu && !$isTanggalMerah) {
                     $keterlambatan++;
                 }
@@ -285,14 +287,12 @@ class PinjamanController extends Controller
         
         $denda = $keterlambatan * 500;
         
-        // 4. Update data Pinjaman
         $pinjaman->update([
             'status' => 'sudah dikembalikan',
             'denda' => $denda,
             'tanggal_kembali' => $tglKembaliStr
         ]);
         
-        // 5. Simpan/Update ke Tabel Pengembalian
         Pengembalian::updateOrCreate(
             ['pinjaman_id' => $pinjaman->id],
             [
@@ -300,8 +300,8 @@ class PinjamanController extends Controller
                 'nama'                 => $pinjaman->nama,
                 'kelas'                => $pinjaman->kelas,
                 'judul_buku'           => $pinjaman->judul_buku,
-                'tanggal_kembali'      => $tglJatuhTempo->toDateString(), // Seharusnya kembali
-                'tanggal_pengembalian' => $tglKembaliStr,                // Aktual kembali
+                'tanggal_kembali'      => $tglJatuhTempo->toDateString(), 
+                'tanggal_pengembalian' => $tglKembaliStr,                
                 'keterlambatan'        => $keterlambatan,
                 'denda'                => $denda,
             ]
