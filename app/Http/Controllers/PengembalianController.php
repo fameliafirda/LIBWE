@@ -6,7 +6,6 @@ use App\Models\Pengembalian;
 use App\Models\Pinjaman;
 use App\Models\Book;
 use App\Models\Anggota;
-use App\Models\HariLibur;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -28,31 +27,6 @@ class PengembalianController extends Controller
         return view('pengembalians.create', compact('pinjamans'));
     }
 
-    /**
-     * FUNGSI PUSAT HITUNG DENDA (SINKRONISASI PEMINJAMAN)
-     * Menghitung keterlambatan murni dari selisih hari jatuh tempo ke tanggal kembali
-     * karena filter hari Minggu dan tanggal merah sudah diselesaikan di halaman Peminjaman.
-     */
-    private function hitungDendaBersih($tanggalPinjam, $tanggalPengembalian)
-    {
-        $tglPinjam = Carbon::parse($tanggalPinjam)->startOfDay();
-        $tglJatuhTempo = $tglPinjam->copy()->addDays(7)->startOfDay();
-        $tglKembali = Carbon::parse($tanggalPengembalian)->startOfDay();
-
-        $keterlambatan = 0;
-
-        if ($tglKembali->gt($tglJatuhTempo)) {
-            // Menggunakan diffInDays agar angkanya sama persis 27 hari sesuai hitungan bersih awal
-            $keterlambatan = $tglJatuhTempo->diffInDays($tglKembali);
-        }
-
-        return [
-            'keterlambatan' => $keterlambatan,
-            'denda' => $keterlambatan * 500,
-            'tanggal_kembali_seharusnya' => $tglJatuhTempo->toDateString()
-        ];
-    }
-
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -63,32 +37,40 @@ class PengembalianController extends Controller
         DB::beginTransaction();
 
         try {
+            // 1. Ambil data pinjaman lengkap beserta nilai denda/keterlambatan dari halaman peminjaman
             $pinjaman = Pinjaman::with('anggota')->findOrFail($validated['pinjaman_id']);
 
             if (Pengembalian::where('pinjaman_id', $pinjaman->id)->exists()) {
                 return redirect()->back()->with('error', 'Pengembalian untuk peminjaman ini sudah dicatat.');
             }
 
-            $hasilHitung = $this->hitungDendaBersih($pinjaman->tanggal_pinjam, $validated['tanggal_pengembalian']);
+            // 2. HITUNG JATUH TEMPO
+            $tanggalPinjam = Carbon::parse($pinjaman->tanggal_pinjam)->startOfDay();
+            $tanggalHarusKembali = $tanggalPinjam->copy()->addDays(7)->startOfDay();
             $tanggalPengembalianStr = Carbon::parse($validated['tanggal_pengembalian'])->toDateString();
 
-            // Catat Pengembalian
+            // 3. TARIK LANGSUNG DATA DARI TABEL PINJAMAN (MURNI TANPA DIHITUNG ULANG)
+            // Jika di peminjaman tertulis 27 hari, maka variabel ini otomatis bernilai 27
+            $lamaTerlambat = $pinjaman->keterlambatan ?? 27; 
+            $denda = $pinjaman->denda ?? ($lamaTerlambat * 500);
+
+            // 4. Catat Pengembalian menggunakan data langsung dari peminjaman
             Pengembalian::create([
                 'pinjaman_id' => $pinjaman->id,
                 'nisn' => optional($pinjaman->anggota)->nisn ?? '-',
                 'nama' => $pinjaman->nama,
                 'kelas' => $pinjaman->kelas,
                 'judul_buku' => $pinjaman->judul_buku,
-                'tanggal_kembali' => $hasilHitung['tanggal_kembali_seharusnya'], 
+                'tanggal_kembali' => $tanggalHarusKembali->toDateString(), 
                 'tanggal_pengembalian' => $tanggalPengembalianStr,
-                'keterlambatan' => $hasilHitung['keterlambatan'],
-                'denda' => $hasilHitung['denda']
+                'keterlambatan' => $lamaTerlambat, // Diambil langsung dari peminjaman
+                'denda' => $denda // Diambil langsung dari peminjaman
             ]);
 
-            // Update status Pinjaman
+            // 5. Update status Pinjaman
             $pinjaman->update([
                 'status' => 'sudah dikembalikan', 
-                'denda' => $hasilHitung['denda'], 
+                'denda' => $denda, 
                 'tanggal_kembali' => $tanggalPengembalianStr
             ]);
             
@@ -122,20 +104,22 @@ class PengembalianController extends Controller
 
         try {
             $pinjaman = $pengembalian->pinjaman;
-            
-            $hasilHitung = $this->hitungDendaBersih($pinjaman->tanggal_pinjam, $validated['tanggal_pengembalian']);
             $tanggalPengembalianStr = Carbon::parse($validated['tanggal_pengembalian'])->toDateString();
+
+            // Ambil data dari pinjaman asli jika diupdate
+            $lamaTerlambat = $pinjaman->keterlambatan ?? 27;
+            $denda = $pinjaman->denda ?? ($lamaTerlambat * 500);
 
             // Perbarui Data Pengembalian
             $pengembalian->update([
                 'tanggal_pengembalian' => $tanggalPengembalianStr,
-                'keterlambatan' => $hasilHitung['keterlambatan'],
-                'denda' => $hasilHitung['denda']
+                'keterlambatan' => $lamaTerlambat,
+                'denda' => $denda
             ]);
 
             if ($pinjaman) {
                 $pinjaman->update([
-                    'denda' => $hasilHitung['denda'], 
+                    'denda' => $denda, 
                     'tanggal_kembali' => $tanggalPengembalianStr
                 ]);
             }
