@@ -154,33 +154,29 @@
                                 </span>
                             </td>
                             <td class="text-center">
-                                @if($pengembalian->keterlambatan > 0)
-                                    <span class="badge bg-danger text-white px-3 py-2">{{ $pengembalian->keterlambatan }} hari</span>
-                                @else
-                                    <span class="badge bg-success text-white px-3 py-2">Tepat waktu</span>
-                                @endif
+                                {!! $pengembalian->status_keterlambatan !!}
                             </td>
-                            <td class="text-end fw-bold text-danger">Rp {{ number_format($pengembalian->denda, 0, ',', '.') }}</td>
+                            <td class="text-end fw-bold text-danger">{{ $pengembalian->denda_formatted }}</td>
                             <td class="text-center">
-                                <div class="d-flex justify-content-center align-items-center" style="gap: 25px;">
+                                <div class="d-flex justify-content-center align-items-center" style="gap: 15px;">
                                     <a href="{{ route('pengembalians.edit', $pengembalian->id) }}" 
-                                       style="color: #f59e0b; font-size: 1.3rem; transition: 0.2s; text-decoration: none;"
+                                       style="color: #f59e0b; font-size: 1.2rem; transition: 0.2s; text-decoration: none;"
                                        onmouseover="this.style.transform='scale(1.2)'"
                                        onmouseout="this.style.transform='scale(1)'"
-                                       title="Edit">
+                                       title="Edit Data Pengembalian">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <form action="{{ route('pengembalians.destroy', $pengembalian->id) }}" 
                                           method="POST" 
                                           class="m-0 p-0"
-                                          onsubmit="return confirm('Yakin ingin menghapus data ini?');">
+                                          onsubmit="return confirm('Peringatan: Menghapus data ini akan membatalkan pengembalian dan mengembalikan status buku menjadi DIPINJAM. Yakin ingin melanjutkan?');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" 
-                                                style="background: transparent; border: none; color: #ef4444; font-size: 1.3rem; transition: 0.2s; padding: 0; cursor: pointer;"
+                                                style="background: transparent; border: none; color: #ef4444; font-size: 1.2rem; transition: 0.2s; padding: 0; cursor: pointer;"
                                                 onmouseover="this.style.transform='scale(1.2)'"
                                                 onmouseout="this.style.transform='scale(1)'"
-                                                title="Hapus">
+                                                title="Hapus Data Pengembalian">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </form>
@@ -208,7 +204,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.map(function (tooltipTriggerEl) {
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
     });
