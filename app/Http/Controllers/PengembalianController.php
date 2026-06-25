@@ -27,6 +27,49 @@ class PengembalianController extends Controller
         return view('pengembalians.create', compact('pinjamans'));
     }
 
+    /**
+     * FUNGSI PUSAT HITUNG DENDA (SINKRON 100% DENGAN VIEW PEMINJAMAN BLADE)
+     * Menggunakan array manual dan logika filter yang persis sama dengan tampilan depan
+     */
+    private function hitungDendaBersih($tanggalPinjam, $tanggalPengembalian)
+    {
+        $tglPinjam = Carbon::parse($tanggalPinjam)->startOfDay();
+        $jatuhTempo = $tglPinjam->copy()->addDays(7)->startOfDay();
+        $hariIniAtauKembali = Carbon::parse($tanggalPengembalian)->startOfDay();
+
+        $terlambat = 0;
+
+        if ($hariIniAtauKembali->gt($jatuhTempo)) {
+            // MENIRU ARRAY MANUAL DARI PINJAMAN INDEX BLADE
+            $daftarTanggalMerah = [
+                '2026-01-01', '2026-01-23', '2026-01-24', '2026-02-15', 
+                '2026-03-19', '2026-03-20', '2026-03-21', '2026-04-03', 
+                '2026-04-05', '2026-05-01', '2026-05-14', '2026-05-15', 
+                '2026-05-24', '2026-05-25', '2026-06-01', '2026-11-27', 
+                '2026-12-25',
+            ];
+
+            $currentDate = $jatuhTempo->copy()->addDay();
+            
+            while ($currentDate->lte($hariIniAtauKembali)) {
+                $isMinggu = $currentDate->isSunday(); 
+                $isTanggalMerah = in_array($currentDate->toDateString(), $daftarTanggalMerah);
+
+                // LOGIKA YANG SAMA PERSIS DENGAN VIEW BLADE
+                if (!$isMinggu && !$isTanggalMerah) {
+                    $terlambat++;
+                }
+                $currentDate->addDay();
+            }
+        }
+
+        return [
+            'keterlambatan' => $terlambat,
+            'denda' => $terlambat * 500,
+            'tanggal_kembali_seharusnya' => $jatuhTempo->toDateString()
+        ];
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -43,39 +86,28 @@ class PengembalianController extends Controller
                 return redirect()->back()->with('error', 'Pengembalian untuk peminjaman ini sudah dicatat.');
             }
 
-            // 1. Tentukan tanggal jatuh tempo (7 hari setelah pinjam)
-            $tanggalPinjam = Carbon::parse($pinjaman->tanggal_pinjam)->startOfDay();
-            $tanggalHarusKembali = $tanggalPinjam->copy()->addDays(7)->startOfDay();
-            
-            // 2. Tentukan tanggal pengembalian dari form input
-            $tanggalPengembalian = Carbon::parse($validated['tanggal_pengembalian'])->startOfDay();
+            // Hitung menggunakan rumus tiruan peminjaman blade
+            $hasilHitung = $this->hitungDendaBersih($pinjaman->tanggal_pinjam, $validated['tanggal_pengembalian']);
+            $tanggalPengembalianStr = Carbon::parse($validated['tanggal_pengembalian'])->toDateString();
 
-            // 3. HITUNG KETERLAMBATAN MURNI KALENDER (Sama dengan logika halaman Peminjaman)
-            $lamaTerlambat = 0;
-            if ($tanggalPengembalian->gt($tanggalHarusKembali)) {
-                $lamaTerlambat = $tanggalHarusKembali->diffInDays($tanggalPengembalian);
-            }
-
-            $denda = $lamaTerlambat * 500;
-
-            // 4. Catat ke tabel Pengembalian
+            // Catat Pengembalian
             Pengembalian::create([
                 'pinjaman_id' => $pinjaman->id,
                 'nisn' => optional($pinjaman->anggota)->nisn ?? '-',
                 'nama' => $pinjaman->nama,
                 'kelas' => $pinjaman->kelas,
                 'judul_buku' => $pinjaman->judul_buku,
-                'tanggal_kembali' => $tanggalHarusKembali->toDateString(), 
-                'tanggal_pengembalian' => $tanggalPengembalian->toDateString(),
-                'keterlambatan' => $lamaTerlambat,
-                'denda' => $denda
+                'tanggal_kembali' => $hasilHitung['tanggal_kembali_seharusnya'], 
+                'tanggal_pengembalian' => $tanggalPengembalianStr,
+                'keterlambatan' => $hasilHitung['keterlambatan'],
+                'denda' => $hasilHitung['denda']
             ]);
 
-            // 5. Update status di tabel Pinjaman agar sinkron
+            // Update status Pinjaman
             $pinjaman->update([
                 'status' => 'sudah dikembalikan', 
-                'denda' => $denda, 
-                'tanggal_kembali' => $tanggalPengembalian->toDateString()
+                'denda' => $hasilHitung['denda'], 
+                'tanggal_kembali' => $tanggalPengembalianStr
             ]);
             
             // Kembalikan Stok Buku
@@ -109,29 +141,20 @@ class PengembalianController extends Controller
         try {
             $pinjaman = $pengembalian->pinjaman;
             
-            $tanggalPinjam = Carbon::parse($pinjaman->tanggal_pinjam)->startOfDay();
-            $tanggalHarusKembali = $tanggalPinjam->copy()->addDays(7)->startOfDay();
-            $tanggalPengembalian = Carbon::parse($validated['tanggal_pengembalian'])->startOfDay();
-
-            // Hitung ulang secara murni tanpa potongan libur
-            $lamaTerlambat = 0;
-            if ($tanggalPengembalian->gt($tanggalHarusKembali)) {
-                $lamaTerlambat = $tanggalHarusKembali->diffInDays($tanggalPengembalian);
-            }
-
-            $denda = $lamaTerlambat * 500;
+            $hasilHitung = $this->hitungDendaBersih($pinjaman->tanggal_pinjam, $validated['tanggal_pengembalian']);
+            $tanggalPengembalianStr = Carbon::parse($validated['tanggal_pengembalian'])->toDateString();
 
             // Perbarui Data Pengembalian
             $pengembalian->update([
-                'tanggal_pengembalian' => $tanggalPengembalian->toDateString(),
-                'keterlambatan' => $lamaTerlambat,
-                'denda' => $denda
+                'tanggal_pengembalian' => $tanggalPengembalianStr,
+                'keterlambatan' => $hasilHitung['keterlambatan'],
+                'denda' => $hasilHitung['denda']
             ]);
 
             if ($pinjaman) {
                 $pinjaman->update([
-                    'denda' => $denda, 
-                    'tanggal_kembali' => $tanggalPengembalian->toDateString()
+                    'denda' => $hasilHitung['denda'], 
+                    'tanggal_kembali' => $tanggalPengembalianStr
                 ]);
             }
 
@@ -167,7 +190,7 @@ class PengembalianController extends Controller
             $pengembalian->delete();
 
             DB::commit();
-            return redirect()->route('pengembalians.index')->with('success', 'Data pengembalian berhasil deleted.');
+            return redirect()->route('pengembalians.index')->with('success', 'Data pengembalian berhasil dihapus.');
 
         } catch (\Exception $e) {
             DB::rollBack();
