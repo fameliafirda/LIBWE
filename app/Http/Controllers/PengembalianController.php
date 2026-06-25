@@ -31,6 +31,7 @@ class PengembalianController extends Controller
     /**
      * FUNGSI PUSAT HITUNG DENDA
      * Dijamin 100% sama dengan logika di PinjamanController (Forward Counting)
+     * Anti potong ganda untuk hari Minggu yang bertepatan dengan tanggal merah
      */
     private function hitungDendaBersih($tanggalPinjam, $tanggalPengembalian)
     {
@@ -54,10 +55,14 @@ class PengembalianController extends Controller
                 $isMinggu = $currentDate->isSunday();
                 $isTanggalMerah = in_array($currentDate->toDateString(), $daftarTanggalMerah);
 
-                // Hanya tambah hari terlambat jika BUKAN Minggu & BUKAN Tanggal Merah
-                if (!$isMinggu && !$isTanggalMerah) {
+                // LOGIKA ANTI BOCOR: Jika hari ini Minggu ATAU Tanggal Merah, abaikan denda
+                if ($isMinggu || $isTanggalMerah) {
+                    // Jangan tambah keterlambatan
+                } else {
+                    // Hanya bertambah jika benar-benar hari kerja aktif
                     $keterlambatan++;
                 }
+                
                 $currentDate->addDay();
             }
         }
