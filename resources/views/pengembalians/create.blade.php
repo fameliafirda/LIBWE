@@ -3,6 +3,13 @@
 @section('title', 'Tambah Pengembalian')
 
 @section('content')
+@php
+    $daftarTanggalMerah = \App\Models\HariLibur::pluck('tanggal')
+        ->map(function($t) {
+            return \Carbon\Carbon::parse($t)->toDateString();
+        })->toArray();
+@endphp
+
 <div class="container-fluid px-4 py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>

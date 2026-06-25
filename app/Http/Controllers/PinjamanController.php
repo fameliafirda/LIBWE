@@ -263,13 +263,11 @@ class PinjamanController extends Controller
 
         // INILAH SUMBER MASALAHNYA! SEKARANG KITA GANTI PAKAI ARRAY MANUAL DARI VIEW KAMU
         if ($tglKembaliAktual->gt($tglJatuhTempo)) {
-            $daftarTanggalMerah = [
-                '2026-01-01', '2026-01-23', '2026-01-24', '2026-02-15', 
-                '2026-03-19', '2026-03-20', '2026-03-21', '2026-04-03', 
-                '2026-04-05', '2026-05-01', '2026-05-14', '2026-05-15', 
-                '2026-05-24', '2026-05-25', '2026-06-01', '2026-11-27', 
-                '2026-12-25',
-            ];
+           // Ambil data tanggal libur langsung dari database
+$daftarTanggalMerah = \App\Models\HariLibur::pluck('tanggal')
+    ->map(function($t) {
+        return \Carbon\Carbon::parse($t)->toDateString();
+    })->toArray();
 
             $currentDate = $tglJatuhTempo->copy()->addDay();
             

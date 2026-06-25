@@ -3,6 +3,15 @@
 @section('title', 'Daftar Peminjaman')
 
 @section('content')
+
+@php
+    // TARIK DATABASE HARI LIBUR SEKALI SAJA DI ATAS AGAR WEBSITE TIDAK LEMOT
+    $daftarTanggalMerah = \App\Models\HariLibur::pluck('tanggal')
+        ->map(function($t) {
+            return \Carbon\Carbon::parse($t)->toDateString();
+        })->toArray();
+@endphp
+
 <div class="container-fluid px-4 py-3">
     <div class="row g-0 mb-4">
         <div class="col-12">
@@ -231,19 +240,11 @@
                                         $jatuhTempo = $tglPinjam->copy()->addDays(7);
                                         $terlambat = 0;
                                         
-                                        // LOGIKA BARU: Sinkronisasi libur nasional ke UI View agar cocok dengan controller!
+                                        // MENGGUNAKAN VARIABEL $daftarTanggalMerah DARI DATABASE DI ATAS
                                         if($pinjaman->status == 'belum dikembalikan') {
                                             $hariIni = \Carbon\Carbon::now('Asia/Jakarta')->startOfDay();
                                             if($hariIni->gt($jatuhTempo)) {
                                                 
-                                                $daftarTanggalMerah = [
-                                                    '2026-01-01', '2026-01-23', '2026-01-24', '2026-02-15', 
-                                                    '2026-03-19', '2026-03-20', '2026-03-21', '2026-04-03', 
-                                                    '2026-04-05', '2026-05-01', '2026-05-14', '2026-05-15', 
-                                                    '2026-05-24', '2026-05-25', '2026-06-01', '2026-11-27', 
-                                                    '2026-12-25',
-                                                ];
-
                                                 $currentDate = $jatuhTempo->copy()->addDay();
                                                 
                                                 while ($currentDate->lte($hariIni)) {

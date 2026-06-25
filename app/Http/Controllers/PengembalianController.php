@@ -6,6 +6,7 @@ use App\Models\Pengembalian;
 use App\Models\Pinjaman;
 use App\Models\Book;
 use App\Models\Anggota;
+use App\Models\HariLibur;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -44,29 +45,39 @@ class PengembalianController extends Controller
                 return redirect()->back()->with('error', 'Pengembalian untuk peminjaman ini sudah dicatat.');
             }
 
-            // 2. Set tanggal utama
-            $tanggalPinjam = Carbon::parse($pinjaman->tanggal_pinjam)->timezone('Asia/Jakarta')->startOfDay();
-            $tanggalHarusKembali = $tanggalPinjam->copy()->addDays(7)->startOfDay();
-            $tanggalPengembalianStr = Carbon::parse($validated['tanggal_pengembalian'])->timezone('Asia/Jakarta')->toDateString();
+            // 2. Set tanggal utama dengan Zona Waktu Asia/Jakarta
+            $tglPinjam = Carbon::parse($pinjaman->tanggal_pinjam)->timezone('Asia/Jakarta')->startOfDay();
+            $tanggalHarusKembali = $tglPinjam->copy()->addDays(7)->startOfDay();
+            $tanggalPengembalianAktual = Carbon::parse($validated['tanggal_pengembalian'])->timezone('Asia/Jakarta')->startOfDay();
 
-            // ================================================================
-            // LOGIKA COPAS MUTLAK (ANTI HITUNG ULANG)
-            // ================================================================
-            // Karena di halaman peminjaman kamu sudah sukses menghitung 37 hari,
-            // kita langsung tembak dan ambil angka itu secara live dari view peminjaman lewat simulasi blade-nya.
-            // Jika variabel $pinjaman->keterlambatan kosong, kita paksa isi 37 hari (khusus untuk kasus Famelia agar aman).
-            
-            $lamaTerlambat = $pinjaman->keterlambatan ?? 37;
-            
-            // Jaga-jaga kalau sistem PHP masih membaca cache angka 34:
-            if ($lamaTerlambat < 37) {
-                $lamaTerlambat = 37;
+            $lamaTerlambat = 0;
+
+            // 3. LOGIKA HITUNG DINAMIS MENGGUNAKAN DATABASE HARI LIBUR
+            if ($tanggalPengembalianAktual->gt($tanggalHarusKembali)) {
+                // Tarik data tanggal libur dari database tabel hari_liburs
+                $daftarTanggalMerah = HariLibur::pluck('tanggal')
+                    ->map(function($t) {
+                        return Carbon::parse($t)->toDateString();
+                    })->toArray();
+
+                // Perhitungan dimulai H+1 setelah tanggal jatuh tempo
+                $currentDate = $tanggalHarusKembali->copy()->addDay();
+                
+                while ($currentDate->lte($tanggalPengembalianAktual)) {
+                    $isMinggu = $currentDate->isSunday(); 
+                    $isTanggalMerah = in_array($currentDate->toDateString(), $daftarTanggalMerah);
+
+                    // Hanya bertambah jika bukan hari Minggu DAN bukan tanggal merah di database
+                    if (!$isMinggu && !$isTanggalMerah) {
+                        $lamaTerlambat++;
+                    }
+                    $currentDate->addDay();
+                }
             }
 
             $denda = $lamaTerlambat * 500;
-            // ================================================================
 
-            // 3. Catat ke tabel Pengembalian
+            // 4. Catat ke tabel Pengembalian
             Pengembalian::create([
                 'pinjaman_id' => $pinjaman->id,
                 'nisn' => optional($pinjaman->anggota)->nisn ?? '-',
@@ -74,16 +85,16 @@ class PengembalianController extends Controller
                 'kelas' => $pinjaman->kelas,
                 'judul_buku' => $pinjaman->judul_buku,
                 'tanggal_kembali' => $tanggalHarusKembali->toDateString(), 
-                'tanggal_pengembalian' => $tanggalPengembalianStr,
+                'tanggal_pengembalian' => $tanggalPengembalianAktual->toDateString(),
                 'keterlambatan' => $lamaTerlambat, 
                 'denda' => $denda
             ]);
 
-            // 4. Update tabel Pinjaman
+            // 5. Update status di tabel Pinjaman
             $pinjaman->update([
                 'status' => 'sudah dikembalikan', 
                 'denda' => $denda, 
-                'tanggal_kembali' => $tanggalPengembalianStr
+                'tanggal_kembali' => $tanggalPengembalianAktual->toDateString()
             ]);
             
             // Kembalikan Stok Buku
@@ -116,14 +127,38 @@ class PengembalianController extends Controller
 
         try {
             $pinjaman = $pengembalian->pinjaman;
-            $tanggalPengembalianStr = Carbon::parse($validated['tanggal_pengembalian'])->timezone('Asia/Jakarta')->toDateString();
+            
+            $tglPinjam = Carbon::parse($pinjaman->tanggal_pinjam)->timezone('Asia/Jakarta')->startOfDay();
+            $tanggalHarusKembali = $tglPinjam->copy()->addDays(7)->startOfDay();
+            $tanggalPengembalianAktual = Carbon::parse($validated['tanggal_pengembalian'])->timezone('Asia/Jakarta')->startOfDay();
 
-            // Paksa 37 hari saat update data
-            $lamaTerlambat = 37;
+            $lamaTerlambat = 0;
+
+            // Perhitungan dinamis saat proses edit/update data
+            if ($tanggalPengembalianAktual->gt($tanggalHarusKembali)) {
+                $daftarTanggalMerah = HariLibur::pluck('tanggal')
+                    ->map(function($t) {
+                        return Carbon::parse($t)->toDateString();
+                    })->toArray();
+
+                $currentDate = $tanggalHarusKembali->copy()->addDay();
+                
+                while ($currentDate->lte($tanggalPengembalianAktual)) {
+                    $isMinggu = $currentDate->isSunday(); 
+                    $isTanggalMerah = in_array($currentDate->toDateString(), $daftarTanggalMerah);
+
+                    if (!$isMinggu && !$isTanggalMerah) {
+                        $lamaTerlambat++;
+                    }
+                    $currentDate->addDay();
+                }
+            }
+
             $denda = $lamaTerlambat * 500;
 
+            // Perbarui Data Pengembalian
             $pengembalian->update([
-                'tanggal_pengembalian' => $tanggalPengembalianStr,
+                'tanggal_pengembalian' => $tanggalPengembalianAktual->toDateString(),
                 'keterlambatan' => $lamaTerlambat,
                 'denda' => $denda
             ]);
@@ -131,7 +166,7 @@ class PengembalianController extends Controller
             if ($pinjaman) {
                 $pinjaman->update([
                     'denda' => $denda, 
-                    'tanggal_kembali' => $tanggalPengembalianStr
+                    'tanggal_kembali' => $tanggalPengembalianAktual->toDateString()
                 ]);
             }
 
