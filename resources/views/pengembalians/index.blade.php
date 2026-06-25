@@ -154,9 +154,15 @@
                                 </span>
                             </td>
                             <td class="text-center">
-                                {!! $pengembalian->status_keterlambatan !!}
+                                @if($pengembalian->keterlambatan > 0)
+                                    <span class="badge bg-danger text-white px-2 py-1">Terlambat {{ $pengembalian->keterlambatan }} hari</span>
+                                @else
+                                    <span class="badge bg-success text-white px-2 py-1">Tepat Waktu</span>
+                                @endif
                             </td>
-                            <td class="text-end fw-bold text-danger">{{ $pengembalian->denda_formatted }}</td>
+                            <td class="text-end fw-bold text-danger">
+                                Rp {{ number_format($pengembalian->denda, 0, ',', '.') }}
+                            </td>
                             <td class="text-center">
                                 <div class="d-flex justify-content-center align-items-center" style="gap: 15px;">
                                     <a href="{{ route('pengembalians.edit', $pengembalian->id) }}" 
