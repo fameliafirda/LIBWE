@@ -28,19 +28,19 @@ class PengembalianController extends Controller
     }
 
     /**
-     * FUNGSI PUSAT HITUNG DENDA (SINKRON 100% DENGAN VIEW PEMINJAMAN BLADE)
-     * Menggunakan array manual dan logika filter yang persis sama dengan tampilan depan
+     * FUNGSI PUSAT HITUNG DENDA (SINKRONISASI TOTAL 100% DENGAN PINJAMAN BLADE)
+     * Menggunakan isi array yang sama persis dan logika pemotongan tunggal agar hari tidak selisih
      */
     private function hitungDendaBersih($tanggalPinjam, $tanggalPengembalian)
     {
-        $tglPinjam = Carbon::parse($tanggalPinjam)->startOfDay();
+        $tglPinjam = Carbon::parse($tanggalPinjam)->timezone('Asia/Jakarta')->startOfDay();
         $jatuhTempo = $tglPinjam->copy()->addDays(7)->startOfDay();
-        $hariIniAtauKembali = Carbon::parse($tanggalPengembalian)->startOfDay();
+        $hariIniAtauKembali = Carbon::parse($tanggalPengembalian)->timezone('Asia/Jakarta')->startOfDay();
 
         $terlambat = 0;
 
         if ($hariIniAtauKembali->gt($jatuhTempo)) {
-            // MENIRU ARRAY MANUAL DARI PINJAMAN INDEX BLADE
+            // MENYALIN PERSIS DAFTAR ARRAY DARI PINJAMAN INDEX BLADE KAMU
             $daftarTanggalMerah = [
                 '2026-01-01', '2026-01-23', '2026-01-24', '2026-02-15', 
                 '2026-03-19', '2026-03-20', '2026-03-21', '2026-04-03', 
@@ -86,7 +86,7 @@ class PengembalianController extends Controller
                 return redirect()->back()->with('error', 'Pengembalian untuk peminjaman ini sudah dicatat.');
             }
 
-            // Hitung menggunakan rumus tiruan peminjaman blade
+            // Hitung menggunakan rumus kloningan peminjaman blade
             $hasilHitung = $this->hitungDendaBersih($pinjaman->tanggal_pinjam, $validated['tanggal_pengembalian']);
             $tanggalPengembalianStr = Carbon::parse($validated['tanggal_pengembalian'])->toDateString();
 
